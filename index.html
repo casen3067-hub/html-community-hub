@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTML Community Hub</title>
+  <title>GameVault - Community Game Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -11,165 +12,203 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --accent: #ec4899;
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-light: #1a1f35;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --border: #334155;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+      color: var(--text-primary);
       min-height: 100vh;
-      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
+      padding: 40px 20px;
     }
 
-    h1 {
-      color: white;
+    /* HEADER */
+    header {
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 2.5em;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.6s ease-out;
     }
 
+    .logo {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5em;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 1.1em;
+      font-weight: 400;
+    }
+
+    /* UPLOAD SECTION */
     .upload-section {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      margin-bottom: 40px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 50px;
+      border-radius: 20px;
+      margin-bottom: 60px;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
     .upload-section h2 {
-      margin-bottom: 20px;
-      color: #333;
+      font-family: 'Outfit', sans-serif;
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: var(--text-primary);
     }
 
     form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    form input[type="file"],
+    form input[type="text"],
+    form textarea {
+      grid-column: 1 / -1;
+    }
+
+    .input-group {
+      position: relative;
     }
 
     input, textarea {
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 1em;
-      font-family: inherit;
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95em;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
     }
 
     textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 100px;
     }
 
-    button {
-      padding: 12px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1em;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #764ba2;
-    }
-
-    .files-section {
-      margin-top: 40px;
-    }
-
-    .files-section h2 {
-      color: white;
-      margin-bottom: 20px;
-    }
-
-    .files-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .file-card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
-
-    .file-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .file-card h3 {
-      color: #667eea;
-      margin-bottom: 10px;
-    }
-
-    .file-card p {
-      color: #666;
-      margin-bottom: 10px;
-      font-size: 0.9em;
-    }
-
-    .meta {
-      color: #999;
-      font-size: 0.85em !important;
-    }
-
-    .actions {
+    .icon-preview {
+      grid-column: 1 / -1;
       display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
     }
 
-    .actions button {
+    .icon-display {
+      width: 100px;
+      height: 100px;
+      background: var(--bg-light);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      overflow: hidden;
+    }
+
+    .icon-display img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .icon-info {
       flex: 1;
-      padding: 10px;
-      text-align: center;
-      background: #f0f0f0;
-      color: #667eea;
+    }
+
+    .icon-info p {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+
+    button[type="submit"] {
+      grid-column: 1 / -1;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
       border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: 0.3s;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05em;
+      font-weight: 600;
       cursor: pointer;
-      min-width: 80px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     }
 
-    .actions button:hover {
-      background: #667eea;
-      color: white;
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
     }
 
-    .actions a {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      background: #f0f0f0;
-      color: #667eea;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: 0.3s;
-      cursor: pointer;
+    button[type="submit"]:active {
+      transform: translateY(0);
     }
 
-    .actions a:hover {
-      background: #667eea;
-      color: white;
-    }
-
+    /* MESSAGE */
     .message {
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
+      grid-column: 1 / -1;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 10px;
       display: none;
+      animation: slideIn 0.3s ease;
     }
 
     .message.show {
@@ -177,16 +216,151 @@
     }
 
     .message.error {
-      background: #ff6b6b;
-      color: white;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--error);
+      color: #fca5a5;
     }
 
     .message.success {
-      background: #51cf66;
-      color: white;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--success);
+      color: #86efac;
     }
 
-    /* MODAL STYLES */
+    /* FILES SECTION */
+    .files-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 40px;
+      color: var(--text-primary);
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+
+    .file-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .file-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 20px 50px rgba(99, 102, 241, 0.2);
+    }
+
+    .card-icon {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .file-card p {
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-size: 0.9em;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .meta {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-bottom: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .actions button,
+    .actions a {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .actions button:hover,
+    .actions a:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .empty-state-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 1.1em;
+    }
+
+    /* MODAL */
     .modal {
       display: none;
       position: fixed;
@@ -195,7 +369,9 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease;
     }
 
     .modal.show {
@@ -205,49 +381,53 @@
     }
 
     .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
+      background-color: var(--bg-card);
+      padding: 30px;
+      border-radius: 20px;
       width: 90%;
       max-width: 1000px;
       height: 90vh;
       max-height: 800px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
     }
 
     .modal-header h2 {
-      color: #667eea;
+      font-family: 'Outfit', sans-serif;
+      color: var(--primary-light);
       margin: 0;
+      font-size: 1.5em;
     }
 
     .close-btn {
-      background: #ff6b6b;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+      border: 1px solid var(--error);
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
       font-size: 24px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: 0.3s;
+      transition: all 0.3s ease;
     }
 
     .close-btn:hover {
-      background: #ff5252;
+      background: var(--error);
+      color: white;
     }
 
     .modal-body {
@@ -259,47 +439,151 @@
       width: 100%;
       height: 100%;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: slideX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .logo {
+        font-size: 2.5em;
+      }
+
+      .upload-section {
+        padding: 30px;
+      }
+
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      .files-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .modal-content {
+        width: 95%;
+        height: 95vh;
+        padding: 20px;
+      }
+
+      .card-icon {
+        height: 120px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎨 HTML Community Hub</h1>
+    <header>
+      <div class="logo">🎮 GameVault</div>
+      <p class="tagline">Share and play HTML games with the community</p>
+    </header>
 
     <div class="upload-section">
-      <h2>📤 Upload Your HTML</h2>
-      <div id="message" class="message"></div>
+      <h2>Create & Upload</h2>
       <form id="uploadForm">
-        <input 
-          type="text" 
-          id="name" 
-          placeholder="Project Name" 
-          required
-        >
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="name" 
+            placeholder="Game Name" 
+            required
+          >
+        </div>
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="uploader" 
+            placeholder="Your Name (optional)"
+          >
+        </div>
         <textarea 
           id="description" 
-          placeholder="Description of your HTML project or game"
+          placeholder="Describe your game..."
         ></textarea>
-        <input 
-          type="text" 
-          id="uploader" 
-          placeholder="Your Name (optional)"
-        >
+        
+        <div class="icon-preview">
+          <div class="icon-display" id="iconDisplay">🎮</div>
+          <div class="icon-info">
+            <p><strong>Game Icon (optional)</strong></p>
+            <p>Upload a square image (PNG/JPG) for your game thumbnail. If you don't upload an icon, a default emoji will be used.</p>
+            <input 
+              type="file" 
+              id="icon" 
+              accept=".jpg,.jpeg,.png"
+              style="margin-top: 10px;"
+            >
+          </div>
+        </div>
+
         <input 
           type="file" 
           id="file" 
           accept=".html" 
+          placeholder="Select your HTML file"
           required
         >
-        <button type="submit">📤 Upload HTML</button>
+
+        <div id="message" class="message"></div>
+        <button type="submit">🚀 Upload Game</button>
       </form>
     </div>
 
     <div class="files-section">
-      <h2>📁 Community Projects</h2>
+      <h2>Community Games</h2>
       <div class="files-grid" id="filesList">
-        <p style="color: white;">Loading files...</p>
+        <div class="empty-state">
+          <div class="empty-state-icon">🎮</div>
+          <p>No games uploaded yet. Be the first to share!</p>
+        </div>
       </div>
     </div>
   </div>
@@ -318,11 +602,27 @@
   </div>
 
   <script>
+    let iconData = null;
+
     // Load all files when page opens
     loadFiles();
 
     // Handle form submission
     document.getElementById('uploadForm').addEventListener('submit', uploadFile);
+
+    // Handle icon preview
+    document.getElementById('icon').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          iconData = event.target.result;
+          const display = document.getElementById('iconDisplay');
+          display.innerHTML = `<img src="${iconData}" alt="Icon preview">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
     // Close modal when clicking outside
     document.getElementById('gameModal').addEventListener('click', function(e) {
@@ -339,24 +639,42 @@
         const filesList = document.getElementById('filesList');
         
         if (files.length === 0) {
-          filesList.innerHTML = '<p style="color: white;">No files uploaded yet. Be the first!</p>';
+          filesList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🎮</div>
+              <p>No games uploaded yet. Be the first to share!</p>
+            </div>
+          `;
           return;
         }
 
         filesList.innerHTML = files.map(file => `
           <div class="file-card">
-            <h3>${file.name}</h3>
-            <p>${file.description}</p>
-            <p class="meta">by ${file.uploader || 'Anonymous'} • ${file.downloads} downloads</p>
-            <div class="actions">
-              <button onclick="playGame(${file.id}, '${file.name}')">🎮 Play</button>
-              <a href="/api/download/${file.id}">⬇️ Download</a>
+            <div class="card-icon">
+              ${file.icon ? `<img src="data:image/jpeg;base64,${file.icon}" alt="${file.name}">` : '🎮'}
+            </div>
+            <div class="card-content">
+              <h3>${file.name}</h3>
+              <p>${file.description}</p>
+              <div class="meta">
+                <div>by ${file.uploader || 'Anonymous'}</div>
+                <div>⬇️ ${file.downloads} plays</div>
+              </div>
+              <div class="actions">
+                <button onclick="playGame(${file.id}, '${file.name}')">🎮 Play Now</button>
+                <a href="/api/download/${file.id}">📥 Download</a>
+              </div>
             </div>
           </div>
         `).join('');
       } catch (err) {
         console.error('Error loading files:', err);
-        document.getElementById('filesList').innerHTML = '<p style="color: white;">Error loading files</p>';
+        document.getElementById('filesList').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">❌</div>
+            <p>Error loading games. Please refresh.</p>
+          </div>
+        `;
       }
     }
 
@@ -365,7 +683,7 @@
       const gameFrame = document.getElementById('gameFrame');
       const gameTitle = document.getElementById('gameTitle');
       
-      gameTitle.textContent = `Playing: ${fileName}`;
+      gameTitle.textContent = `🎮 ${fileName}`;
       gameFrame.src = `/api/view/${fileId}`;
       
       modal.classList.add('show');
@@ -387,6 +705,10 @@
       formData.append('description', document.getElementById('description').value);
       formData.append('uploader', document.getElementById('uploader').value);
       formData.append('file', document.getElementById('file').files[0]);
+      
+      if (iconData) {
+        formData.append('icon', iconData);
+      }
 
       try {
         const response = await fetch('/api/upload', {
@@ -398,13 +720,15 @@
 
         if (response.ok) {
           messageDiv.className = 'message show success';
-          messageDiv.textContent = '✅ File uploaded successfully!';
+          messageDiv.textContent = '✅ Game uploaded successfully!';
           document.getElementById('uploadForm').reset();
+          document.getElementById('iconDisplay').innerHTML = '🎮';
+          iconData = null;
           
           setTimeout(() => {
             loadFiles();
             messageDiv.className = 'message';
-          }, 1000);
+          }, 1500);
         } else {
           messageDiv.className = 'message show error';
           messageDiv.textContent = '❌ Upload failed. Try again!';
