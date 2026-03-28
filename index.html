@@ -700,14 +700,31 @@
     async function uploadFile(e) {
       e.preventDefault();
 
+      const htmlFile = document.getElementById('file').files[0];
+      const gameName = document.getElementById('name').value;
+      
+      if (!htmlFile) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'message show error';
+        messageDiv.textContent = '❌ Please select an HTML file!';
+        return;
+      }
+
+      if (!gameName) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'message show error';
+        messageDiv.textContent = '❌ Please enter a game name!';
+        return;
+      }
+
       const formData = new FormData();
-      formData.append('name', document.getElementById('name').value);
+      formData.append('name', gameName);
       formData.append('description', document.getElementById('description').value);
       formData.append('uploader', document.getElementById('uploader').value);
-      formData.append('file', document.getElementById('file').files[0]);
+      formData.append('file', htmlFile);
       
       if (iconData) {
-        formData.append('icon', iconData);
+        formData.append('iconData', iconData);
       }
 
       try {
@@ -717,6 +734,7 @@
         });
 
         const messageDiv = document.getElementById('message');
+        const result = await response.json();
 
         if (response.ok) {
           messageDiv.className = 'message show success';
@@ -731,12 +749,13 @@
           }, 1500);
         } else {
           messageDiv.className = 'message show error';
-          messageDiv.textContent = '❌ Upload failed. Try again!';
+          messageDiv.textContent = '❌ ' + (result.error || 'Upload failed. Try again!');
         }
       } catch (err) {
         const messageDiv = document.getElementById('message');
         messageDiv.className = 'message show error';
         messageDiv.textContent = '❌ Error: ' + err.message;
+        console.error('Upload error:', err);
       }
     }
   </script>
