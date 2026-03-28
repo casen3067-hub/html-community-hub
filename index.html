@@ -20,6 +20,7 @@
       --text-primary: #f1f5f9;
       --text-secondary: #cbd5e1;
       --border: #334155;
+      --neon: #00ff88;
     }
 
     body {
@@ -58,7 +59,6 @@
       border-bottom: 1px solid var(--border);
       color: var(--text-secondary);
       font-size: 0.85em;
-      animation: fadeInDown 0.6s ease-out;
     }
 
     .attribution strong {
@@ -71,7 +71,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 40px;
-      animation: fadeInDown 0.6s ease-out;
       flex-wrap: wrap;
       gap: 20px;
     }
@@ -148,12 +147,20 @@
       box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
     }
 
+    /* MAIN & SETTINGS VIEWS */
+    .main-view, .settings-view {
+      display: none;
+    }
+
+    .main-view.active, .settings-view.active {
+      display: block;
+    }
+
     /* CATEGORIES */
     .categories {
       display: flex;
       gap: 10px;
       margin-bottom: 30px;
-      animation: fadeInUp 0.6s ease-out 0.05s both;
       overflow-x: auto;
       padding-bottom: 10px;
     }
@@ -182,267 +189,128 @@
       border-color: transparent;
     }
 
-    /* LOADING SCREEN */
-    .loading-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(10, 14, 39, 0.95);
-      backdrop-filter: blur(5px);
-      z-index: 2500;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s ease;
+    /* SETTINGS GRID */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      animation: fadeInUp 0.6s ease-out;
     }
 
-    .loading-screen.show {
-      display: flex;
+    .settings-panel {
+      border: 2px solid var(--neon);
+      background: rgba(0, 255, 136, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
     }
 
-    .loading-content {
-      text-align: center;
-      color: white;
+    .settings-panel:hover {
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      transform: translateY(-2px);
     }
 
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(99, 102, 241, 0.2);
-      border-top: 4px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      font-size: 1.2em;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    /* MODALS */
-    .upload-modal, .settings-modal, .game-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .upload-modal.show, .settings-modal.show, .game-modal.show {
-      display: flex;
-    }
-
-    .modal-content, .upload-content, .settings-content {
-      background: var(--bg-card);
-      padding: 30px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .upload-content, .settings-content {
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-header h2 {
+    .settings-panel h3 {
       font-family: 'Outfit', sans-serif;
-      color: var(--primary);
-      margin: 0;
-      font-size: 1.5em;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: var(--neon);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .close-btn {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-      border-radius: 10px;
-      width: 45px;
-      height: 45px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
+    .settings-panel p {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      margin-bottom: 15px;
+      line-height: 1.5;
     }
 
-    .close-btn:hover {
-      background: #ef4444;
-      color: white;
-    }
-
-    /* GAME MODAL */
-    .game-modal .modal-content {
-      width: 95%;
-      height: 95vh;
-      padding: 0;
+    .settings-content {
       display: flex;
       flex-direction: column;
+      gap: 10px;
     }
 
-    .game-modal .modal-header {
-      padding: 20px 30px;
-      margin: 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-body {
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* FULLSCREEN STATE */
-    .game-modal.fullscreen {
-      background: #000;
-    }
-
-    .game-modal.fullscreen .modal-content {
-      width: 100%;
-      height: 100%;
-      border-radius: 0;
-      border: none;
-    }
-
-    .game-modal.fullscreen .modal-header {
-      background: rgba(10, 14, 39, 0.95);
-      padding: 15px 20px;
-    }
-
-    .fullscreen-btn {
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      border-radius: 10px;
-      width: 45px;
-      height: 45px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      padding: 0;
-    }
-
-    .fullscreen-btn:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* UPLOAD & SETTINGS FORMS */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    input, textarea, select {
-      padding: 12px 16px;
+    .settings-input, .settings-select {
+      padding: 10px 15px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       color: var(--text-primary);
       font-family: 'Poppins', sans-serif;
       transition: all 0.3s ease;
     }
 
-    input:focus, textarea:focus, select:focus {
+    .settings-input:focus, .settings-select:focus {
       outline: none;
-      border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--neon);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    button[type="submit"] {
-      padding: 14px 28px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1em;
-      font-weight: 600;
+    .settings-button {
+      padding: 10px 20px;
+      background: rgba(0, 255, 136, 0.15);
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
       transition: all 0.3s ease;
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     }
 
-    button[type="submit"]:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+    .settings-button:hover {
+      background: var(--neon);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
     }
 
-    button[type="submit"]:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    .settings-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
     }
 
-    .message {
-      padding: 12px 16px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      display: none;
-      animation: slideIn 0.3s ease;
+    .settings-buttons button {
+      flex: 1;
+      padding: 8px 15px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85em;
+      transition: all 0.3s ease;
     }
 
-    .message.show {
-      display: block;
+    .settings-buttons button:hover {
+      background: var(--neon);
+      color: #000;
     }
 
-    .message.error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid #ef4444;
-      color: #fca5a5;
+    .back-button {
+      margin-bottom: 20px;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
     }
 
-    .message.success {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid #10b981;
-      color: #86efac;
+    .back-button:hover {
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
     /* GAMES GRID */
     .games-header {
       margin-bottom: 30px;
-      animation: fadeInUp 0.6s ease-out 0.1s both;
     }
 
     .games-header h2 {
@@ -456,7 +324,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
-      animation: fadeInUp 0.6s ease-out 0.2s both;
     }
 
     .game-card {
@@ -545,7 +412,6 @@
       text-align: center;
       padding: 80px 20px;
       color: var(--text-secondary);
-      animation: fadeIn 0.6s ease-out;
     }
 
     .empty-state-icon {
@@ -554,19 +420,313 @@
       opacity: 0.5;
     }
 
-    .empty-state p {
+    /* MODALS */
+    .upload-modal, .game-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-modal.show, .game-modal.show {
+      display: flex;
+    }
+
+    .upload-content {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(26, 31, 58, 0.8) 100%);
+      padding: 40px;
+      border-radius: 25px;
+      border: 2px solid var(--primary);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.3), 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .modal-header-content h2 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-primary);
+      margin: 0;
+      font-size: 1.8em;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .modal-header-content p {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* GAME MODAL */
+    .game-modal .modal-content {
+      width: 95%;
+      height: 95vh;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    .game-modal .modal-header {
+      padding: 20px 30px;
+      margin: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .fullscreen-btn {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .fullscreen-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* FORMS */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    form > div {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+
+    .form-group-hint {
+      color: var(--text-secondary);
+      font-size: 0.8em;
+    }
+
+    input, textarea, select {
+      padding: 13px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      font-size: 0.95em;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(203, 213, 225, 0.5);
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    select option {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 10px;
+    }
+
+    select option:checked {
+      background: var(--primary);
+      color: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      display: none;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .file-input-label:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .file-name {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-top: 5px;
+    }
+
+    button[type="submit"] {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .submit-btn {
+      padding: 16px 28px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .btn-emoji {
       font-size: 1.2em;
     }
 
-    /* ANIMATIONS */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .message {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: none;
     }
 
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .message.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #86efac;
     }
 
     @keyframes fadeInUp {
@@ -574,12 +734,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    /* RESPONSIVE */
     @media (max-width: 768px) {
       .container {
         padding: 20px 15px;
@@ -603,8 +757,17 @@
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       }
 
-      .logo {
-        font-size: 1.8em;
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .upload-content {
+        padding: 25px;
+        max-width: 95%;
       }
     }
   </style>
@@ -629,33 +792,37 @@
         >
         <div class="header-buttons">
           <button class="upload-toggle" onclick="openUploadModal()">+</button>
-          <button class="settings-toggle" onclick="openSettingsModal()">⚙️</button>
+          <button class="settings-toggle" onclick="openSettingsView()">⚙️</button>
         </div>
       </div>
     </header>
 
-    <!-- CATEGORIES -->
-    <div class="categories" id="categoriesContainer">
-      <button class="category-btn active" onclick="filterCategory('all')">All Games</button>
-    </div>
+    <!-- MAIN VIEW -->
+    <div class="main-view active">
+      <div class="categories" id="categoriesContainer">
+        <button class="category-btn active" onclick="filterCategory('all')">All Games</button>
+      </div>
 
-    <div class="games-header">
-      <h2>games</h2>
-    </div>
+      <div class="games-header">
+        <h2>games</h2>
+      </div>
 
-    <div class="games-grid" id="gamesGrid">
-      <div class="empty-state">
-        <div class="empty-state-icon">🎮</div>
-        <p>No games uploaded yet. Be the first to share!</p>
+      <div class="games-grid" id="gamesGrid">
+        <div class="empty-state">
+          <div class="empty-state-icon">🎮</div>
+          <p>No games uploaded yet. Be the first to share!</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- LOADING SCREEN -->
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <div class="loading-text" id="loadingText">Loading...</div>
+    <!-- SETTINGS VIEW -->
+    <div class="settings-view">
+      <button class="back-button" onclick="closeSettingsView()">← Back to Games</button>
+      <div class="settings-grid" id="settingsGrid">
+        <div style="grid-column: 1 / -1; color: var(--text-secondary); text-align: center;">
+          No game-specific settings available
+        </div>
+      </div>
     </div>
   </div>
 
@@ -663,72 +830,110 @@
   <div class="upload-modal" id="uploadModal">
     <div class="upload-content">
       <div class="modal-header">
-        <h2>Create & Upload</h2>
+        <div class="modal-header-content">
+          <h2>🚀 Share Your Game</h2>
+          <p>Upload a game to the community vault</p>
+        </div>
         <button class="close-btn" onclick="closeUploadModal()">&times;</button>
       </div>
       <form id="uploadForm">
-        <input 
-          type="text" 
-          id="name" 
-          placeholder="Game Name" 
-          required
-        >
-        <input 
-          type="text" 
-          id="uploader" 
-          placeholder="Your Name (optional)"
-        >
-        <textarea 
-          id="description" 
-          placeholder="Describe your game..."
-        ></textarea>
+        <!-- GAME NAME & CREATOR -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Game Name *</label>
+            <input 
+              type="text" 
+              id="name" 
+              placeholder="e.g., Space Runner, Puzzle Master..." 
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label>Your Name</label>
+            <input 
+              type="text" 
+              id="uploader" 
+              placeholder="Optional - appears as creator"
+            >
+          </div>
+        </div>
 
-        <select id="category" required>
-          <option value="">Select Category</option>
-          <option value="action">Action</option>
-          <option value="puzzle">Puzzle</option>
-          <option value="adventure">Adventure</option>
-          <option value="strategy">Strategy</option>
-          <option value="sports">Sports</option>
-          <option value="casual">Casual</option>
-          <option value="other">Other</option>
-        </select>
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label>Description</label>
+          <textarea 
+            id="description" 
+            placeholder="What's your game about? What should players expect?"
+          ></textarea>
+        </div>
 
-        <input 
-          type="file" 
-          id="icon" 
-          accept=".jpg,.jpeg,.png"
-        >
+        <!-- CATEGORY -->
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="category" required>
+            <option value="">Choose a category...</option>
+            <option value="action">🎯 Action</option>
+            <option value="puzzle">🧩 Puzzle</option>
+            <option value="adventure">🗺️ Adventure</option>
+            <option value="strategy">♟️ Strategy</option>
+            <option value="sports">⚽ Sports</option>
+            <option value="casual">🎮 Casual</option>
+            <option value="other">✨ Other</option>
+          </select>
+        </div>
 
-        <input 
-          type="file" 
-          id="file" 
-          accept=".html" 
-          required
-        >
+        <!-- CUSTOM SETTINGS -->
+        <div class="form-group">
+          <label>Settings/Options</label>
+          <textarea 
+            id="customSettings" 
+            placeholder="Any special settings? (e.g., Difficulty: Easy/Hard, Volume Control, etc.) - optional"
+          ></textarea>
+          <span class="form-group-hint">Players will see these when playing your game</span>
+        </div>
+
+        <!-- GAME ICON -->
+        <div class="form-group">
+          <label>Game Icon (Thumbnail)</label>
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              id="icon" 
+              accept=".jpg,.jpeg,.png"
+              onchange="updateFileName('icon', 'iconLabel')"
+            >
+            <label for="icon" class="file-input-label" id="iconLabel">
+              🖼️ Choose an icon image (JPG/PNG)
+            </label>
+            <div class="file-name" id="iconName"></div>
+          </div>
+        </div>
+
+        <!-- GAME FILE -->
+        <div class="form-group">
+          <label>Game File * <span style="color: #ef4444;">(Required)</span></label>
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              id="file" 
+              accept=".html"
+              onchange="updateFileName('file', 'fileLabel')"
+              required
+            >
+            <label for="file" class="file-input-label" id="fileLabel">
+              📁 Choose your HTML game file
+            </label>
+            <div class="file-name" id="fileName"></div>
+          </div>
+          <span class="form-group-hint">Upload your .html game file (max 100MB)</span>
+        </div>
 
         <div id="message" class="message"></div>
-        <button type="submit">🚀 Upload Game</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- SETTINGS MODAL -->
-  <div class="settings-modal" id="settingsModal">
-    <div class="settings-content">
-      <div class="modal-header">
-        <h2>Settings</h2>
-        <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
-      </div>
-      <form id="settingsForm">
-        <label style="color: var(--text-secondary); font-size: 0.9em;">Loading Screen Text</label>
-        <input 
-          type="text" 
-          id="loadingTextInput" 
-          placeholder="Enter loading text..."
-          value="Loading..."
-        >
-        <button type="submit">💾 Save Settings</button>
+        
+        <button type="submit" class="submit-btn">
+          <span class="btn-emoji">🚀</span>
+          <span class="btn-text">Upload Game</span>
+        </button>
       </form>
     </div>
   </div>
@@ -753,15 +958,12 @@
     let iconData = null;
     let allGames = [];
     let currentCategory = 'all';
-    let loadingText = 'Loading...';
 
-    // Load games and settings on startup
+    // Load games on startup
     loadGames();
-    loadSettings();
 
     // Event listeners
     document.getElementById('uploadForm').addEventListener('submit', uploadFile);
-    document.getElementById('settingsForm').addEventListener('submit', saveSettings);
     document.getElementById('searchInput').addEventListener('input', function(e) {
       filterGames(e.target.value);
     });
@@ -781,9 +983,6 @@
     document.getElementById('uploadModal').addEventListener('click', function(e) {
       if (e.target === this) closeUploadModal();
     });
-    document.getElementById('settingsModal').addEventListener('click', function(e) {
-      if (e.target === this) closeSettingsModal();
-    });
     document.getElementById('gameModal').addEventListener('click', function(e) {
       if (e.target === this) closeGame();
     });
@@ -792,8 +991,8 @@
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         const gameModal = document.getElementById('gameModal');
-        if (gameModal.classList.contains('fullscreen')) {
-          toggleFullscreen();
+        if (gameModal.classList.contains('show')) {
+          closeGame();
         }
       }
     });
@@ -818,26 +1017,21 @@
 
       const container = document.getElementById('categoriesContainer');
       container.innerHTML = Array.from(categories).map(cat => `
-        <button class="category-btn ${cat === 'all' ? 'active' : ''}" onclick="filterCategory('${cat}')">
+        <button class="category-btn ${cat === 'all' ? 'active' : ''}" onclick="filterCategory(event, '${cat}')">
           ${cat.charAt(0).toUpperCase() + cat.slice(1)}
         </button>
       `).join('');
     }
 
-    function filterCategory(cat) {
+    function filterCategory(e, cat) {
       currentCategory = cat;
-      showLoadingScreen();
-      
-      setTimeout(() => {
-        document.querySelectorAll('.category-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      e.target.classList.add('active');
 
-        const filtered = cat === 'all' ? allGames : allGames.filter(g => g.category === cat);
-        renderGames(filtered);
-        hideLoadingScreen();
-      }, 500);
+      const filtered = cat === 'all' ? allGames : allGames.filter(g => g.category === cat);
+      renderGames(filtered);
     }
 
     function renderGames(games) {
@@ -864,6 +1058,7 @@
             <div class="game-actions">
               <button class="game-btn" onclick="playGame(${game.id}, '${game.name}')">🎮 Play</button>
               <button class="game-btn" onclick="downloadGame(${game.id})">📥</button>
+              ${game.customSettings ? `<button class="game-btn" onclick="showGameSettings(${game.id})">⚙️</button>` : ''}
             </div>
           </div>
         </div>
@@ -879,23 +1074,32 @@
     }
 
     function playGame(fileId, fileName) {
-      showLoadingScreen();
+      const modal = document.getElementById('gameModal');
+      const gameFrame = document.getElementById('gameFrame');
+      const gameTitle = document.getElementById('gameTitle');
       
-      setTimeout(() => {
-        const modal = document.getElementById('gameModal');
-        const gameFrame = document.getElementById('gameFrame');
-        const gameTitle = document.getElementById('gameTitle');
-        
-        gameTitle.textContent = `🎮 ${fileName}`;
-        gameFrame.src = `/api/view/${fileId}`;
-        
-        modal.classList.add('show');
-        hideLoadingScreen();
-      }, 500);
+      gameTitle.textContent = `🎮 ${fileName}`;
+      gameFrame.src = `/api/view/${fileId}`;
+      
+      modal.classList.add('show');
     }
 
     function downloadGame(fileId) {
       window.location.href = `/api/download/${fileId}`;
+    }
+
+    function showGameSettings(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (game && game.customSettings) {
+        openSettingsView();
+        const grid = document.getElementById('settingsGrid');
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1;">
+            <h2 style="color: white; margin-bottom: 20px;">${game.name} Settings</h2>
+            <p style="color: var(--text-secondary); white-space: pre-wrap;">${game.customSettings}</p>
+          </div>
+        `;
+      }
     }
 
     function closeGame() {
@@ -903,17 +1107,23 @@
       const gameFrame = document.getElementById('gameFrame');
       
       modal.classList.remove('show');
-      modal.classList.remove('fullscreen');
       gameFrame.src = '';
     }
 
     function toggleFullscreen() {
       const modal = document.getElementById('gameModal');
+      const content = modal.querySelector('.modal-content');
       
-      if (modal.classList.contains('fullscreen')) {
-        modal.classList.remove('fullscreen');
+      if (content.style.width === '100%') {
+        content.style.width = '95%';
+        content.style.height = '95vh';
+        content.style.borderRadius = '20px';
+        modal.style.background = 'rgba(0, 0, 0, 0.8)';
       } else {
-        modal.classList.add('fullscreen');
+        content.style.width = '100%';
+        content.style.height = '100%';
+        content.style.borderRadius = '0';
+        modal.style.background = '#000';
       }
     }
 
@@ -925,49 +1135,14 @@
       document.getElementById('uploadModal').classList.remove('show');
     }
 
-    function openSettingsModal() {
-      document.getElementById('settingsModal').classList.add('show');
+    function openSettingsView() {
+      document.querySelector('.main-view').classList.remove('active');
+      document.querySelector('.settings-view').classList.add('active');
     }
 
-    function closeSettingsModal() {
-      document.getElementById('settingsModal').classList.remove('show');
-    }
-
-    function showLoadingScreen() {
-      const screen = document.getElementById('loadingScreen');
-      document.getElementById('loadingText').textContent = loadingText;
-      screen.classList.add('show');
-    }
-
-    function hideLoadingScreen() {
-      document.getElementById('loadingScreen').classList.remove('show');
-    }
-
-    function loadSettings() {
-      const saved = localStorage.getItem('gameVaultSettings');
-      if (saved) {
-        const settings = JSON.parse(saved);
-        loadingText = settings.loadingText || 'Loading...';
-        document.getElementById('loadingTextInput').value = loadingText;
-      }
-    }
-
-    async function saveSettings(e) {
-      e.preventDefault();
-      
-      loadingText = document.getElementById('loadingTextInput').value || 'Loading...';
-      const settings = { loadingText };
-      
-      localStorage.setItem('gameVaultSettings', JSON.stringify(settings));
-      
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'message show success';
-      messageDiv.textContent = '✅ Settings saved!';
-      document.getElementById('settingsForm').prepend(messageDiv);
-      
-      setTimeout(() => {
-        messageDiv.remove();
-      }, 3000);
+    function closeSettingsView() {
+      document.querySelector('.settings-view').classList.remove('active');
+      document.querySelector('.main-view').classList.add('active');
     }
 
     async function uploadFile(e) {
@@ -992,6 +1167,7 @@
       formData.append('description', document.getElementById('description').value);
       formData.append('uploader', document.getElementById('uploader').value);
       formData.append('category', document.getElementById('category').value);
+      formData.append('customSettings', document.getElementById('customSettings').value);
       formData.append('file', htmlFile);
       
       if (iconData) {
@@ -1027,6 +1203,18 @@
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         showMessage('❌ Error: ' + err.message, 'error');
+      }
+    }
+
+    function updateFileName(inputId, labelId) {
+      const input = document.getElementById(inputId);
+      const nameDisplay = document.getElementById(inputId + 'Name');
+      
+      if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+        const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
+        nameDisplay.textContent = `✓ ${fileName} (${fileSize}MB)`;
+        nameDisplay.style.color = 'var(--text-secondary)';
       }
     }
 
