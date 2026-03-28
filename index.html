@@ -498,7 +498,62 @@
       color: white;
     }
 
-    .modal-body {
+    .fullscreen-btn {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .fullscreen-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Fullscreen state */
+    .game-modal.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+      background: #000;
+    }
+
+    .game-modal.fullscreen .modal-content {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .game-modal.fullscreen .modal-header {
+      background: rgba(10, 14, 39, 0.95);
+      border-bottom: 1px solid var(--border);
+      margin: 0;
+      padding: 15px 20px;
+    }
+
+    .game-modal.fullscreen .modal-body {
+      margin: 0;
+    }
+
+    .game-modal.fullscreen .modal-body iframe {
+      border-radius: 0;
+    }
       flex: 1;
       overflow: hidden;
     }
@@ -675,10 +730,13 @@
 
   <!-- GAME PLAYER MODAL -->
   <div class="game-modal" id="gameModal">
-    <div class="modal-content">
+    <div class="modal-content" id="modalContent">
       <div class="modal-header">
         <h2 id="gameTitle">Playing Game</h2>
-        <button class="close-btn" onclick="closeGame()">&times;</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+          <button class="close-btn" onclick="closeGame()">&times;</button>
+        </div>
       </div>
       <div class="modal-body">
         <iframe id="gameFrame" src="" title="Game Player"></iframe>
@@ -797,10 +855,36 @@
       const gameFrame = document.getElementById('gameFrame');
       
       modal.classList.remove('show');
+      modal.classList.remove('fullscreen');
       gameFrame.src = '';
     }
 
-    async function uploadFile(e) {
+    function toggleFullscreen() {
+      const modal = document.getElementById('gameModal');
+      const fullscreenBtn = document.querySelector('.fullscreen-btn');
+      
+      if (modal.classList.contains('fullscreen')) {
+        // Exit fullscreen
+        modal.classList.remove('fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.title = 'Fullscreen';
+      } else {
+        // Enter fullscreen
+        modal.classList.add('fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.title = 'Exit Fullscreen';
+      }
+    }
+
+    // Handle ESC key to exit fullscreen
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('gameModal');
+        if (modal.classList.contains('fullscreen')) {
+          toggleFullscreen();
+        }
+      }
+    });
       e.preventDefault();
 
       const htmlFile = document.getElementById('file').files[0];
