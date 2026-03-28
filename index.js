@@ -35,22 +35,30 @@ app.get('/', (req, res) => {
 // UPLOAD: When someone uploads a file
 app.post('/api/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
+    return res.status(400).json({ error: 'No HTML file uploaded' });
   }
 
-  // Convert icon to base64 if provided
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'Game name is required' });
+  }
+
+  // Get icon from request body
   let iconBase64 = null;
-  if (req.body.icon && req.body.icon.startsWith('data:')) {
-    // Extract base64 from data URI
-    iconBase64 = req.body.icon.split(',')[1];
+  if (req.body.iconData) {
+    // If it's a data URI, extract the base64 part
+    if (req.body.iconData.includes(',')) {
+      iconBase64 = req.body.iconData.split(',')[1];
+    } else {
+      iconBase64 = req.body.iconData;
+    }
   }
 
   // Save file info
   const newFile = {
     id: nextId,
-    name: req.body.name,
-    description: req.body.description,
-    uploader: req.body.uploader,
+    name: req.body.name || 'Unnamed Game',
+    description: req.body.description || 'No description',
+    uploader: req.body.uploader || 'Anonymous',
     filename: req.file.filename,
     icon: iconBase64,
     uploadDate: new Date().toLocaleDateString(),
