@@ -15,17 +15,48 @@ app.use(express.static(__dirname));
 // Serve uploaded HTML files as static files
 app.use('/uploads', express.static('uploads'));
 
-// Create uploads folder if it doesn't exist
+// Create necessary folders
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
+// DATABASE FILE PATH
+const DB_FILE = path.join(__dirname, 'games-database.json');
+
 // Setup file upload
 const upload = multer({ dest: 'uploads/' });
 
-// This stores files in memory
+// Load games from database file
 let allFiles = [];
 let nextId = 1;
+
+function loadDatabase() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const data = fs.readFileSync(DB_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      allFiles = parsed.games || [];
+      nextId = parsed.nextId || 1;
+      console.log(`📂 Loaded ${allFiles.length} games from database`);
+    }
+  } catch (err) {
+    console.error('Error loading database:', err);
+    allFiles = [];
+    nextId = 1;
+  }
+}
+
+function saveDatabase() {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify({ games: allFiles, nextId }, null, 2));
+    console.log('💾 Database saved');
+  } catch (err) {
+    console.error('Error saving database:', err);
+  }
+}
+
+// Load games on startup
+loadDatabase();
 
 // HOME: Serve index.html
 app.get('/', (req, res) => {
@@ -68,6 +99,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   allFiles.push(newFile);
   nextId++;
 
+  // Save to database file
+  saveDatabase();
+
   console.log(`✅ Game uploaded: ${newFile.name}`);
   res.json({ success: true, file: newFile });
 });
@@ -101,6 +135,10 @@ app.get('/api/download/:id', (req, res) => {
   }
 
   file.downloads++;
+  
+  // Save updated downloads to database
+  saveDatabase();
+  
   const filePath = path.join(__dirname, 'uploads', file.filename);
   res.download(filePath, file.name + '.html');
 });
@@ -109,4 +147,5 @@ app.get('/api/download/:id', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🎮 GameVault running on port ${PORT}`);
+  console.log(`📂 Database file: ${DB_FILE}`);
 });
