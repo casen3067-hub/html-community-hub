@@ -30,7 +30,6 @@
       overflow-x: hidden;
     }
 
-    /* Animated background */
     body::before {
       content: '';
       position: fixed;
@@ -49,6 +48,21 @@
       max-width: 1600px;
       margin: 0 auto;
       padding: 30px 20px;
+    }
+
+    /* ATTRIBUTION */
+    .attribution {
+      text-align: center;
+      padding: 12px 20px;
+      background: rgba(99, 102, 241, 0.1);
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .attribution strong {
+      color: var(--primary);
     }
 
     /* HEADER */
@@ -111,7 +125,12 @@
       box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
     }
 
-    .upload-toggle {
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .upload-toggle, .settings-toggle {
       background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
       border: none;
@@ -124,13 +143,93 @@
       box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
     }
 
-    .upload-toggle:hover {
+    .upload-toggle:hover, .settings-toggle:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
     }
 
-    /* UPLOAD MODAL */
-    .upload-modal {
+    /* CATEGORIES */
+    .categories {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.6s ease-out 0.05s both;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .category-btn {
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .category-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .category-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* LOADING SCREEN */
+    .loading-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(5px);
+      z-index: 2500;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .loading-screen.show {
+      display: flex;
+    }
+
+    .loading-content {
+      text-align: center;
+      color: white;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(99, 102, 241, 0.2);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* MODALS */
+    .upload-modal, .settings-modal, .game-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -145,61 +244,133 @@
       animation: fadeIn 0.3s ease;
     }
 
-    .upload-modal.show {
+    .upload-modal.show, .settings-modal.show, .game-modal.show {
       display: flex;
     }
 
-    .upload-content {
+    .modal-content, .upload-content, .settings-content {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 40px;
+      padding: 30px;
       border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .upload-content, .settings-content {
       width: 90%;
       max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
     }
 
-    .upload-header {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--border);
     }
 
-    .upload-header h2 {
+    .modal-header h2 {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.8em;
-      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+      font-size: 1.5em;
     }
 
-    .close-modal {
+    .close-btn {
       background: rgba(239, 68, 68, 0.15);
       color: #ef4444;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
       font-size: 24px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.3s ease;
     }
 
-    .close-modal:hover {
+    .close-btn:hover {
       background: #ef4444;
       color: white;
     }
 
+    /* GAME MODAL */
+    .game-modal .modal-content {
+      width: 95%;
+      height: 95vh;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-modal .modal-header {
+      padding: 20px 30px;
+      margin: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* FULLSCREEN STATE */
+    .game-modal.fullscreen {
+      background: #000;
+    }
+
+    .game-modal.fullscreen .modal-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+    }
+
+    .game-modal.fullscreen .modal-header {
+      background: rgba(10, 14, 39, 0.95);
+      padding: 15px 20px;
+    }
+
+    .fullscreen-btn {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      width: 45px;
+      height: 45px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .fullscreen-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* UPLOAD & SETTINGS FORMS */
     form {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
 
-    input, textarea {
+    input, textarea, select {
       padding: 12px 16px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
@@ -209,7 +380,7 @@
       transition: all 0.3s ease;
     }
 
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--primary);
       background: rgba(99, 102, 241, 0.1);
@@ -218,31 +389,6 @@
     textarea {
       resize: vertical;
       min-height: 80px;
-    }
-
-    .icon-preview {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .icon-display {
-      width: 80px;
-      height: 80px;
-      background: var(--bg);
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      overflow: hidden;
-    }
-
-    .icon-display img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
     button[type="submit"] {
@@ -293,7 +439,7 @@
       color: #86efac;
     }
 
-    /* GAMES SECTION */
+    /* GAMES GRID */
     .games-header {
       margin-bottom: 30px;
       animation: fadeInUp 0.6s ease-out 0.1s both;
@@ -306,12 +452,6 @@
       margin-bottom: 10px;
     }
 
-    .games-subtitle {
-      color: var(--text-secondary);
-      font-size: 1em;
-    }
-
-    /* GAME GRID */
     .games-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -347,7 +487,6 @@
       justify-content: center;
       font-size: 3.5em;
       overflow: hidden;
-      position: relative;
     }
 
     .game-thumbnail img {
@@ -369,7 +508,6 @@
       font-weight: 700;
       margin-bottom: 8px;
       color: var(--text-primary);
-      line-height: 1.3;
     }
 
     .game-meta {
@@ -403,13 +541,6 @@
       color: white;
     }
 
-    .game-btn a {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    /* EMPTY STATE */
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -425,144 +556,6 @@
 
     .empty-state p {
       font-size: 1.2em;
-      margin-bottom: 20px;
-    }
-
-    /* GAME PLAYER MODAL */
-    .game-modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(5px);
-      animation: fadeIn 0.3s ease;
-    }
-
-    .game-modal.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: var(--bg-card);
-      padding: 30px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 1000px;
-      height: 90vh;
-      max-height: 800px;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid var(--border);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-header h2 {
-      font-family: 'Outfit', sans-serif;
-      color: var(--primary);
-      margin: 0;
-      font-size: 1.5em;
-    }
-
-    .close-btn {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-      border-radius: 10px;
-      width: 45px;
-      height: 45px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover {
-      background: #ef4444;
-      color: white;
-    }
-
-    .fullscreen-btn {
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      border-radius: 10px;
-      width: 45px;
-      height: 45px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      padding: 0;
-    }
-
-    .fullscreen-btn:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* Fullscreen state */
-    .game-modal.fullscreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2000;
-      background: #000;
-    }
-
-    .game-modal.fullscreen .modal-content {
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 0;
-      border: none;
-      padding: 0;
-    }
-
-    .game-modal.fullscreen .modal-header {
-      background: rgba(10, 14, 39, 0.95);
-      border-bottom: 1px solid var(--border);
-      margin: 0;
-      padding: 15px 20px;
-    }
-
-    .game-modal.fullscreen .modal-body {
-      margin: 0;
-    }
-
-    .game-modal.fullscreen .modal-body iframe {
-      border-radius: 0;
-    }
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 12px;
     }
 
     /* ANIMATIONS */
@@ -587,19 +580,6 @@
     }
 
     /* RESPONSIVE */
-    .attribution {
-      text-align: center;
-      padding: 12px 20px;
-      background: rgba(99, 102, 241, 0.1);
-      border-bottom: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-size: 0.85em;
-      animation: fadeInDown 0.6s ease-out;
-    }
-
-    .attribution strong {
-      color: var(--primary);
-    }
     @media (max-width: 768px) {
       .container {
         padding: 20px 15px;
@@ -621,25 +601,9 @@
 
       .games-grid {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
-      }
-
-      .game-thumbnail {
-        height: 150px;
-        font-size: 2.5em;
-      }
-
-      .modal-content {
-        width: 95%;
-        height: 95vh;
-        padding: 20px;
       }
 
       .logo {
-        font-size: 1.8em;
-      }
-
-      .games-header h2 {
         font-size: 1.8em;
       }
     }
@@ -649,6 +613,7 @@
   <div class="attribution">
     website made with <strong>java</strong>, by <strong>Casen</strong>
   </div>
+
   <div class="container">
     <header>
       <div class="header-left">
@@ -662,13 +627,20 @@
           id="searchInput" 
           placeholder="find what you want..."
         >
-        <button class="upload-toggle" onclick="openUploadModal()">+</button>
+        <div class="header-buttons">
+          <button class="upload-toggle" onclick="openUploadModal()">+</button>
+          <button class="settings-toggle" onclick="openSettingsModal()">⚙️</button>
+        </div>
       </div>
     </header>
 
+    <!-- CATEGORIES -->
+    <div class="categories" id="categoriesContainer">
+      <button class="category-btn active" onclick="filterCategory('all')">All Games</button>
+    </div>
+
     <div class="games-header">
       <h2>games</h2>
-      <p class="games-subtitle">Share and play HTML games with the community</p>
     </div>
 
     <div class="games-grid" id="gamesGrid">
@@ -679,12 +651,20 @@
     </div>
   </div>
 
+  <!-- LOADING SCREEN -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+  </div>
+
   <!-- UPLOAD MODAL -->
   <div class="upload-modal" id="uploadModal">
     <div class="upload-content">
-      <div class="upload-header">
+      <div class="modal-header">
         <h2>Create & Upload</h2>
-        <button class="close-modal" onclick="closeUploadModal()">&times;</button>
+        <button class="close-btn" onclick="closeUploadModal()">&times;</button>
       </div>
       <form id="uploadForm">
         <input 
@@ -703,17 +683,22 @@
           placeholder="Describe your game..."
         ></textarea>
 
-        <div class="icon-preview">
-          <div class="icon-display" id="iconDisplay">🎮</div>
-          <div style="flex: 1;">
-            <p style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 10px;">Game Icon (optional)</p>
-            <input 
-              type="file" 
-              id="icon" 
-              accept=".jpg,.jpeg,.png"
-            >
-          </div>
-        </div>
+        <select id="category" required>
+          <option value="">Select Category</option>
+          <option value="action">Action</option>
+          <option value="puzzle">Puzzle</option>
+          <option value="adventure">Adventure</option>
+          <option value="strategy">Strategy</option>
+          <option value="sports">Sports</option>
+          <option value="casual">Casual</option>
+          <option value="other">Other</option>
+        </select>
+
+        <input 
+          type="file" 
+          id="icon" 
+          accept=".jpg,.jpeg,.png"
+        >
 
         <input 
           type="file" 
@@ -728,9 +713,29 @@
     </div>
   </div>
 
-  <!-- GAME PLAYER MODAL -->
+  <!-- SETTINGS MODAL -->
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+      </div>
+      <form id="settingsForm">
+        <label style="color: var(--text-secondary); font-size: 0.9em;">Loading Screen Text</label>
+        <input 
+          type="text" 
+          id="loadingTextInput" 
+          placeholder="Enter loading text..."
+          value="Loading..."
+        >
+        <button type="submit">💾 Save Settings</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- GAME MODAL -->
   <div class="game-modal" id="gameModal">
-    <div class="modal-content" id="modalContent">
+    <div class="modal-content">
       <div class="modal-header">
         <h2 id="gameTitle">Playing Game</h2>
         <div style="display: flex; gap: 10px;">
@@ -747,27 +752,26 @@
   <script>
     let iconData = null;
     let allGames = [];
+    let currentCategory = 'all';
+    let loadingText = 'Loading...';
 
-    // Load games when page opens
+    // Load games and settings on startup
     loadGames();
+    loadSettings();
 
-    // Handle form submission
+    // Event listeners
     document.getElementById('uploadForm').addEventListener('submit', uploadFile);
-
-    // Handle search
+    document.getElementById('settingsForm').addEventListener('submit', saveSettings);
     document.getElementById('searchInput').addEventListener('input', function(e) {
       filterGames(e.target.value);
     });
 
-    // Handle icon preview
     document.getElementById('icon').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(event) {
           iconData = event.target.result;
-          const display = document.getElementById('iconDisplay');
-          display.innerHTML = `<img src="${iconData}" alt="Icon preview">`;
         };
         reader.readAsDataURL(file);
       }
@@ -777,9 +781,21 @@
     document.getElementById('uploadModal').addEventListener('click', function(e) {
       if (e.target === this) closeUploadModal();
     });
-
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+      if (e.target === this) closeSettingsModal();
+    });
     document.getElementById('gameModal').addEventListener('click', function(e) {
       if (e.target === this) closeGame();
+    });
+
+    // ESC key handling
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const gameModal = document.getElementById('gameModal');
+        if (gameModal.classList.contains('fullscreen')) {
+          toggleFullscreen();
+        }
+      }
     });
 
     async function loadGames() {
@@ -787,10 +803,41 @@
         const response = await fetch('/api/files');
         allGames = await response.json();
         document.getElementById('gameCount').textContent = allGames.length;
+        buildCategories();
         renderGames(allGames);
       } catch (err) {
         console.error('Error loading games:', err);
       }
+    }
+
+    function buildCategories() {
+      const categories = new Set(['all']);
+      allGames.forEach(game => {
+        if (game.category) categories.add(game.category);
+      });
+
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = Array.from(categories).map(cat => `
+        <button class="category-btn ${cat === 'all' ? 'active' : ''}" onclick="filterCategory('${cat}')">
+          ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </button>
+      `).join('');
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      showLoadingScreen();
+      
+      setTimeout(() => {
+        document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        const filtered = cat === 'all' ? allGames : allGames.filter(g => g.category === cat);
+        renderGames(filtered);
+        hideLoadingScreen();
+      }, 500);
     }
 
     function renderGames(games) {
@@ -800,7 +847,7 @@
         grid.innerHTML = `
           <div class="empty-state" style="grid-column: 1 / -1;">
             <div class="empty-state-icon">🎮</div>
-            <p>No games found. Be the first to share!</p>
+            <p>No games found</p>
           </div>
         `;
         return;
@@ -816,7 +863,7 @@
             <div class="game-meta">${game.uploader || 'Anonymous'}</div>
             <div class="game-actions">
               <button class="game-btn" onclick="playGame(${game.id}, '${game.name}')">🎮 Play</button>
-              <button class="game-btn"><a href="/api/download/${game.id}">📥</a></button>
+              <button class="game-btn" onclick="downloadGame(${game.id})">📥</button>
             </div>
           </div>
         </div>
@@ -831,23 +878,24 @@
       renderGames(filtered);
     }
 
-    function openUploadModal() {
-      document.getElementById('uploadModal').classList.add('show');
-    }
-
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('show');
-    }
-
     function playGame(fileId, fileName) {
-      const modal = document.getElementById('gameModal');
-      const gameFrame = document.getElementById('gameFrame');
-      const gameTitle = document.getElementById('gameTitle');
+      showLoadingScreen();
       
-      gameTitle.textContent = `🎮 ${fileName}`;
-      gameFrame.src = `/api/view/${fileId}`;
-      
-      modal.classList.add('show');
+      setTimeout(() => {
+        const modal = document.getElementById('gameModal');
+        const gameFrame = document.getElementById('gameFrame');
+        const gameTitle = document.getElementById('gameTitle');
+        
+        gameTitle.textContent = `🎮 ${fileName}`;
+        gameFrame.src = `/api/view/${fileId}`;
+        
+        modal.classList.add('show');
+        hideLoadingScreen();
+      }, 500);
+    }
+
+    function downloadGame(fileId) {
+      window.location.href = `/api/download/${fileId}`;
     }
 
     function closeGame() {
@@ -861,30 +909,66 @@
 
     function toggleFullscreen() {
       const modal = document.getElementById('gameModal');
-      const fullscreenBtn = document.querySelector('.fullscreen-btn');
       
       if (modal.classList.contains('fullscreen')) {
-        // Exit fullscreen
         modal.classList.remove('fullscreen');
-        fullscreenBtn.textContent = '⛶';
-        fullscreenBtn.title = 'Fullscreen';
       } else {
-        // Enter fullscreen
         modal.classList.add('fullscreen');
-        fullscreenBtn.textContent = '⛶';
-        fullscreenBtn.title = 'Exit Fullscreen';
       }
     }
 
-    // Handle ESC key to exit fullscreen
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape') {
-        const modal = document.getElementById('gameModal');
-        if (modal.classList.contains('fullscreen')) {
-          toggleFullscreen();
-        }
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('show');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('show');
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.add('show');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('show');
+    }
+
+    function showLoadingScreen() {
+      const screen = document.getElementById('loadingScreen');
+      document.getElementById('loadingText').textContent = loadingText;
+      screen.classList.add('show');
+    }
+
+    function hideLoadingScreen() {
+      document.getElementById('loadingScreen').classList.remove('show');
+    }
+
+    function loadSettings() {
+      const saved = localStorage.getItem('gameVaultSettings');
+      if (saved) {
+        const settings = JSON.parse(saved);
+        loadingText = settings.loadingText || 'Loading...';
+        document.getElementById('loadingTextInput').value = loadingText;
       }
-    });
+    }
+
+    async function saveSettings(e) {
+      e.preventDefault();
+      
+      loadingText = document.getElementById('loadingTextInput').value || 'Loading...';
+      const settings = { loadingText };
+      
+      localStorage.setItem('gameVaultSettings', JSON.stringify(settings));
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message show success';
+      messageDiv.textContent = '✅ Settings saved!';
+      document.getElementById('settingsForm').prepend(messageDiv);
+      
+      setTimeout(() => {
+        messageDiv.remove();
+      }, 3000);
+    }
 
     async function uploadFile(e) {
       e.preventDefault();
@@ -898,7 +982,6 @@
         return;
       }
 
-      // Show loading state
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
       submitBtn.textContent = '⏳ Uploading...';
@@ -908,6 +991,7 @@
       formData.append('name', gameName);
       formData.append('description', document.getElementById('description').value);
       formData.append('uploader', document.getElementById('uploader').value);
+      formData.append('category', document.getElementById('category').value);
       formData.append('file', htmlFile);
       
       if (iconData) {
@@ -915,21 +999,17 @@
       }
 
       try {
-        console.log('Uploading:', gameName);
-        
         const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData
         });
 
         const result = await response.json();
-        console.log('Upload response:', result);
 
         if (response.ok) {
           submitBtn.textContent = '✅ Uploaded!';
           showMessage('✅ Game uploaded successfully!', 'success');
           document.getElementById('uploadForm').reset();
-          document.getElementById('iconDisplay').innerHTML = '🎮';
           iconData = null;
           
           setTimeout(() => {
@@ -941,13 +1021,12 @@
         } else {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
-          showMessage('❌ ' + (result.error || 'Upload failed. Try again!'), 'error');
+          showMessage('❌ ' + (result.error || 'Upload failed!'), 'error');
         }
       } catch (err) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-        console.error('Upload error:', err);
-        showMessage('❌ Upload error: ' + err.message, 'error');
+        showMessage('❌ Error: ' + err.message, 'error');
       }
     }
 
