@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Community Hub</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+
+    .upload-section {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .upload-section h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, textarea {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #764ba2;
+    }
+
+    .files-section {
+      margin-top: 40px;
+    }
+
+    .files-section h2 {
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .file-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .file-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .file-card h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .file-card p {
+      color: #666;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+
+    .meta {
+      color: #999;
+      font-size: 0.85em !important;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .actions button {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: #f0f0f0;
+      color: #667eea;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s;
+      cursor: pointer;
+      min-width: 80px;
+    }
+
+    .actions button:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .actions a {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: #f0f0f0;
+      color: #667eea;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .actions a:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .message.success {
+      background: #51cf66;
+      color: white;
+    }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 1000px;
+      height: 90vh;
+      max-height: 800px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .modal-header h2 {
+      color: #667eea;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+
+    .close-btn:hover {
+      background: #ff5252;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 HTML Community Hub</h1>
+
+    <div class="upload-section">
+      <h2>📤 Upload Your HTML</h2>
+      <div id="message" class="message"></div>
+      <form id="uploadForm">
+        <input 
+          type="text" 
+          id="name" 
+          placeholder="Project Name" 
+          required
+        >
+        <textarea 
+          id="description" 
+          placeholder="Description of your HTML project or game"
+        ></textarea>
+        <input 
+          type="text" 
+          id="uploader" 
+          placeholder="Your Name (optional)"
+        >
+        <input 
+          type="file" 
+          id="file" 
+          accept=".html" 
+          required
+        >
+        <button type="submit">📤 Upload HTML</button>
+      </form>
+    </div>
+
+    <div class="files-section">
+      <h2>📁 Community Projects</h2>
+      <div class="files-grid" id="filesList">
+        <p style="color: white;">Loading files...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME PLAYER MODAL -->
+  <div id="gameModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="gameTitle">Playing Game</h2>
+        <button class="close-btn" onclick="closeGame()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="gameFrame" src="" title="Game Player"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load all files when page opens
+    loadFiles();
+
+    // Handle form submission
+    document.getElementById('uploadForm').addEventListener('submit', uploadFile);
+
+    // Close modal when clicking outside
+    document.getElementById('gameModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeGame();
+      }
+    });
+
+    async function loadFiles() {
+      try {
+        const response = await fetch('http://localhost:5000/api/files');
+        const files = await response.json();
+        
+        const filesList = document.getElementById('filesList');
+        
+        if (files.length === 0) {
+          filesList.innerHTML = '<p style="color: white;">No files uploaded yet. Be the first!</p>';
+          return;
+        }
+
+        filesList.innerHTML = files.map(file => `
+          <div class="file-card">
+            <h3>${file.name}</h3>
+            <p>${file.description}</p>
+            <p class="meta">by ${file.uploader || 'Anonymous'} • ${file.downloads} downloads</p>
+            <div class="actions">
+              <button onclick="playGame(${file.id}, '${file.name}')">🎮 Play</button>
+              <a href="http://localhost:5000/api/download/${file.id}">⬇️ Download</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading files:', err);
+        document.getElementById('filesList').innerHTML = '<p style="color: white;">Error loading files</p>';
+      }
+    }
+
+    function playGame(fileId, fileName) {
+      const modal = document.getElementById('gameModal');
+      const gameFrame = document.getElementById('gameFrame');
+      const gameTitle = document.getElementById('gameTitle');
+      
+      gameTitle.textContent = `Playing: ${fileName}`;
+      gameFrame.src = `http://localhost:5000/api/view/${fileId}`;
+      
+      modal.classList.add('show');
+    }
+
+    function closeGame() {
+      const modal = document.getElementById('gameModal');
+      const gameFrame = document.getElementById('gameFrame');
+      
+      modal.classList.remove('show');
+      gameFrame.src = '';
+    }
+
+    async function uploadFile(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('name', document.getElementById('name').value);
+      formData.append('description', document.getElementById('description').value);
+      formData.append('uploader', document.getElementById('uploader').value);
+      formData.append('file', document.getElementById('file').files[0]);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const messageDiv = document.getElementById('message');
+
+        if (response.ok) {
+          messageDiv.className = 'message show success';
+          messageDiv.textContent = '✅ File uploaded successfully!';
+          document.getElementById('uploadForm').reset();
+          
+          setTimeout(() => {
+            loadFiles();
+            messageDiv.className = 'message';
+          }, 1000);
+        } else {
+          messageDiv.className = 'message show error';
+          messageDiv.textContent = '❌ Upload failed. Try again!';
+        }
+      } catch (err) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'message show error';
+        messageDiv.textContent = '❌ Error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
