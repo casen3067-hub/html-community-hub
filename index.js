@@ -120,6 +120,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     name: gameName,
     description: req.body.description || 'No description',
     uploader: req.body.uploader || 'Anonymous',
+    category: req.body.category || 'other',
     filename: req.file.filename,
     originalName: req.file.originalname,
     icon: iconBase64,
