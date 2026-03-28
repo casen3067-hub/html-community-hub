@@ -259,9 +259,14 @@
       box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
     }
 
-    button[type="submit"]:hover {
+    button[type="submit"]:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
 
     .message {
@@ -784,11 +789,18 @@
 
       const htmlFile = document.getElementById('file').files[0];
       const gameName = document.getElementById('name').value;
+      const submitBtn = document.querySelector('button[type="submit"]');
       
       if (!htmlFile || !gameName) {
         showMessage('❌ Please fill in all required fields!', 'error');
         return;
       }
+
+      // Show loading state
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Uploading...';
+      showMessage('⏳ Uploading your game...', 'success');
 
       const formData = new FormData();
       formData.append('name', gameName);
@@ -801,14 +813,18 @@
       }
 
       try {
+        console.log('Uploading:', gameName);
+        
         const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData
         });
 
         const result = await response.json();
+        console.log('Upload response:', result);
 
         if (response.ok) {
+          submitBtn.textContent = '✅ Uploaded!';
           showMessage('✅ Game uploaded successfully!', 'success');
           document.getElementById('uploadForm').reset();
           document.getElementById('iconDisplay').innerHTML = '🎮';
@@ -817,13 +833,19 @@
           setTimeout(() => {
             closeUploadModal();
             loadGames();
-          }, 1500);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }, 2000);
         } else {
-          showMessage('❌ ' + (result.error || 'Upload failed!'), 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          showMessage('❌ ' + (result.error || 'Upload failed. Try again!'), 'error');
         }
       } catch (err) {
-        showMessage('❌ Error: ' + err.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         console.error('Upload error:', err);
+        showMessage('❌ Upload error: ' + err.message, 'error');
       }
     }
 
