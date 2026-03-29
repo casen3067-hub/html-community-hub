@@ -117,6 +117,15 @@
       50% { opacity: 0.7; }
     }
 
+    @keyframes musicGlow {
+      0%, 100% { box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4); }
+      50% { box-shadow: 0 5px 30px rgba(0, 255, 136, 0.7); }
+    }
+
+    .music-toggle.playing {
+      animation: musicGlow 2s ease-in-out infinite;
+    }
+
     .header-right {
       display: flex;
       gap: 10px;
@@ -145,7 +154,7 @@
       gap: 10px;
     }
 
-    .upload-toggle, .settings-toggle {
+    .upload-toggle, .settings-toggle, .music-toggle {
       background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
       border: none;
@@ -158,9 +167,14 @@
       box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
     }
 
-    .upload-toggle:hover, .settings-toggle:hover {
+    .upload-toggle:hover, .settings-toggle:hover, .music-toggle:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .music-toggle.playing {
+      background: linear-gradient(135deg, var(--neon) 0%, var(--primary) 100%);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
     }
 
     /* MAIN & SETTINGS VIEWS */
@@ -800,6 +814,11 @@
   </style>
 </head>
 <body>
+  <!-- Background Music -->
+  <audio id="bgMusic" loop preload="none">
+ <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="attribution">
     website made with <strong>java</strong>, by <strong>Casen</strong>
   </div>
@@ -819,6 +838,7 @@
           placeholder="find what you want..."
         >
         <div class="header-buttons">
+          <button class="music-toggle" id="musicToggle" onclick="toggleMusic()" title="Toggle Music">🎵</button>
           <button class="upload-toggle" onclick="openUploadModal()">+</button>
           <button class="settings-toggle" onclick="openSettingsView()">⚙️</button>
         </div>
@@ -1017,6 +1037,55 @@
     let allGames = [];
     let currentCategory = 'all';
     let uploaderTokens = {}; // Store tokens: gameId -> token
+    let isMusicPlaying = false;
+    const bgMusic = document.getElementById('bgMusic');
+
+    // Set volume to 30% so it's not too loud
+    bgMusic.volume = 0.3;
+
+    // Load music preference from localStorage
+    function loadMusicPreference() {
+      const saved = localStorage.getItem('musicPlaying');
+      if (saved === 'true') {
+        // Try to play music on page load
+        bgMusic.play().catch(() => {
+          console.log('Auto-play blocked by browser');
+          isMusicPlaying = false;
+          updateMusicButton();
+        });
+        isMusicPlaying = true;
+      }
+      updateMusicButton();
+    }
+
+    // Toggle music on/off
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgMusic.pause();
+        isMusicPlaying = false;
+      } else {
+        bgMusic.play().catch(() => {
+          console.log('Could not play music');
+        });
+        isMusicPlaying = true;
+      }
+      localStorage.setItem('musicPlaying', isMusicPlaying);
+      updateMusicButton();
+    }
+
+    // Update music button appearance
+    function updateMusicButton() {
+      const btn = document.getElementById('musicToggle');
+      if (isMusicPlaying) {
+        btn.classList.add('playing');
+        btn.textContent = '🎵';
+      } else {
+        btn.classList.remove('playing');
+        btn.textContent = '🔇';
+      }
+    }
+
+    loadMusicPreference();
 
     // Load tokens from localStorage
     function loadTokens() {
