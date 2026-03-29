@@ -33,11 +33,11 @@ if (!fs.existsSync('uploads')) {
 const DB_FILE = path.join(__dirname, 'games-database.json');
 
 // ADMIN PASSWORD FOR DELETING GAMES (Change this to your secret password!)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Tiu2mc3y!!!';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
 
-// Setup file upload with optimizations
+// Setup file upload with memory storage (so we can store in database)
 const upload = multer({
-  dest: 'uploads/',
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 100 * 1024 * 1024 // 100MB
   }
@@ -101,6 +101,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 
   console.log(`⏳ Processing upload for: ${gameName}`);
+  
+  // Check if file buffer is available
+  if (!req.file || !req.file.buffer) {
+    console.error('File buffer not available:', req.file);
+    return res.status(400).json({ error: 'File processing failed - no file buffer' });
+  }
 
   // Get icon from request body
   let iconBase64 = null;
@@ -118,6 +124,14 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 
   // Save file info
+  let htmlContent = '';
+  try {
+    htmlContent = req.file.buffer.toString('utf-8');
+  } catch (err) {
+    console.error('Error converting file buffer:', err);
+    return res.status(400).json({ error: 'Could not process HTML file' });
+  }
+
   const newFile = {
     id: nextId,
     name: gameName,
@@ -130,7 +144,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     downloads: 0,
     timestamp: Date.now(),
     // Store the actual HTML file content in the database
-    htmlContent: req.file.buffer.toString('utf-8')
+    htmlContent: htmlContent
   };
 
   allFiles.push(newFile);
