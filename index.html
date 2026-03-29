@@ -464,6 +464,66 @@
       font-size: 1.2em;
     }
 
+    /* NOTIFICATION TOAST */
+    .notification-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      z-index: 500;
+      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+      display: none;
+      animation: slideDown 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .notification-toast.show {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notification-toast.success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    }
+
+    .notification-toast.error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    .notification-spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* MODALS */
     .modal {
       display: none;
@@ -881,6 +941,12 @@
   <!-- PARTICLE BACKGROUND -->
   <canvas id="particleCanvas"></canvas>
 
+  <!-- NOTIFICATION TOAST -->
+  <div class="notification-toast" id="notificationToast">
+    <div class="notification-spinner" id="notificationSpinner"></div>
+    <span id="notificationText">Uploading Game...</span>
+  </div>
+
   <div class="main-wrapper">
     <div class="attribution">
       website made with <strong>java</strong>, by <strong>Casen</strong>
@@ -1156,6 +1222,27 @@
   </div>
 
   <script>
+    function showNotification(message, type = 'loading') {
+      const toast = document.getElementById('notificationToast');
+      const text = document.getElementById('notificationText');
+      const spinner = document.getElementById('notificationSpinner');
+
+      text.textContent = message;
+      toast.classList.remove('success', 'error');
+      if (type !== 'loading') {
+        toast.classList.add(type);
+        spinner.style.display = 'none';
+      } else {
+        spinner.style.display = 'block';
+      }
+      toast.classList.add('show');
+    }
+
+    function hideNotification() {
+      const toast = document.getElementById('notificationToast');
+      toast.classList.remove('show');
+    }
+
     // ===== PARTICLE BACKGROUND =====
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
@@ -1419,9 +1506,12 @@
       const iconInput = document.getElementById('icon');
 
       if (!fileInput.files[0] || !nameInput.value) {
-        alert('Please fill in required fields');
+        showNotification('Please fill in required fields', 'error');
+        setTimeout(hideNotification, 3000);
         return;
       }
+
+      showNotification('⏳ Uploading Game...', 'loading');
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
@@ -1450,14 +1540,19 @@
         if (result.success) {
           uploaderTokens[result.file.id] = result.uploaderToken;
           localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
-          alert('✅ Game uploaded! Token: ' + result.uploaderToken);
-          closeUploadModal();
-          loadGames();
+          showNotification('✅ Game uploaded successfully!', 'success');
+          setTimeout(() => {
+            hideNotification();
+            closeUploadModal();
+            loadGames();
+          }, 2000);
         } else {
-          alert('Error: ' + result.error);
+          showNotification('❌ ' + result.error, 'error');
+          setTimeout(hideNotification, 3000);
         }
       } catch (err) {
-        alert('Upload failed: ' + err.message);
+        showNotification('❌ Upload failed: ' + err.message, 'error');
+        setTimeout(hideNotification, 3000);
       }
     }
 
@@ -1578,3 +1673,5 @@
   </script>
 </body>
 </html>
+EOFNEW
+echo "✅ Complete UI revamp with particle background created!"
