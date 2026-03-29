@@ -23,6 +23,104 @@
       --text-secondary: #94a3b8;
     }
 
+    /* THEME VARIANTS */
+    :root.theme-snow {
+      --primary: #3b82f6;
+      --accent: #06b6d4;
+      --neon: #00d4ff;
+      --bg-dark: #0f1419;
+      --bg-card: #1a2332;
+      --border: #2a3a52;
+      --text-primary: #e0f2fe;
+      --text-secondary: #a5d8ff;
+    }
+
+    :root.theme-lava {
+      --primary: #ff6b35;
+      --accent: #ff0000;
+      --neon: #ff3333;
+      --bg-dark: #2a1a0f;
+      --bg-card: #3d2317;
+      --border: #5c3d2e;
+      --text-primary: #ffe4cc;
+      --text-secondary: #ffb896;
+    }
+
+    :root.theme-nature {
+      --primary: #10b981;
+      --accent: #34d399;
+      --neon: #6ee7b7;
+      --bg-dark: #051f1d;
+      --bg-card: #0f3f3a;
+      --border: #1f5f59;
+      --text-primary: #d1fae5;
+      --text-secondary: #a7f3d0;
+    }
+
+    :root.theme-ocean {
+      --primary: #0ea5e9;
+      --accent: #06b6d4;
+      --neon: #00d4ff;
+      --bg-dark: #0c1929;
+      --bg-card: #1a3a4f;
+      --border: #2a5a7f;
+      --text-primary: #cffafe;
+      --text-secondary: #9eddff;
+    }
+
+    :root.theme-space {
+      --primary: #d946ef;
+      --accent: #ff00ff;
+      --neon: #ff00ff;
+      --bg-dark: #2a1540;
+      --bg-card: #3d2560;
+      --border: #6a3faa;
+      --text-primary: #f3e8ff;
+      --text-secondary: #e9d5ff;
+    }
+
+    :root.theme-cyberpunk {
+      --primary: #ff00ff;
+      --accent: #00ffff;
+      --neon: #ffff00;
+      --bg-dark: #0a0e1a;
+      --bg-card: #1a2540;
+      --border: #2d4a7f;
+      --text-primary: #ffffff;
+      --text-secondary: #00ffff;
+    }
+
+    :root.theme-sunset {
+      --primary: #f97316;
+      --accent: #fb923c;
+      --neon: #fbbf24;
+      --bg-dark: #4a2810;
+      --bg-card: #5a3817;
+      --border: #7a5e3e;
+      --text-primary: #fed7aa;
+      --text-secondary: #ffb896;
+    }
+
+    :root.theme-midnight {
+      --primary: #0f766e;
+      --accent: #06b6d4;
+      --neon: #00e5ff;
+      --bg-dark: #0a0e27;
+      --bg-card: #1a2f3f;
+      --border: #2a4f5f;
+      --text-primary: #e0f2fe;
+      --text-secondary: #9eddff;
+    }
+
+    :root.theme-midnight #particleCanvas {
+      background: linear-gradient(135deg, 
+        #0a0e27 0%,
+        #0f1f3f 25%,
+        #1a2f4f 50%,
+        #0f1f3f 75%,
+        #0a0e27 100%) !important;
+    }
+
     html {
       color-scheme: dark;
     }
@@ -45,6 +143,34 @@
       pointer-events: none;
       z-index: 1;
       background: linear-gradient(135deg, #0a0e27 0%, #151b3a 50%, #0a0e27 100%);
+    }
+
+    :root.theme-snow #particleCanvas {
+      background: linear-gradient(135deg, #0f1419 0%, #1a3a52 50%, #0f1419 100%) !important;
+    }
+
+    :root.theme-lava #particleCanvas {
+      background: linear-gradient(135deg, #2a1a0f 0%, #4a2817 50%, #2a1a0f 100%) !important;
+    }
+
+    :root.theme-nature #particleCanvas {
+      background: linear-gradient(135deg, #051f1d 0%, #0f4a42 50%, #051f1d 100%) !important;
+    }
+
+    :root.theme-ocean #particleCanvas {
+      background: linear-gradient(135deg, #0c1929 0%, #1a4a7f 50%, #0c1929 100%) !important;
+    }
+
+    :root.theme-space #particleCanvas {
+      background: linear-gradient(135deg, #1a0f2e 0%, #5a2f8f 50%, #1a0f2e 100%) !important;
+    }
+
+    :root.theme-cyberpunk #particleCanvas {
+      background: linear-gradient(135deg, #0a0e1a 0%, #1a3f6f 50%, #0a0e1a 100%) !important;
+    }
+
+    :root.theme-sunset #particleCanvas {
+      background: linear-gradient(135deg, #2a1810 0%, #7a5030 50%, #2a1810 100%) !important;
     }
 
     /* MAIN CONTENT WRAPPER */
@@ -1108,9 +1234,25 @@
                 <span id="animationsLabel" class="setting-value">On</span>
               </div>
             </div>
-          </div>
 
-          <!-- DISPLAY -->
+            <div class="settings-item">
+              <div class="settings-label">
+                <span>Theme</span>
+                <small>Choose a visual theme</small>
+              </div>
+              <select id="themeSelector" onchange="changeTheme(this.value)" class="settings-select">
+                <option value="default">🌌 Default (Purple)</option>
+                <option value="snow">❄️ Snow (Blue)</option>
+                <option value="lava">🔥 Lava (Orange)</option>
+                <option value="nature">🍃 Nature (Green)</option>
+                <option value="ocean">🌊 Ocean (Cyan)</option>
+                <option value="space">🚀 Space (Purple)</option>
+                <option value="cyberpunk">💻 Cyberpunk (Neon)</option>
+                <option value="sunset">🌅 Sunset (Gold)</option>
+                <option value="midnight">🌙 Midnight (Deep Blue)</option>
+              </select>
+            </div>
+          </div>
           <div class="settings-section">
             <div class="settings-section-header">
               <h3>🎮 Game Display</h3>
@@ -1322,11 +1464,12 @@
     // ===== PARTICLE BACKGROUND =====
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
+    let currentTheme = 'default';
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    class Particle {
+    class DefaultParticle {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
@@ -1334,6 +1477,232 @@
         this.speedX = (Math.random() - 0.5) * 0.8;
         this.speedY = (Math.random() - 0.5) * 0.8;
         this.opacity = Math.random() * 0.5 + 0.3;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        const color = currentTheme === 'default' ? '99, 102, 241' :
+                      currentTheme === 'snow' ? '59, 130, 246' :
+                      currentTheme === 'lava' ? '255, 107, 53' : '16, 185, 129';
+        ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class Snowflake {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 1.5;
+        this.speedY = Math.random() * 1 + 0.5;
+        this.opacity = Math.random() * 0.7 + 0.3;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = `rgba(174, 225, 255, ${this.opacity})`;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (i * Math.PI) / 3;
+          const x = Math.cos(angle) * this.size;
+          const y = Math.sin(angle) * this.size;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class LavaParticle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = Math.random() * 4 + 2;
+        this.speedX = (Math.random() - 0.5) * 1.2;
+        this.speedY = (Math.random() - 0.5) * 1.2;
+        this.opacity = Math.random() * 0.6 + 0.2;
+        this.lifespan = 100;
+        this.age = 0;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.speedY += 0.05;
+        this.age++;
+        this.opacity = Math.max(0, 0.6 - (this.age / this.lifespan) * 0.6);
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        gradient.addColorStop(0, `rgba(255, 107, 53, ${this.opacity})`);
+        gradient.addColorStop(1, `rgba(255, 0, 0, ${this.opacity * 0.5})`);
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class Leaf {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height - canvas.height;
+        this.size = Math.random() * 6 + 4;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.speedY = Math.random() * 1.5 + 0.5;
+        this.opacity = Math.random() * 0.6 + 0.3;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.15;
+        this.wobble = Math.random() * 0.5;
+      }
+
+      update() {
+        this.x += this.speedX + Math.sin(this.rotation) * 0.3;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = `rgba(16, 185, 129, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(52, 211, 153, ${this.opacity * 0.7})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-this.size * 0.3, -this.size * 0.3);
+        ctx.lineTo(this.size * 0.3, this.size * 0.3);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    class Bubble {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 20;
+        this.radius = Math.random() * 4 + 2;
+        this.speedX = (Math.random() - 0.5) * 1;
+        this.speedY = -(Math.random() * 1 + 0.5);
+        this.opacity = Math.random() * 0.5 + 0.3;
+        this.wobbleX = 0;
+        this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+      }
+
+      update() {
+        this.x += this.speedX + Math.sin(this.wobbleX) * 0.3;
+        this.y += this.speedY;
+        this.wobbleX += this.wobbleSpeed;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y < -20) this.y = canvas.height + 20;
+      }
+
+      draw() {
+        const gradient = ctx.createRadialGradient(this.x - this.radius/2, this.y - this.radius/2, 0, this.x, this.y, this.radius);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${this.opacity * 0.8})`);
+        gradient.addColorStop(1, `rgba(14, 165, 233, ${this.opacity * 0.3})`);
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(14, 165, 233, ${this.opacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    class ShootingStar {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * (canvas.height * 0.6);
+        this.size = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 3;
+        this.speedY = (Math.random() - 0.5) * 3;
+        this.opacity = Math.random() * 0.7 + 0.3;
+        this.trail = [];
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+
+        this.trail.push({x: this.x, y: this.y, opacity: this.opacity});
+        if (this.trail.length > 20) this.trail.shift();
+      }
+
+      draw() {
+        this.trail.forEach((point, i) => {
+          const trailOpacity = (i / this.trail.length) * this.opacity;
+          ctx.fillStyle = `rgba(168, 85, 247, ${trailOpacity})`;
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, this.size * (1 - i / this.trail.length), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = `rgba(236, 72, 217, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class NeonParticle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.speedY = (Math.random() - 0.5) * 2;
+        this.opacity = Math.random() * 0.6 + 0.3;
+        this.color = ['rgba(255, 0, 255', 'rgba(0, 255, 255', 'rgba(255, 255, 0'][Math.floor(Math.random() * 3)];
       }
 
       update() {
@@ -1347,14 +1716,108 @@
       }
 
       draw() {
-        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = this.color + ', ' + this.opacity + ')';
+        ctx.fillStyle = this.color + ', ' + this.opacity + ')';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    class Ember {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 20;
+        this.radius = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 1.5;
+        this.speedY = -(Math.random() * 2 + 1);
+        this.opacity = Math.random() * 0.8 + 0.2;
+        this.heat = Math.random() * 100 + 100;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.heat -= 1;
+        this.opacity = (this.heat / 200) * 0.8;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y < -20 || this.heat < 0) this.y = canvas.height + 20;
+      }
+
+      draw() {
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        gradient.addColorStop(0, `rgba(249, 115, 22, ${this.opacity})`);
+        gradient.addColorStop(0.5, `rgba(251, 191, 36, ${this.opacity * 0.6})`);
+        gradient.addColorStop(1, `rgba(249, 115, 22, 0)`);
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    const particles = Array(100).fill(null).map(() => new Particle());
+    class AuroraWave {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 4 + 2;
+        this.speedX = (Math.random() - 0.5) * 1;
+        this.speedY = (Math.random() - 0.5) * 1;
+        this.opacity = Math.random() * 0.5 + 0.2;
+        this.wave = Math.random() * Math.PI * 2;
+        this.color = ['rgba(16, 185, 129', 'rgba(168, 85, 247', 'rgba(59, 130, 246'][Math.floor(Math.random() * 3)];
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY + Math.sin(this.wave) * 0.5;
+        this.wave += 0.05;
+
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+        gradient.addColorStop(0, this.color + ', ' + this.opacity + ')');
+        gradient.addColorStop(1, this.color + ', 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    let particles = Array(100).fill(null).map(() => new DefaultParticle());
+
+    function createParticles(theme) {
+      currentTheme = theme;
+      if (theme === 'snow') {
+        particles = Array(80).fill(null).map(() => new Snowflake());
+      } else if (theme === 'lava') {
+        particles = Array(120).fill(null).map(() => new LavaParticle());
+      } else if (theme === 'nature') {
+        particles = Array(60).fill(null).map(() => new Leaf());
+      } else if (theme === 'ocean') {
+        particles = Array(100).fill(null).map(() => new Bubble());
+      } else if (theme === 'space') {
+        particles = Array(80).fill(null).map(() => new ShootingStar());
+      } else if (theme === 'cyberpunk') {
+        particles = Array(150).fill(null).map(() => new NeonParticle());
+      } else if (theme === 'sunset') {
+        particles = Array(90).fill(null).map(() => new Ember());
+      } else if (theme === 'midnight') {
+        particles = Array(50).fill(null).map(() => new ShootingStar());
+      } else {
+        particles = Array(100).fill(null).map(() => new DefaultParticle());
+      }
+    }
 
     function animateParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1364,20 +1827,22 @@
         particle.draw();
       });
 
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+      // Draw connections for default theme
+      if (currentTheme === 'default') {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 150) {
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 * (1 - distance / 150)})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+            if (distance < 150) {
+              ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 * (1 - distance / 150)})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
           }
         }
       }
@@ -1401,8 +1866,37 @@
     bgMusic.volume = 0.3;
     bgMusic.loop = true;
 
+    // Load tokens from localStorage
+    function loadTokensFromStorage() {
+      try {
+        const saved = localStorage.getItem('uploaderTokens');
+        if (saved) {
+          uploaderTokens = JSON.parse(saved);
+          console.log('✅ Loaded ' + Object.keys(uploaderTokens).length + ' saved delete tokens');
+        }
+      } catch (err) {
+        console.error('Error loading tokens:', err);
+        uploaderTokens = {};
+      }
+    }
+
+    // Save tokens to localStorage
+    function saveTokensToStorage() {
+      try {
+        localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
+        console.log('💾 Saved ' + Object.keys(uploaderTokens).length + ' delete tokens');
+      } catch (err) {
+        console.error('Error saving tokens:', err);
+      }
+    }
+
     // Load settings
     function loadAllSettings() {
+      // Load theme
+      const savedTheme = localStorage.getItem('colorTheme') || 'default';
+      changeTheme(savedTheme, false);
+      document.getElementById('themeSelector').value = savedTheme;
+
       const savedVolume = localStorage.getItem('musicVolume') || '30';
       document.getElementById('volumeSlider').value = savedVolume;
       document.getElementById('volumeValue').textContent = savedVolume + '%';
@@ -1417,6 +1911,24 @@
         isMusicPlaying = true;
       }
       updateMusicButton();
+    }
+
+    function changeTheme(theme, save = true) {
+      currentTheme = theme;
+      
+      // Remove ALL theme classes
+      document.documentElement.classList.remove('theme-snow', 'theme-lava', 'theme-nature', 'theme-ocean', 'theme-space', 'theme-cyberpunk', 'theme-sunset', 'theme-midnight');
+      
+      // Add new theme class
+      if (theme !== 'default') {
+        document.documentElement.classList.add(`theme-${theme}`);
+      }
+      
+      createParticles(theme);
+      if (save) {
+        localStorage.setItem('colorTheme', theme);
+      }
+      console.log(`🎨 Theme changed to: ${theme}`);
     }
 
     function toggleMusic() {
@@ -1488,7 +2000,7 @@
     function resetAllSettings() {
       if (confirm('Reset all settings to default?')) {
         Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('music') || key === 'cardSize' || key === 'uploaderNamesShown' || key === 'theme') {
+          if (key.startsWith('music') || key === 'cardSize' || key === 'uploaderNamesShown' || key === 'theme' || key === 'colorTheme' || key === 'animationsEnabled') {
             localStorage.removeItem(key);
           }
         });
@@ -1615,7 +2127,7 @@
 
         if (result.success) {
           uploaderTokens[result.file.id] = result.uploaderToken;
-          localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
+          saveTokensToStorage();
           showNotification('✅ Game uploaded! Check Settings for your delete token.', 'success');
           setTimeout(() => {
             hideNotification();
@@ -1661,6 +2173,7 @@
 
     async function confirmDelete() {
       const token = document.getElementById('deleteToken').value;
+      showNotification('⏳ Deleting game...', 'loading');
       try {
         const response = await fetch(`/api/delete/${window.currentDeleteId}`, {
           method: 'DELETE',
@@ -1669,16 +2182,21 @@
         });
         const result = await response.json();
         if (result.success) {
-          alert('Game deleted!');
           delete uploaderTokens[window.currentDeleteId];
-          localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
-          closeDeleteModal();
-          loadGames();
+          saveTokensToStorage();
+          showNotification('✅ Game deleted successfully!', 'success');
+          setTimeout(() => {
+            hideNotification();
+            closeDeleteModal();
+            loadGames();
+          }, 2000);
         } else {
-          alert('Error: ' + result.error);
+          showNotification('❌ ' + result.error, 'error');
+          setTimeout(hideNotification, 3000);
         }
       } catch (err) {
-        alert('Delete failed: ' + err.message);
+        showNotification('❌ Delete failed: ' + err.message, 'error');
+        setTimeout(hideNotification, 3000);
       }
     }
 
@@ -1778,6 +2296,7 @@
     }
 
     // Initialize
+    loadTokensFromStorage();
     loadAllSettings();
     loadGames();
     setInterval(sendHeartbeat, 5000);
