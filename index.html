@@ -408,6 +408,17 @@
       color: white;
     }
 
+    .delete-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .delete-btn:hover {
+      background: #ef4444;
+      color: white;
+    }
+
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -938,6 +949,36 @@
     </div>
   </div>
 
+  <!-- DELETE MODAL -->
+  <div class="upload-modal" id="deleteModal">
+    <div class="upload-content">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <h2>🗑️ Delete Game</h2>
+          <p>Enter admin password to delete</p>
+        </div>
+        <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div style="color: var(--text-secondary); margin-bottom: 20px;">
+        <p>Are you sure you want to delete <strong id="deleteGameName">this game</strong>?</p>
+        <p style="font-size: 0.9em; margin-top: 10px;">This action cannot be undone.</p>
+        <p style="font-size: 0.8em; margin-top: 15px; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px;">💡 Hint: Default password is <strong>changeme123</strong> (if not changed)</p>
+      </div>
+      <input 
+        type="password" 
+        id="deletePassword" 
+        placeholder="Enter admin password"
+        style="padding: 13px 16px; background: rgba(255, 255, 255, 0.08); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Poppins', sans-serif; margin-bottom: 20px; width: 100%;"
+        onkeypress="if(event.key==='Enter') deleteGameConfirm()"
+      >
+      <div id="deleteMessage" class="message"></div>
+      <div style="display: flex; gap: 10px;">
+        <button onclick="closeDeleteModal()" style="flex: 1; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); border-radius: 10px; cursor: pointer; font-weight: 600;">Cancel</button>
+        <button onclick="deleteGameConfirm()" style="flex: 1; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">Delete Game</button>
+      </div>
+    </div>
+  </div>
+
   <!-- GAME MODAL -->
   <div class="game-modal" id="gameModal">
     <div class="modal-content">
@@ -985,6 +1026,9 @@
     });
     document.getElementById('gameModal').addEventListener('click', function(e) {
       if (e.target === this) closeGame();
+    });
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteModal();
     });
 
     // ESC key handling
@@ -1059,6 +1103,7 @@
               <button class="game-btn" onclick="playGame(${game.id}, '${game.name}')">🎮 Play</button>
               <button class="game-btn" onclick="downloadGame(${game.id})">📥</button>
               ${game.customSettings ? `<button class="game-btn" onclick="showGameSettings(${game.id})">⚙️</button>` : ''}
+              <button class="game-btn delete-btn" onclick="openDeleteModal(${game.id})">🗑️</button>
             </div>
           </div>
         </div>
@@ -1143,6 +1188,82 @@
     function closeSettingsView() {
       document.querySelector('.settings-view').classList.remove('active');
       document.querySelector('.main-view').classList.add('active');
+    }
+
+    let currentDeleteId = null;
+
+    function openDeleteModal(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) return;
+
+      currentDeleteId = gameId;
+      document.getElementById('deleteGameName').textContent = game.name;
+      document.getElementById('deletePassword').value = '';
+      document.getElementById('deleteMessage').className = 'message';
+      document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+      currentDeleteId = null;
+    }
+
+    async function deleteGameConfirm() {
+      const password = document.getElementById('deletePassword').value;
+      const deleteBtn = document.querySelector('[onclick="deleteGameConfirm()"]');
+      
+      if (!password) {
+        const msgDiv = document.getElementById('deleteMessage');
+        msgDiv.className = 'message show error';
+        msgDiv.textContent = '❌ Please enter the admin password';
+        return;
+      }
+
+      deleteBtn.disabled = true;
+      const originalText = deleteBtn.textContent;
+      deleteBtn.textContent = '⏳ Deleting...';
+
+      try {
+        console.log(`Deleting game ID: ${currentDeleteId}`);
+        console.log(`Password: ${password}`);
+        
+        const response = await fetch(`/api/delete/${currentDeleteId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        });
+
+        console.log(`Response status: ${response.status}`);
+        
+        const result = await response.json();
+        console.log(`Response: ${JSON.stringify(result)}`);
+
+        if (response.ok) {
+          const msgDiv = document.getElementById('deleteMessage');
+          msgDiv.className = 'message show success';
+          msgDiv.textContent = '✅ Game deleted successfully!';
+          
+          setTimeout(() => {
+            closeDeleteModal();
+            loadGames();
+          }, 1500);
+        } else {
+          const msgDiv = document.getElementById('deleteMessage');
+          msgDiv.className = 'message show error';
+          msgDiv.textContent = '❌ ' + (result.error || 'Failed to delete game');
+          deleteBtn.disabled = false;
+          deleteBtn.textContent = originalText;
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        const msgDiv = document.getElementById('deleteMessage');
+        msgDiv.className = 'message show error';
+        msgDiv.textContent = '❌ Error: ' + err.message;
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = originalText;
+      }
     }
 
     async function uploadFile(e) {
