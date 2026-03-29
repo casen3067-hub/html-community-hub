@@ -955,19 +955,19 @@
       <div class="modal-header">
         <div class="modal-header-content">
           <h2>🗑️ Delete Game</h2>
-          <p>Enter admin password to delete</p>
+          <p>Only you can delete your games</p>
         </div>
         <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
       </div>
       <div style="color: var(--text-secondary); margin-bottom: 20px;">
         <p>Are you sure you want to delete <strong id="deleteGameName">this game</strong>?</p>
         <p style="font-size: 0.9em; margin-top: 10px;">This action cannot be undone.</p>
-        <p style="font-size: 0.8em; margin-top: 15px; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px;">💡 Hint: Default password is <strong>changeme123</strong> (if not changed)</p>
+        <p style="font-size: 0.8em; margin-top: 15px; color: var(--accent); background: rgba(236, 72, 153, 0.1); padding: 8px; border-radius: 6px; border: 1px solid rgba(236, 72, 153, 0.3);">📝 Enter your deletion token (saved when you uploaded)</p>
       </div>
       <input 
         type="password" 
-        id="deletePassword" 
-        placeholder="Enter admin password"
+        id="deleteToken" 
+        placeholder="Enter your deletion token"
         style="padding: 13px 16px; background: rgba(255, 255, 255, 0.08); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Poppins', sans-serif; margin-bottom: 20px; width: 100%;"
         onkeypress="if(event.key==='Enter') deleteGameConfirm()"
       >
@@ -999,6 +999,22 @@
     let iconData = null;
     let allGames = [];
     let currentCategory = 'all';
+    let uploaderTokens = {}; // Store tokens: gameId -> token
+
+    // Load tokens from localStorage
+    function loadTokens() {
+      const saved = localStorage.getItem('uploaderTokens');
+      if (saved) {
+        uploaderTokens = JSON.parse(saved);
+      }
+    }
+
+    // Save tokens to localStorage
+    function saveTokens() {
+      localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
+    }
+
+    loadTokens();
 
     // Load games on startup
     loadGames();
@@ -1198,9 +1214,15 @@
 
       currentDeleteId = gameId;
       document.getElementById('deleteGameName').textContent = game.name;
-      document.getElementById('deletePassword').value = '';
+      
+      // Pre-fill token if we have it
+      const savedToken = uploaderTokens[gameId] || '';
+      document.getElementById('deleteToken').value = savedToken;
       document.getElementById('deleteMessage').className = 'message';
       document.getElementById('deleteModal').classList.add('show');
+      
+      // Focus on token input
+      document.getElementById('deleteToken').focus();
     }
 
     function closeDeleteModal() {
@@ -1209,13 +1231,13 @@
     }
 
     async function deleteGameConfirm() {
-      const password = document.getElementById('deletePassword').value;
+      const uploaderToken = document.getElementById('deleteToken').value;
       const deleteBtn = document.querySelector('[onclick="deleteGameConfirm()"]');
       
-      if (!password) {
+      if (!uploaderToken) {
         const msgDiv = document.getElementById('deleteMessage');
         msgDiv.className = 'message show error';
-        msgDiv.textContent = '❌ Please enter the admin password';
+        msgDiv.textContent = '❌ Please enter your deletion token';
         return;
       }
 
@@ -1225,14 +1247,13 @@
 
       try {
         console.log(`Deleting game ID: ${currentDeleteId}`);
-        console.log(`Password: ${password}`);
         
         const response = await fetch(`/api/delete/${currentDeleteId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ password })
+          body: JSON.stringify({ uploaderToken })
         });
 
         console.log(`Response status: ${response.status}`);
@@ -1241,6 +1262,10 @@
         console.log(`Response: ${JSON.stringify(result)}`);
 
         if (response.ok) {
+          // Remove token from localStorage
+          delete uploaderTokens[currentDeleteId];
+          saveTokens();
+          
           const msgDiv = document.getElementById('deleteMessage');
           msgDiv.className = 'message show success';
           msgDiv.textContent = '✅ Game deleted successfully!';
@@ -1304,8 +1329,19 @@
         const result = await response.json();
 
         if (response.ok) {
+          // Save the uploader token
+          if (result.uploaderToken && result.file) {
+            uploaderTokens[result.file.id] = result.uploaderToken;
+            saveTokens();
+            
+            // Show token to user
+            showMessage(`✅ Game uploaded! Your deletion token: ${result.uploaderToken} (save this to delete later)`, 'success');
+            console.log(`Saved token for game ID ${result.file.id}: ${result.uploaderToken}`);
+          } else {
+            showMessage('✅ Game uploaded successfully!', 'success');
+          }
+          
           submitBtn.textContent = '✅ Uploaded!';
-          showMessage('✅ Game uploaded successfully!', 'success');
           document.getElementById('uploadForm').reset();
           iconData = null;
           
@@ -1314,7 +1350,7 @@
             loadGames();
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
-          }, 2000);
+          }, 3000);
         } else {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
