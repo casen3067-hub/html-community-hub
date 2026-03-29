@@ -4,10 +4,11 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
+const { GridFSBucket } = require('mongodb');
 
 const app = express();
 
-// Increase timeout limits for faster uploads
+// Increase timeout limits for 100MB uploads
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb' }));
 app.use(cors());
@@ -31,6 +32,7 @@ if (!MONGODB_URI) {
 }
 
 let db = null;
+let gridFSBucket = null;
 
 async function connectDB() {
   if (!MONGODB_URI) {
@@ -44,7 +46,8 @@ async function connectDB() {
       useUnifiedTopology: true,
     });
     db = mongoose.connection;
-    console.log('✅ Connected to MongoDB');
+    gridFSBucket = new GridFSBucket(db.getClient().db('gamevault'));
+    console.log('✅ Connected to MongoDB with GridFS (supports 100MB+ files)');
     
     // Load existing games
     loadGamesFromDB();
@@ -54,7 +57,7 @@ async function connectDB() {
   }
 }
 
-// Game Schema
+// Game Schema (stores metadata only - HTML is in GridFS)
 const gameSchema = new mongoose.Schema({
   id: Number,
   name: String,
@@ -66,7 +69,7 @@ const gameSchema = new mongoose.Schema({
   uploadDate: String,
   downloads: Number,
   timestamp: Number,
-  htmlContent: String,
+  htmlFileId: mongoose.Schema.Types.ObjectId, // Reference to GridFS file
   uploaderToken: String,
 });
 
@@ -76,7 +79,7 @@ if (MONGODB_URI) {
   Game = mongoose.model('Game', gameSchema);
 }
 
-// In-memory fallback
+// In-memory fallback for HTML content
 let allFiles = [];
 let nextId = 1;
 
@@ -103,26 +106,28 @@ async function saveGamesToDB(game) {
   }
 
   try {
-    // Remove htmlContent temporarily to avoid buffer issues
-    const gameData = { ...game };
-    
     await Game.findOneAndUpdate(
       { id: game.id },
-      gameData,
+      game,
       { upsert: true, new: true }
     );
-    console.log(`💾 Game saved to MongoDB: ${game.name}`);
+    console.log(`💾 Game metadata saved to MongoDB: ${game.name}`);
   } catch (err) {
-    console.error('Error saving game to MongoDB:', err.message);
-    // Game is still saved in memory, so don't fail completely
-    console.log(`⚠️ MongoDB save failed, but game is in memory`);
+    console.error('Error saving game to MongoDB:', err);
   }
 }
 
 async function deleteGameFromDB(gameId) {
-  if (!Game) return;
+  if (!Game || !gridFSBucket) return;
 
   try {
+    const game = await Game.findOne({ id: gameId });
+    if (game && game.htmlFileId) {
+      // Delete file from GridFS
+      await gridFSBucket.delete(game.htmlFileId);
+      console.log(`🗑️ HTML file deleted from GridFS`);
+    }
+    // Delete metadata
     await Game.deleteOne({ id: gameId });
     console.log(`🗑️ Game deleted from MongoDB (ID: ${gameId})`);
   } catch (err) {
@@ -155,7 +160,7 @@ setInterval(cleanupInactiveSessions, 10000);
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 100 * 1024 * 1024
+    fileSize: 100 * 1024 * 1024 // 100MB
   }
 });
 
@@ -165,7 +170,7 @@ app.get('/', (req, res) => {
 });
 
 // UPLOAD: When someone uploads a file
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/upload', upload.single('file'), async (req, res) => {
   console.log('📥 Upload request received');
   
   if (!req.file) {
@@ -189,17 +194,15 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   let iconBase64 = null;
   if (req.body.iconData) {
     try {
-      let iconData = req.body.iconData;
-      if (iconData.includes(',')) {
-        iconData = iconData.split(',')[1];
-      }
-      // Store icon but compress quality - limit to 300KB
-      if (iconData.length > 300 * 1024) {
-        console.warn('Icon too large, compressing or skipping');
-        // Try to keep only first 300KB of base64
-        iconBase64 = iconData.substring(0, 300 * 1024);
+      if (req.body.iconData.includes(',')) {
+        iconBase64 = req.body.iconData.split(',')[1];
       } else {
-        iconBase64 = iconData;
+        iconBase64 = req.body.iconData;
+      }
+      // Limit icon to 1MB
+      if (iconBase64.length > 1024 * 1024) {
+        console.warn('Icon too large, skipping');
+        iconBase64 = null;
       }
     } catch (err) {
       console.error('Icon processing error:', err);
@@ -215,16 +218,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     return res.status(400).json({ error: 'Could not process HTML file' });
   }
 
-  // Check file size - MongoDB has 16MB limit, we'll use 12MB to be safe with icon
-  const totalSize = htmlContent.length + (iconBase64 ? iconBase64.length : 0);
-  if (totalSize > 12 * 1024 * 1024) {
-    return res.status(413).json({ error: 'Total file size too large for storage (HTML + icon must be under 12MB combined)' });
-  }
-
-  if (htmlContent.length > 11 * 1024 * 1024) {
-    return res.status(413).json({ error: 'HTML file too large (max 11MB)' });
-  }
-
+  const uploaderToken = generateToken();
+  
+  // Create game metadata object
   const newFile = {
     id: nextId,
     name: gameName,
@@ -232,28 +228,64 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     uploader: req.body.uploader || 'Anonymous',
     category: req.body.category || 'other',
     customSettings: req.body.customSettings || '',
-    icon: iconBase64 || null,  // Make icon optional
+    icon: iconBase64,
     uploadDate: new Date().toLocaleDateString(),
     downloads: 0,
     timestamp: Date.now(),
-    htmlContent: htmlContent,
-    uploaderToken: generateToken()
+    uploaderToken: uploaderToken
   };
 
-  allFiles.push(newFile);
-  nextId++;
+  // If MongoDB is connected, save to GridFS
+  if (gridFSBucket && Game) {
+    try {
+      // Upload HTML content to GridFS
+      const uploadStream = gridFSBucket.openUploadStream(`game-${nextId}.html`, {
+        metadata: { gameId: nextId, gameName: gameName }
+      });
 
-  // Save to MongoDB
-  saveGamesToDB(newFile);
+      uploadStream.end(htmlContent, async (err) => {
+        if (err) {
+          console.error('GridFS upload failed:', err);
+          return res.status(500).json({ error: 'Failed to save game file' });
+        }
 
-  console.log(`✅ Game uploaded successfully: ${newFile.name} (ID: ${newFile.id})`);
-  
-  res.json({ 
-    success: true, 
-    file: newFile,
-    uploaderToken: newFile.uploaderToken,
-    message: 'Game uploaded successfully!'
-  });
+        newFile.htmlFileId = uploadStream.id;
+        
+        // Save metadata to MongoDB
+        await saveGamesToDB(newFile);
+        
+        // Also store in memory for quick access
+        allFiles.push(newFile);
+        nextId++;
+
+        console.log(`✅ Game uploaded successfully: ${newFile.name} (${(req.file.buffer.length / 1024 / 1024).toFixed(2)}MB)`);
+        
+        res.json({ 
+          success: true, 
+          file: newFile,
+          uploaderToken: uploaderToken,
+          message: 'Game uploaded successfully!'
+        });
+      });
+    } catch (err) {
+      console.error('GridFS error:', err);
+      return res.status(500).json({ error: 'Failed to save game' });
+    }
+  } else {
+    // Fallback: store HTML in memory if MongoDB not available
+    newFile.htmlContent = htmlContent;
+    allFiles.push(newFile);
+    nextId++;
+
+    console.log(`✅ Game uploaded (memory only): ${newFile.name}`);
+    
+    res.json({ 
+      success: true, 
+      file: newFile,
+      uploaderToken: uploaderToken,
+      message: 'Game uploaded successfully! (stored in memory)'
+    });
+  }
 });
 
 // GET ALL: Show all uploaded files
@@ -286,7 +318,7 @@ app.get('/api/active-players', (req, res) => {
 });
 
 // VIEW: Display HTML file in browser
-app.get('/api/view/:id', (req, res) => {
+app.get('/api/view/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
     console.log(`👁️ View request for game ID: ${fileId}`);
@@ -298,17 +330,38 @@ app.get('/api/view/:id', (req, res) => {
       return res.status(404).send('<h1 style="color:#ef4444;">Game not found</h1>');
     }
 
-    if (!file.htmlContent) {
+    let htmlContent = file.htmlContent; // From memory storage
+    
+    // If stored in GridFS, retrieve from there
+    if (file.htmlFileId && gridFSBucket) {
+      try {
+        const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
+        let content = '';
+        
+        downloadStream.on('data', (chunk) => {
+          content += chunk.toString('utf-8');
+        });
+        
+        downloadStream.on('end', () => {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.setHeader('Content-Disposition', 'inline');
+          res.send(content);
+        });
+        
+        downloadStream.on('error', () => {
+          res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
+        });
+      } catch (err) {
+        res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
+      }
+    } else if (htmlContent) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', 'inline');
+      res.send(htmlContent);
+    } else {
       console.error(`❌ No HTML content for game: ${file.name}`);
       return res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
     }
-
-    console.log(`✅ Serving game: ${file.name}`);
-    
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', 'inline');
-    
-    res.send(file.htmlContent);
   } catch (err) {
     console.error('View error:', err);
     res.status(500).send('<h1 style="color:#ef4444;">Error loading game</h1>');
@@ -316,7 +369,7 @@ app.get('/api/view/:id', (req, res) => {
 });
 
 // DOWNLOAD: Download the HTML file
-app.get('/api/download/:id', (req, res) => {
+app.get('/api/download/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
     const file = allFiles.find(f => f.id === fileId);
@@ -325,18 +378,47 @@ app.get('/api/download/:id', (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    if (!file.htmlContent) {
+    let htmlContent = file.htmlContent;
+    
+    // If stored in GridFS, retrieve from there
+    if (file.htmlFileId && gridFSBucket) {
+      try {
+        const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
+        let content = '';
+        
+        downloadStream.on('data', (chunk) => {
+          content += chunk.toString('utf-8');
+        });
+        
+        downloadStream.on('end', () => {
+          file.downloads++;
+          saveGamesToDB(file);
+          
+          console.log(`📥 Downloading: ${file.name}`);
+          
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
+          res.send(content);
+        });
+        
+        downloadStream.on('error', () => {
+          res.status(404).json({ error: 'Game file not found' });
+        });
+      } catch (err) {
+        res.status(404).json({ error: 'Game file not found' });
+      }
+    } else if (htmlContent) {
+      file.downloads++;
+      saveGamesToDB(file);
+
+      console.log(`📥 Downloading: ${file.name}`);
+      
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
+      res.send(htmlContent);
+    } else {
       return res.status(404).json({ error: 'Game file not found' });
     }
-
-    file.downloads++;
-    saveGamesToDB(file);
-
-    console.log(`📥 Downloading: ${file.name}`);
-    
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
-    res.send(file.htmlContent);
   } catch (err) {
     console.error('Download error:', err);
     res.status(500).json({ error: 'Download failed' });
@@ -373,7 +455,7 @@ app.delete('/api/delete/:id', (req, res) => {
     // Remove from memory
     allFiles.splice(fileIndex, 1);
     
-    // Delete from MongoDB
+    // Delete from MongoDB/GridFS
     deleteGameFromDB(fileId);
     
     console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
@@ -409,7 +491,7 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, async () => {
   console.log(`\n🎮 GameVault running on port ${PORT}`);
   
-  // Connect to MongoDB
+  // Connect to MongoDB with GridFS
   await connectDB();
   
   console.log(`📊 Games loaded: ${allFiles.length}\n`);
