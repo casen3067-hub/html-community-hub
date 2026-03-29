@@ -816,7 +816,7 @@
 <body>
   <!-- Background Music -->
   <audio id="bgMusic" loop preload="none">
- <source src="https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3" type="audio/mpeg">
+    <source src="https://cdn.pixabay.com/download/audio/2021/08/16/audio_8ffda34a8e.mp3" type="audio/mpeg">
   </audio>
 
   <div class="attribution">
@@ -951,10 +951,11 @@
               onchange="updateFileName('icon', 'iconLabel')"
             >
             <label for="icon" class="file-input-label" id="iconLabel">
-              🖼️ Choose an icon image (JPG/PNG)
+              🖼️ Choose an icon image (JPG/PNG - will be compressed)
             </label>
             <div class="file-name" id="iconName"></div>
           </div>
+          <span class="form-group-hint">Icon will be compressed to save space (max 300KB stored)</span>
         </div>
 
         <!-- GAME FILE -->
@@ -973,7 +974,7 @@
             </label>
             <div class="file-name" id="fileName"></div>
           </div>
-          <span class="form-group-hint">Upload your .html game file (max 100MB)</span>
+          <span class="form-group-hint">Upload your .html game file (HTML max 11MB, total with icon max 12MB)</span>
         </div>
 
         <div id="message" class="message"></div>
