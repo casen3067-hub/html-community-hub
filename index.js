@@ -33,7 +33,7 @@ if (!fs.existsSync('uploads')) {
 const DB_FILE = path.join(__dirname, 'games-database.json');
 
 // ADMIN PASSWORD FOR DELETING GAMES (Change this to your secret password!)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Tiu2mc3y!!!';
 
 // Setup file upload with optimizations
 const upload = multer({
