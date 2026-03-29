@@ -891,7 +891,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, async () => {
   console.log(`\n🎮 GameVault running on port ${PORT}`);
-  console.log(`🔐 Admin email: ${ADMIN_EMAIL}`);
+  console.log(`🔐 Admin password protected ✅`);
   
   await connectDB();
   
