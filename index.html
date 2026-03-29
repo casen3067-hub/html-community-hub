@@ -867,6 +867,71 @@
       box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
     }
 
+    /* TOKEN ITEM */
+    .token-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .token-item:hover {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.08) 100%);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+    }
+
+    .token-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .token-game-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-size: 0.95em;
+    }
+
+    .token-value {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      word-break: break-all;
+      background: var(--bg-card);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .token-copy-btn {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .token-copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .token-copy-btn.copied {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
     /* RESPONSIVENESS */
     @media (max-width: 1024px) {
       .games-grid {
@@ -1129,6 +1194,17 @@
                 </div>
                 <span id="autoPlayFullscreenLabel" class="setting-value">Off</span>
               </div>
+            </div>
+          </div>
+
+          <!-- MY TOKENS -->
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>🔐 My Delete Tokens</h3>
+              <p>View tokens for games you uploaded</p>
+            </div>
+            <div id="tokensContainer" style="display: flex; flex-direction: column; gap: 15px;">
+              <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>
             </div>
           </div>
 
@@ -1540,7 +1616,7 @@
         if (result.success) {
           uploaderTokens[result.file.id] = result.uploaderToken;
           localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
-          showNotification('✅ Game uploaded successfully!', 'success');
+          showNotification('✅ Game uploaded! Check Settings for your delete token.', 'success');
           setTimeout(() => {
             hideNotification();
             closeUploadModal();
@@ -1633,6 +1709,51 @@
       const musicStatus = document.getElementById('musicStatus');
       document.getElementById('musicControlBtn').textContent = isMusicPlaying ? '⏸️ Pause' : '▶️ Play';
       musicStatus.textContent = isMusicPlaying ? 'Now playing' : 'Paused';
+      displayTokens();
+    }
+
+    function displayTokens() {
+      const container = document.getElementById('tokensContainer');
+      
+      if (!uploaderTokens || Object.keys(uploaderTokens).length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>';
+        return;
+      }
+
+      const tokenItems = Object.entries(uploaderTokens)
+        .map(([gameId, token]) => {
+          const game = allGames.find(g => g.id === parseInt(gameId));
+          const gameName = game ? game.name : `Game #${gameId}`;
+          
+          return `
+            <div class="token-item">
+              <div class="token-info">
+                <div class="token-game-name">📌 ${gameName}</div>
+                <div class="token-value">${token}</div>
+              </div>
+              <button class="token-copy-btn" onclick="copyToken('${token}', this)">📋 Copy</button>
+            </div>
+          `;
+        })
+        .join('');
+
+      container.innerHTML = tokenItems;
+    }
+
+    function copyToken(token, button) {
+      navigator.clipboard.writeText(token).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✅ Copied!';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        showNotification('❌ Failed to copy token', 'error');
+        setTimeout(hideNotification, 3000);
+      });
     }
 
     function closeSettingsView() {
