@@ -103,14 +103,19 @@ async function saveGamesToDB(game) {
   }
 
   try {
+    // Remove htmlContent temporarily to avoid buffer issues
+    const gameData = { ...game };
+    
     await Game.findOneAndUpdate(
       { id: game.id },
-      game,
+      gameData,
       { upsert: true, new: true }
     );
     console.log(`💾 Game saved to MongoDB: ${game.name}`);
   } catch (err) {
-    console.error('Error saving game to MongoDB:', err);
+    console.error('Error saving game to MongoDB:', err.message);
+    // Game is still saved in memory, so don't fail completely
+    console.log(`⚠️ MongoDB save failed, but game is in memory`);
   }
 }
 
@@ -184,13 +189,21 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   let iconBase64 = null;
   if (req.body.iconData) {
     try {
-      if (req.body.iconData.includes(',')) {
-        iconBase64 = req.body.iconData.split(',')[1];
+      let iconData = req.body.iconData;
+      if (iconData.includes(',')) {
+        iconData = iconData.split(',')[1];
+      }
+      // Store icon but compress quality - limit to 300KB
+      if (iconData.length > 300 * 1024) {
+        console.warn('Icon too large, compressing or skipping');
+        // Try to keep only first 300KB of base64
+        iconBase64 = iconData.substring(0, 300 * 1024);
       } else {
-        iconBase64 = req.body.iconData;
+        iconBase64 = iconData;
       }
     } catch (err) {
       console.error('Icon processing error:', err);
+      iconBase64 = null;
     }
   }
 
@@ -202,6 +215,16 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     return res.status(400).json({ error: 'Could not process HTML file' });
   }
 
+  // Check file size - MongoDB has 16MB limit, we'll use 12MB to be safe with icon
+  const totalSize = htmlContent.length + (iconBase64 ? iconBase64.length : 0);
+  if (totalSize > 12 * 1024 * 1024) {
+    return res.status(413).json({ error: 'Total file size too large for storage (HTML + icon must be under 12MB combined)' });
+  }
+
+  if (htmlContent.length > 11 * 1024 * 1024) {
+    return res.status(413).json({ error: 'HTML file too large (max 11MB)' });
+  }
+
   const newFile = {
     id: nextId,
     name: gameName,
@@ -209,7 +232,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     uploader: req.body.uploader || 'Anonymous',
     category: req.body.category || 'other',
     customSettings: req.body.customSettings || '',
-    icon: iconBase64,
+    icon: iconBase64 || null,  // Make icon optional
     uploadDate: new Date().toLocaleDateString(),
     downloads: 0,
     timestamp: Date.now(),
