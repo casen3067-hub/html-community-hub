@@ -101,6 +101,22 @@
       font-weight: 600;
     }
 
+    .active-players {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-size: 0.9em;
+      font-weight: 600;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
     .header-right {
       display: flex;
       gap: 10px;
@@ -793,6 +809,7 @@
       <div class="header-left">
         <div class="logo">🎮</div>
         <div class="game-count">Loaded <span id="gameCount">0</span> games...</div>
+        <div class="active-players">👥 <span id="activePlayers">0</span> online</div>
       </div>
       <div class="header-right">
         <input 
@@ -1018,6 +1035,37 @@
 
     // Load games on startup
     loadGames();
+
+    // Active players tracking
+    let sessionId = Math.random().toString(36).substring(7);
+    
+    function sendHeartbeat() {
+      fetch('/api/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      }).catch(() => {}); // Silent fail if server is down
+    }
+
+    async function updateActivePlayers() {
+      try {
+        const response = await fetch('/api/active-players');
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('activePlayers').textContent = data.count;
+        }
+      } catch (err) {
+        // Silent fail
+      }
+    }
+
+    // Send heartbeat every 5 seconds
+    sendHeartbeat();
+    setInterval(sendHeartbeat, 5000);
+
+    // Update active player count every 5 seconds
+    updateActivePlayers();
+    setInterval(updateActivePlayers, 5000);
 
     // Event listeners
     document.getElementById('uploadForm').addEventListener('submit', uploadFile);
