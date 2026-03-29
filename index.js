@@ -32,8 +32,10 @@ if (!fs.existsSync('uploads')) {
 // DATABASE FILE PATH
 const DB_FILE = path.join(__dirname, 'games-database.json');
 
-// ADMIN PASSWORD FOR DELETING GAMES (Change this to your secret password!)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
+// Utility function to generate a unique token
+function generateToken() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
 
 // Setup file upload with memory storage (so we can store in database)
 const upload = multer({
@@ -144,7 +146,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     downloads: 0,
     timestamp: Date.now(),
     // Store the actual HTML file content in the database
-    htmlContent: htmlContent
+    htmlContent: htmlContent,
+    // Unique token to identify the uploader
+    uploaderToken: generateToken()
   };
 
   allFiles.push(newFile);
@@ -155,11 +159,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
   console.log(`✅ Game uploaded successfully: ${newFile.name} (ID: ${newFile.id})`);
   
-  // Return success with the file data
+  // Return success with the file data AND the token
   res.json({ 
     success: true, 
     file: newFile,
-    message: 'Game uploaded successfully!'
+    uploaderToken: newFile.uploaderToken,
+    message: 'Game uploaded successfully! Save your token to delete later.'
   });
 });
 
@@ -228,29 +233,18 @@ app.get('/api/download/:id', (req, res) => {
   }
 });
 
-// DELETE: Remove a game (admin only)
+// DELETE: Remove a game (only uploader can delete)
 app.delete('/api/delete/:id', (req, res) => {
   try {
     console.log(`🗑️ Delete request for game ID: ${req.params.id}`);
-    console.log(`📊 Current games in database: ${allFiles.length}`);
     
     const fileId = parseInt(req.params.id);
-    const password = req.body.password;
+    const uploaderToken = req.body.uploaderToken;
     
-    console.log(`Checking password...`);
-    
-    // Check admin password
-    if (!password || password !== ADMIN_PASSWORD) {
-      console.log('❌ Delete attempt with wrong password');
-      return res.status(401).json({ error: 'Invalid admin password' });
-    }
-    
-    console.log(`✅ Password correct, looking for game ID: ${fileId}`);
+    console.log(`Checking uploader token...`);
     
     // Find the game
     const fileIndex = allFiles.findIndex(f => f.id === fileId);
-    
-    console.log(`Found at index: ${fileIndex}, Total games: ${allFiles.length}`);
     
     if (fileIndex === -1) {
       console.log(`❌ Game not found. Available IDs: ${allFiles.map(f => f.id).join(', ')}`);
@@ -260,7 +254,15 @@ app.delete('/api/delete/:id', (req, res) => {
     const file = allFiles[fileIndex];
     console.log(`Found game: ${file.name}`);
     
-    // Remove from database (no need to delete from disk since we store in DB)
+    // Check if uploader token matches
+    if (!uploaderToken || uploaderToken !== file.uploaderToken) {
+      console.log('❌ Delete attempt with wrong token');
+      return res.status(401).json({ error: 'Invalid token - you did not upload this game' });
+    }
+    
+    console.log(`✅ Token correct, deleting game`);
+    
+    // Remove from database
     allFiles.splice(fileIndex, 1);
     saveDatabase();
     
