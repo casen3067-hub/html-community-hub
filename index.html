@@ -1478,6 +1478,26 @@
         <!-- MY TOKENS -->
         <div class="settings-section">
           <div class="settings-section-header">
+            <h3>🔐 Admin Mode</h3>
+            <p>Enter password to unlock admin features</p>
+          </div>
+
+          <div class="form-group">
+            <label>Admin Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter admin password">
+          </div>
+
+          <button class="btn-submit" onclick="unlockAdminMode()" style="margin-bottom: 20px;">🔓 Unlock Admin</button>
+
+          <div id="adminStatusDiv" style="padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: none;">
+            <div style="color: var(--text-primary); font-weight: 700;">✅ Admin Mode Active</div>
+            <div style="color: var(--text-secondary); font-size: 0.9em; margin-top: 5px;">You can now access admin dashboard</div>
+          </div>
+        </div>
+
+        <!-- MY TOKENS -->
+        <div class="settings-section">
+          <div class="settings-section-header">
             <h3>🔐 My Delete Tokens</h3>
             <p>View tokens for games you uploaded</p>
           </div>
@@ -1514,11 +1534,6 @@
         <div class="form-group">
           <label>Your Name</label>
           <input type="text" id="uploaderName" placeholder="Enter your name">
-        </div>
-
-        <div class="form-group">
-          <label>Your Email (for admin features)</label>
-          <input type="email" id="uploaderEmail" placeholder="your@email.com">
         </div>
 
         <div class="form-group">
@@ -1710,9 +1725,8 @@
     let currentRatingGameId = null;
     let sessionId = Math.random().toString(36).substring(7);
     let userFavorites = [];
-    let userEmail = localStorage.getItem('userEmail') || '';
+    let isAdminMode = localStorage.getItem('isAdminMode') === 'true' || false;
 
-    const ADMIN_EMAIL = 'casen3067@gmail.com';
     const API_BASE = '';
 
     const bgMusic = document.getElementById('bgMusic') || new Audio('https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3');
@@ -2168,7 +2182,12 @@
       const uploaderNamesShown = localStorage.getItem('uploaderNamesShown') !== 'false';
       document.getElementById('uploaderNamesToggle').checked = uploaderNamesShown;
 
-      userEmail = localStorage.getItem('userEmail') || '';
+      // Load admin mode status
+      isAdminMode = localStorage.getItem('isAdminMode') === 'true';
+      if (isAdminMode) {
+        document.getElementById('adminStatusDiv').style.display = 'block';
+        document.getElementById('adminPassword').disabled = true;
+      }
     }
 
     function changeTheme(theme, save = true) {
@@ -2246,6 +2265,7 @@
             <div class="game-actions">
               <button class="game-btn" onclick="playGame(${game.id})">▶️ Play</button>
               <button class="game-btn secondary" onclick="downloadGame(${game.id})">⬇️ Download</button>
+              ${uploaderTokens.hasOwnProperty(game.id) ? `<button class="game-btn secondary" style="background: #ef4444; border-color: #ef4444; color: white;" onclick="openDeleteModal(${game.id})">🗑️ Delete</button>` : ''}
               <button class="fav-btn ${userFavorites.includes(game.id) ? 'favorited' : ''}" onclick="toggleFavorite(${game.id}, event)">❤️</button>
             </div>
           </div>
@@ -2373,7 +2393,6 @@
       document.getElementById('gameName').value = '';
       document.getElementById('gameDescription').value = '';
       document.getElementById('uploaderName').value = '';
-      document.getElementById('uploaderEmail').value = userEmail;
       document.getElementById('gameTags').value = '';
       document.getElementById('file').value = '';
       document.getElementById('icon').value = '';
@@ -2397,7 +2416,6 @@
       const nameInput = document.getElementById('gameName');
       const descInput = document.getElementById('gameDescription');
       const uploaderInput = document.getElementById('uploaderName');
-      const emailInput = document.getElementById('uploaderEmail');
       const tagsInput = document.getElementById('gameTags');
       const categorySelect = document.getElementById('gameCategory');
       const iconInput = document.getElementById('icon');
@@ -2411,15 +2429,12 @@
       }
 
       showNotification('⏳ Uploading Game...', 'loading');
-      userEmail = emailInput.value;
-      localStorage.setItem('userEmail', userEmail);
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       formData.append('name', nameInput.value);
       formData.append('description', descInput.value);
       formData.append('uploader', uploaderInput.value);
-      formData.append('uploaderEmail', emailInput.value);
       formData.append('category', categorySelect.value);
       formData.append('tags', tagsInput.value);
       formData.append('isPasswordProtected', passwordProtect);
@@ -2840,6 +2855,7 @@
 
     function closeDeleteModal() {
       document.getElementById('deleteModal').classList.remove('show');
+      document.getElementById('deleteToken').value = '';
     }
 
     async function confirmDelete() {
@@ -2965,18 +2981,21 @@
 
     // ===== ADMIN DASHBOARD =====
     async function openAdminDashboard() {
-      if (!userEmail) {
-        showNotification('⚠️ Please enter your email in upload form first', 'error');
+      if (!isAdminMode) {
+        showNotification('🔐 Unlock admin mode in Settings first', 'error');
         setTimeout(hideNotification, 3000);
         return;
       }
 
       try {
-        const response = await fetch(`${API_BASE}/api/dashboard/${userEmail}`);
+        const response = await fetch(`${API_BASE}/api/dashboard/${localStorage.getItem('adminPassword')}`);
         const result = await response.json();
 
         if (result.error) {
-          showNotification('🔐 Admin features only', 'error');
+          showNotification('🔐 Admin mode expired', 'error');
+          isAdminMode = false;
+          localStorage.removeItem('isAdminMode');
+          localStorage.removeItem('adminPassword');
           setTimeout(hideNotification, 3000);
           return;
         }
@@ -3015,6 +3034,29 @@
         console.error('Admin dashboard error:', err);
         showNotification('❌ Error loading dashboard', 'error');
       }
+    }
+
+    // ===== UNLOCK ADMIN MODE =====
+    function unlockAdminMode() {
+      const password = document.getElementById('adminPassword').value;
+
+      if (!password) {
+        showNotification('⚠️ Enter admin password', 'error');
+        setTimeout(hideNotification, 2000);
+        return;
+      }
+
+      // For now, we'll accept any password (backend validates on API calls)
+      // In production, you'd validate against backend first
+      isAdminMode = true;
+      localStorage.setItem('isAdminMode', 'true');
+      localStorage.setItem('adminPassword', password);
+
+      document.getElementById('adminStatusDiv').style.display = 'block';
+      document.getElementById('adminPassword').disabled = true;
+      
+      showNotification('✅ Admin mode activated!', 'success');
+      setTimeout(hideNotification, 2000);
     }
 
     function closeAdminModal() {
