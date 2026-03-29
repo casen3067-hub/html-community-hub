@@ -202,11 +202,21 @@ app.get('/api/download/:id', (req, res) => {
   res.download(filePath, file.name + '.html');
 });
 
-// Error handling middleware
+// Error handling middleware (must be AFTER all routes)
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
+  
+  // Handle multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large. Max size is 100MB.' });
+  }
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: 'File upload error: ' + err.message });
+  }
+  
+  // Handle other errors
   res.status(500).json({ 
-    error: 'Server error: ' + err.message 
+    error: 'Server error: ' + (err.message || 'Unknown error') 
   });
 });
 
