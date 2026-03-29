@@ -3,6 +3,7 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -21,16 +22,108 @@ app.use((req, res, next) => {
 // Serve static files from current directory
 app.use(express.static(__dirname));
 
-// Serve uploaded HTML files as static files
-app.use('/uploads', express.static('uploads'));
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Create necessary folders
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
+if (!MONGODB_URI) {
+  console.error('⚠️ WARNING: MONGODB_URI not set! Games will not persist.');
+  console.log('Set MONGODB_URI in Render environment variables.');
 }
 
-// DATABASE FILE PATH
-const DB_FILE = path.join(__dirname, 'games-database.json');
+let db = null;
+
+async function connectDB() {
+  if (!MONGODB_URI) {
+    console.log('Skipping MongoDB connection - using in-memory storage only');
+    return;
+  }
+
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    db = mongoose.connection;
+    console.log('✅ Connected to MongoDB');
+    
+    // Load existing games
+    loadGamesFromDB();
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    console.log('Games will be stored in memory only (will not persist on restart)');
+  }
+}
+
+// Game Schema
+const gameSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  description: String,
+  uploader: String,
+  category: String,
+  customSettings: String,
+  icon: String,
+  uploadDate: String,
+  downloads: Number,
+  timestamp: Number,
+  htmlContent: String,
+  uploaderToken: String,
+});
+
+let Game = null;
+
+if (MONGODB_URI) {
+  Game = mongoose.model('Game', gameSchema);
+}
+
+// In-memory fallback
+let allFiles = [];
+let nextId = 1;
+
+async function loadGamesFromDB() {
+  if (!Game) {
+    console.log('📂 Using in-memory storage (no MongoDB)');
+    return;
+  }
+
+  try {
+    const games = await Game.find().sort({ id: 1 });
+    allFiles = games.map(g => g.toObject());
+    nextId = allFiles.length > 0 ? Math.max(...allFiles.map(g => g.id)) + 1 : 1;
+    console.log(`📂 Loaded ${allFiles.length} games from MongoDB`);
+  } catch (err) {
+    console.error('Error loading games from MongoDB:', err);
+  }
+}
+
+async function saveGamesToDB(game) {
+  if (!Game) {
+    console.log('⚠️ MongoDB not connected - game only saved in memory');
+    return;
+  }
+
+  try {
+    await Game.findOneAndUpdate(
+      { id: game.id },
+      game,
+      { upsert: true, new: true }
+    );
+    console.log(`💾 Game saved to MongoDB: ${game.name}`);
+  } catch (err) {
+    console.error('Error saving game to MongoDB:', err);
+  }
+}
+
+async function deleteGameFromDB(gameId) {
+  if (!Game) return;
+
+  try {
+    await Game.deleteOne({ id: gameId });
+    console.log(`🗑️ Game deleted from MongoDB (ID: ${gameId})`);
+  } catch (err) {
+    console.error('Error deleting game from MongoDB:', err);
+  }
+}
 
 // Utility function to generate a unique token
 function generateToken() {
@@ -38,11 +131,11 @@ function generateToken() {
 }
 
 // Active players tracking
-const activeSessions = new Map(); // sessionId -> timestamp
+const activeSessions = new Map();
 
 function cleanupInactiveSessions() {
   const now = Date.now();
-  const timeout = 15000; // 15 seconds
+  const timeout = 15000;
   
   for (const [sessionId, timestamp] of activeSessions) {
     if (now - timestamp > timeout) {
@@ -51,60 +144,15 @@ function cleanupInactiveSessions() {
   }
 }
 
-// Run cleanup every 10 seconds
 setInterval(cleanupInactiveSessions, 10000);
 
-// Setup file upload with memory storage (so we can store in database)
+// Setup file upload with memory storage
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 100 * 1024 * 1024 // 100MB
+    fileSize: 100 * 1024 * 1024
   }
 });
-
-// Load games from database file
-let allFiles = [];
-let nextId = 1;
-
-function loadDatabase() {
-  try {
-    if (fs.existsSync(DB_FILE)) {
-      const data = fs.readFileSync(DB_FILE, 'utf8');
-      const parsed = JSON.parse(data);
-      allFiles = parsed.games || [];
-      nextId = (parsed.nextId || 1);
-      console.log(`📂 Loaded ${allFiles.length} games from database`);
-    } else {
-      console.log('📂 No database file found, starting fresh');
-      allFiles = [];
-      nextId = 1;
-    }
-  } catch (err) {
-    console.error('Error loading database:', err);
-    allFiles = [];
-    nextId = 1;
-  }
-}
-
-function saveDatabase() {
-  try {
-    const dbData = JSON.stringify({ games: allFiles, nextId }, null, 2);
-    fs.writeFileSync(DB_FILE, dbData, 'utf8');
-    console.log(`💾 Database saved with ${allFiles.length} games`);
-  } catch (err) {
-    console.error('Error saving database:', err);
-    // Try to create the file if it doesn't exist
-    try {
-      fs.writeFileSync(DB_FILE, JSON.stringify({ games: allFiles, nextId }, null, 2), 'utf8');
-      console.log('✅ Database file created and saved');
-    } catch (retryErr) {
-      console.error('Failed to save database even after retry:', retryErr);
-    }
-  }
-}
-
-// Load games on startup
-loadDatabase();
 
 // HOME: Serve index.html
 app.get('/', (req, res) => {
@@ -128,13 +176,11 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
   console.log(`⏳ Processing upload for: ${gameName}`);
   
-  // Check if file buffer is available
   if (!req.file || !req.file.buffer) {
     console.error('File buffer not available:', req.file);
-    return res.status(400).json({ error: 'File processing failed - no file buffer' });
+    return res.status(400).json({ error: 'File processing failed' });
   }
 
-  // Get icon from request body
   let iconBase64 = null;
   if (req.body.iconData) {
     try {
@@ -145,11 +191,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
       }
     } catch (err) {
       console.error('Icon processing error:', err);
-      // Continue without icon
     }
   }
 
-  // Save file info
   let htmlContent = '';
   try {
     htmlContent = req.file.buffer.toString('utf-8');
@@ -169,26 +213,23 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     uploadDate: new Date().toLocaleDateString(),
     downloads: 0,
     timestamp: Date.now(),
-    // Store the actual HTML file content in the database
     htmlContent: htmlContent,
-    // Unique token to identify the uploader
     uploaderToken: generateToken()
   };
 
   allFiles.push(newFile);
   nextId++;
 
-  // Save to database file immediately
-  saveDatabase();
+  // Save to MongoDB
+  saveGamesToDB(newFile);
 
   console.log(`✅ Game uploaded successfully: ${newFile.name} (ID: ${newFile.id})`);
   
-  // Return success with the file data AND the token
   res.json({ 
     success: true, 
     file: newFile,
     uploaderToken: newFile.uploaderToken,
-    message: 'Game uploaded successfully! Save your token to delete later.'
+    message: 'Game uploaded successfully!'
   });
 });
 
@@ -206,10 +247,7 @@ app.post('/api/heartbeat', (req, res) => {
     return res.status(400).json({ error: 'Missing sessionId' });
   }
   
-  // Update or create session
   activeSessions.set(sessionId, Date.now());
-  
-  // Clean up old sessions
   cleanupInactiveSessions();
   
   res.json({ success: true, activePlayers: activeSessions.size });
@@ -244,7 +282,6 @@ app.get('/api/view/:id', (req, res) => {
 
     console.log(`✅ Serving game: ${file.name}`);
     
-    // Set header to display as HTML
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Content-Disposition', 'inline');
     
@@ -270,7 +307,7 @@ app.get('/api/download/:id', (req, res) => {
     }
 
     file.downloads++;
-    saveDatabase();
+    saveGamesToDB(file);
 
     console.log(`📥 Downloading: ${file.name}`);
     
@@ -293,18 +330,16 @@ app.delete('/api/delete/:id', (req, res) => {
     
     console.log(`Checking uploader token...`);
     
-    // Find the game
     const fileIndex = allFiles.findIndex(f => f.id === fileId);
     
     if (fileIndex === -1) {
-      console.log(`❌ Game not found. Available IDs: ${allFiles.map(f => f.id).join(', ')}`);
+      console.log(`❌ Game not found`);
       return res.status(404).json({ error: 'Game not found' });
     }
     
     const file = allFiles[fileIndex];
     console.log(`Found game: ${file.name}`);
     
-    // Check if uploader token matches
     if (!uploaderToken || uploaderToken !== file.uploaderToken) {
       console.log('❌ Delete attempt with wrong token');
       return res.status(401).json({ error: 'Invalid token - you did not upload this game' });
@@ -312,9 +347,11 @@ app.delete('/api/delete/:id', (req, res) => {
     
     console.log(`✅ Token correct, deleting game`);
     
-    // Remove from database
+    // Remove from memory
     allFiles.splice(fileIndex, 1);
-    saveDatabase();
+    
+    // Delete from MongoDB
+    deleteGameFromDB(fileId);
     
     console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
     
@@ -328,11 +365,10 @@ app.delete('/api/delete/:id', (req, res) => {
   }
 });
 
-// Error handling middleware (must be AFTER all routes)
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
   
-  // Handle multer errors
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({ error: 'File too large. Max size is 100MB.' });
   }
@@ -340,7 +376,6 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ error: 'File upload error: ' + err.message });
   }
   
-  // Handle other errors
   res.status(500).json({ 
     error: 'Server error: ' + (err.message || 'Unknown error') 
   });
@@ -348,15 +383,20 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`\n🎮 GameVault running on port ${PORT}`);
-  console.log(`📂 Database file: ${DB_FILE}`);
+  
+  // Connect to MongoDB
+  await connectDB();
+  
   console.log(`📊 Games loaded: ${allFiles.length}\n`);
 });
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
   console.log('Shutting down gracefully...');
-  saveDatabase();
   server.close();
+  if (db) {
+    mongoose.connection.close();
+  }
 });
