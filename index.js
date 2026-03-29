@@ -1,3045 +1,908 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎮 GameVault - HTML Community Game Hub</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #6366f1;
-      --accent: #ec4899;
-      --neon: #00ff88;
-      --bg-dark: #0a0e27;
-      --bg-card: #1a1f3a;
-      --border: #2d3748;
-      --text-primary: #ffffff;
-      --text-secondary: #94a3b8;
-    }
-
-    /* THEME VARIANTS */
-    :root.theme-snow {
-      --primary: #3b82f6;
-      --accent: #06b6d4;
-      --neon: #00d4ff;
-      --bg-dark: #0f1419;
-      --bg-card: #1a2332;
-      --border: #2a3a52;
-      --text-primary: #e0f2fe;
-      --text-secondary: #a5d8ff;
-    }
-
-    :root.theme-lava {
-      --primary: #ff6b35;
-      --accent: #ff0000;
-      --neon: #ff3333;
-      --bg-dark: #2a1a0f;
-      --bg-card: #3d2317;
-      --border: #5c3d2e;
-      --text-primary: #ffe4cc;
-      --text-secondary: #ffb896;
-    }
-
-    :root.theme-nature {
-      --primary: #10b981;
-      --accent: #34d399;
-      --neon: #6ee7b7;
-      --bg-dark: #051f1d;
-      --bg-card: #0f3f3a;
-      --border: #1f5f59;
-      --text-primary: #d1fae5;
-      --text-secondary: #a7f3d0;
-    }
-
-    :root.theme-ocean {
-      --primary: #0ea5e9;
-      --accent: #06b6d4;
-      --neon: #00d4ff;
-      --bg-dark: #0c1929;
-      --bg-card: #1a3a4f;
-      --border: #2a5a7f;
-      --text-primary: #cffafe;
-      --text-secondary: #9eddff;
-    }
-
-    :root.theme-space {
-      --primary: #d946ef;
-      --accent: #ff00ff;
-      --neon: #ff00ff;
-      --bg-dark: #2a1540;
-      --bg-card: #3d2560;
-      --border: #6a3faa;
-      --text-primary: #f3e8ff;
-      --text-secondary: #e9d5ff;
-    }
-
-    :root.theme-cyberpunk {
-      --primary: #ff00ff;
-      --accent: #00ffff;
-      --neon: #ffff00;
-      --bg-dark: #0a0e1a;
-      --bg-card: #1a2540;
-      --border: #2d4a7f;
-      --text-primary: #ffffff;
-      --text-secondary: #00ffff;
-    }
-
-    :root.theme-sunset {
-      --primary: #f97316;
-      --accent: #fb923c;
-      --neon: #fbbf24;
-      --bg-dark: #4a2810;
-      --bg-card: #5a3817;
-      --border: #7a5e3e;
-      --text-primary: #fed7aa;
-      --text-secondary: #ffb896;
-    }
-
-    :root.theme-midnight {
-      --primary: #0f766e;
-      --accent: #06b6d4;
-      --neon: #00e5ff;
-      --bg-dark: #0a0e27;
-      --bg-card: #1a2f3f;
-      --border: #2a4f5f;
-      --text-primary: #e0f2fe;
-      --text-secondary: #9eddff;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* PARTICLE BACKGROUND */
-    #particleCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-      background: linear-gradient(135deg, #0a0e27 0%, #151b3a 50%, #0a0e27 100%);
-    }
-
-    :root.theme-snow #particleCanvas {
-      background: linear-gradient(135deg, #0f1419 0%, #1a3a52 50%, #0f1419 100%) !important;
-    }
-
-    :root.theme-lava #particleCanvas {
-      background: linear-gradient(135deg, #2a1a0f 0%, #4a2817 50%, #2a1a0f 100%) !important;
-    }
-
-    :root.theme-nature #particleCanvas {
-      background: linear-gradient(135deg, #051f1d 0%, #0f4a42 50%, #051f1d 100%) !important;
-    }
-
-    :root.theme-ocean #particleCanvas {
-      background: linear-gradient(135deg, #0c1929 0%, #1a4a7f 50%, #0c1929 100%) !important;
-    }
-
-    :root.theme-space #particleCanvas {
-      background: linear-gradient(135deg, #2a1540 0%, #5a2f8f 50%, #2a1540 100%) !important;
-    }
-
-    :root.theme-cyberpunk #particleCanvas {
-      background: linear-gradient(135deg, #0a0e1a 0%, #1a3f6f 50%, #0a0e1a 100%) !important;
-    }
-
-    :root.theme-sunset #particleCanvas {
-      background: linear-gradient(135deg, #4a2810 0%, #7a5030 50%, #4a2810 100%) !important;
-    }
-
-    :root.theme-midnight #particleCanvas {
-      background: linear-gradient(135deg, #0a0e27 0%, #1a3a5f 50%, #0a0e27 100%) !important;
-    }
-
-    /* NOTIFICATION TOAST */
-    .notification-toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 30px;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      z-index: 500;
-      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
-      display: none;
-      animation: slideDown 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .notification-toast.show {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .notification-toast.success {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
-    }
-
-    .notification-toast.error {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-
-    .notification-spinner {
-      width: 18px;
-      height: 18px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top: 3px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* MAIN CONTENT */
-    .main-wrapper {
-      position: relative;
-      z-index: 10;
-      min-height: 100vh;
-    }
-
-    .attribution {
-      text-align: center;
-      padding: 12px 20px;
-      background: rgba(99, 102, 241, 0.1);
-      border-bottom: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-size: 0.85em;
-      backdrop-filter: blur(10px);
-    }
-
-    /* HEADER */
-    .header {
-      padding: 20px 30px;
-      background: rgba(10, 14, 39, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      z-index: 20;
-      position: relative;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .logo {
-      font-size: 1.8em;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-badge {
-      padding: 8px 16px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1px solid var(--primary);
-      border-radius: 20px;
-      font-size: 0.9em;
-      font-weight: 600;
-      color: var(--neon);
-    }
-
-    /* SEARCH BAR */
-    .search-container {
-      flex: 2;
-      min-width: 250px;
-      position: relative;
-    }
-
-    .search-bar {
-      width: 100%;
-      padding: 12px 20px;
-      background: rgba(45, 55, 72, 0.5);
-      border: 1.5px solid var(--border);
-      border-radius: 25px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-    }
-
-    .search-bar:focus {
-      outline: none;
-      background: rgba(45, 55, 72, 0.8);
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
-    }
-
-    .search-results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-      max-height: 300px;
-      overflow-y: auto;
-      display: none;
-      z-index: 100;
-    }
-
-    .search-results.show {
-      display: block;
-    }
-
-    .search-result-item {
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .search-result-item:hover {
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-
-    .search-result-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .search-result-desc {
-      font-size: 0.85em;
-      color: var(--text-secondary);
-    }
-
-    /* HEADER CONTROLS */
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .header-btn {
-      padding: 10px 16px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      transition: all 0.3s ease;
-      font-size: 0.95em;
-    }
-
-    .header-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 10px;
-      padding: 20px 30px;
-      background: rgba(10, 14, 39, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-      z-index: 15;
-      position: relative;
-    }
-
-    .tab-btn {
-      padding: 10px 20px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      color: var(--text-secondary);
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .tab-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      border-color: var(--accent);
-      color: white;
-    }
-
-    /* FILTERS */
-    .filters-section {
-      padding: 20px 30px;
-      background: rgba(10, 14, 39, 0.5);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      z-index: 12;
-      position: relative;
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .filter-group label {
-      font-weight: 600;
-      font-size: 0.9em;
-      color: var(--text-secondary);
-    }
-
-    .filter-group select,
-    .filter-group input {
-      padding: 8px 12px;
-      background: rgba(45, 55, 72, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .filter-group select:hover,
-    .filter-group input:hover {
-      border-color: var(--primary);
-    }
-
-    .filter-group select:focus,
-    .filter-group input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-    }
-
-    /* MAIN VIEW */
-    .main-view {
-      display: none;
-    }
-
-    .main-view.active {
-      display: block;
-    }
-
-    .games-container {
-      padding: 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 25px;
-      z-index: 11;
-      position: relative;
-    }
-
-    /* GAME CARD */
-    .game-card {
-      background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(45, 55, 90, 0.4) 100%);
-      border: 1.5px solid var(--border);
-      border-radius: 15px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .game-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--primary);
-      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.25);
-    }
-
-    .game-thumbnail {
-      width: 100%;
-      height: 240px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3em;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .game-thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .game-thumbnail.shimmer {
-      animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
-
-    .game-info {
-      padding: 18px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .game-title {
-      font-size: 1.1em;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
-
-    .game-meta {
-      font-size: 0.85em;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .game-description {
-      font-size: 0.9em;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-      line-height: 1.4;
-      flex-grow: 1;
-    }
-
-    .game-stats {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-size: 0.8em;
-      flex-wrap: wrap;
-    }
-
-    .stat {
-      padding: 4px 10px;
-      background: rgba(99, 102, 241, 0.15);
-      border-radius: 6px;
-      color: var(--neon);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .rating-display {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9em;
-    }
-
-    .stars {
-      color: #fbbf24;
-      letter-spacing: 2px;
-    }
-
-    .game-tags {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      padding: 4px 10px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 0.5px solid var(--primary);
-      border-radius: 6px;
-      font-size: 0.8em;
-      color: var(--primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .tag:hover {
-      background: rgba(99, 102, 241, 0.4);
-    }
-
-    .game-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-    }
-
-    .game-btn {
-      flex: 1;
-      padding: 10px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9em;
-      transition: all 0.3s ease;
-    }
-
-    .game-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .game-btn.secondary {
-      background: transparent;
-      border: 1.5px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .game-btn.secondary:hover {
-      background: rgba(99, 102, 241, 0.2);
-    }
-
-    .fav-btn {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: 8px;
-      font-size: 1.2em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .fav-btn.favorited {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-      color: white;
-    }
-
-    /* MODALS */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--bg-dark);
-      border: 1.5px solid var(--border);
-      border-radius: 15px;
-      padding: 30px;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      width: 90%;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      animation: modalSlide 0.3s ease;
-    }
-
-    @keyframes modalSlide {
-      from {
-        transform: translateY(-50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .modal-header {
-      font-size: 1.5em;
-      font-weight: 800;
-      margin-bottom: 20px;
-      color: var(--text-primary);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 1.5em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .modal-close:hover {
-      color: var(--text-primary);
-      transform: rotate(90deg);
-    }
-
-    /* UPLOAD MODAL */
-    .upload-content {
-      max-width: 650px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(45, 55, 72, 0.5);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      outline: none;
-      background: rgba(45, 55, 72, 0.8);
-      border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1em;
-      transition: all 0.3s ease;
-    }
-
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-    }
-
-    /* GAME VIEWER MODAL */
-    .game-viewer {
-      max-width: 95vw;
-      max-height: 95vh;
-    }
-
-    .game-viewer-iframe {
-      width: 100%;
-      height: 70vh;
-      border: none;
-      border-radius: 10px;
-      background: black;
-    }
-
-    /* RATING SECTION */
-    .rating-section {
-      margin-bottom: 20px;
-    }
-
-    .rating-title {
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: var(--text-primary);
-    }
-
-    .star-rating {
-      display: flex;
-      gap: 8px;
-      font-size: 2em;
-      margin-bottom: 12px;
-    }
-
-    .star {
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: #cccccc;
-    }
-
-    .star:hover,
-    .star.active {
-      color: #fbbf24;
-      transform: scale(1.2);
-    }
-
-    /* COMMENTS SECTION */
-    .comments-section {
-      margin-top: 20px;
-      border-top: 1px solid var(--border);
-      padding-top: 20px;
-    }
-
-    .comment-input-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .comment-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: rgba(45, 55, 72, 0.5);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .comment-input:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
-    .comment-item {
-      background: rgba(45, 55, 72, 0.3);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      border-left: 3px solid var(--primary);
-    }
-
-    .comment-author {
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-
-    .comment-text {
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .comment-time {
-      font-size: 0.8em;
-      color: var(--text-secondary);
-    }
-
-    /* GAME STATS MODAL */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .stat-box {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.05));
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-    }
-
-    .stat-label {
-      font-size: 0.9em;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 1.8em;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* SETTINGS VIEW */
-    .settings-view {
-      display: none;
-      padding: 30px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .settings-view.active {
-      display: block;
-    }
-
-    .settings-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .back-button {
-      padding: 10px 16px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      color: var(--text-primary);
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      transition: all 0.3s ease;
-    }
-
-    .back-button:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .settings-container {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-
-    .settings-section {
-      background: linear-gradient(135deg, rgba(26, 31, 58, 0.8), rgba(45, 55, 90, 0.3));
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    .settings-section-header {
-      margin-bottom: 15px;
-    }
-
-    .settings-section-header h3 {
-      font-size: 1.1em;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .settings-section-header p {
-      font-size: 0.9em;
-      color: var(--text-secondary);
-    }
-
-    .settings-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .settings-item:last-child {
-      border-bottom: none;
-    }
-
-    .settings-label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .settings-label span {
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .settings-label small {
-      color: var(--text-secondary);
-      font-size: 0.85em;
-    }
-
-    .settings-control {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .toggle-switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-    }
-
-    .toggle-switch input {
-      display: none;
-    }
-
-    .toggle-label {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(45, 55, 72, 0.5);
-      border-radius: 20px;
-      transition: all 0.3s ease;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 4px;
-    }
-
-    .toggle-switch input:checked + .toggle-label {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-color: var(--accent);
-    }
-
-    .toggle-icon {
-      display: block;
-      width: 24px;
-      height: 24px;
-      background: var(--bg-dark);
-      border-radius: 50%;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8em;
-    }
-
-    .toggle-switch input:checked + .toggle-label .toggle-icon {
-      transform: translateX(22px);
-    }
-
-    .settings-select {
-      padding: 8px 12px;
-      background: rgba(45, 55, 72, 0.5);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-    }
-
-    .reset-button {
-      width: 100%;
-      padding: 14px;
-      background: transparent;
-      border: 2px solid #ef4444;
-      color: #ef4444;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-    }
-
-    .reset-button:hover {
-      background: #ef4444;
-      color: white;
-    }
-
-    /* TOKEN ITEM */
-    .token-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      transition: all 0.3s ease;
-      margin-bottom: 12px;
-    }
-
-    .token-item:hover {
-      border-color: var(--primary);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.08) 100%);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
-    }
-
-    .token-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .token-game-name {
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-      font-size: 0.95em;
-    }
-
-    .token-value {
-      font-family: 'Courier New', monospace;
-      font-size: 0.85em;
-      color: var(--text-secondary);
-      word-break: break-all;
-      background: var(--bg-card);
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .token-copy-btn {
-      padding: 10px 16px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9em;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .token-copy-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    .token-copy-btn.copied {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    }
-
-    /* NO GAMES MESSAGE */
-    .no-games {
-      text-align: center;
-      padding: 60px 30px;
-      color: var(--text-secondary);
-    }
-
-    .no-games-icon {
-      font-size: 4em;
-      margin-bottom: 20px;
-    }
-
-    .no-games-text {
-      font-size: 1.2em;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .no-games-subtext {
-      color: var(--text-secondary);
-    }
-
-    /* RESPONSIVENESS */
-    @media (max-width: 768px) {
-      .games-container {
-        grid-template-columns: 1fr;
-        padding: 15px;
-        gap: 15px;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .header-left {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .header-controls {
-        width: 100%;
-        flex-direction: column-reverse;
-      }
-
-      .header-btn {
-        width: 100%;
-      }
-
-      .search-container {
-        width: 100%;
-      }
-
-      .filters-section {
-        flex-direction: column;
-      }
-
-      .filter-group {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .filter-group select,
-      .filter-group input {
-        width: 100%;
-      }
-
-      .modal-content {
-        max-height: 85vh;
-        width: 95%;
-      }
-
-      .game-viewer-iframe {
-        height: 50vh;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .tabs {
-        padding: 10px 15px;
-        gap: 5px;
-      }
-
-      .tab-btn {
-        padding: 8px 12px;
-        font-size: 0.9em;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- PARTICLE BACKGROUND -->
-  <canvas id="particleCanvas"></canvas>
-
-  <!-- NOTIFICATION TOAST -->
-  <div class="notification-toast" id="notificationToast">
-    <div class="notification-spinner" id="notificationSpinner"></div>
-    <span id="notificationText">Uploading Game...</span>
-  </div>
-
-  <div class="main-wrapper">
-    <!-- ATTRIBUTION -->
-    <div class="attribution">
-      🎮 website made with ❤️ by Casen
-    </div>
-
-    <!-- HEADER -->
-    <div class="header">
-      <div class="header-left">
-        <div class="logo">🎮 GameVault</div>
-        <div class="stat-badge" id="gameCount">0 Games</div>
-        <div class="stat-badge" id="playerCount">👥 0 Active</div>
-      </div>
-
-      <div class="search-container">
-        <input type="text" id="searchInput" class="search-bar" placeholder="🔎 Search games...">
-        <div class="search-results" id="searchResults"></div>
-      </div>
-
-      <div class="header-controls">
-        <button class="header-btn" onclick="openUploadModal()">➕ Upload</button>
-        <button class="header-btn" onclick="openSettingsView()">⚙️ Settings</button>
-        <button class="header-btn" id="musicControlBtn" onclick="toggleMusic()">▶️ Play Music</button>
-      </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('home', this)">🏠 Home</button>
-      <button class="tab-btn" onclick="showTab('trending', this)">🔥 Trending</button>
-      <button class="tab-btn" onclick="showTab('recent', this)">⏰ Recent</button>
-      <button class="tab-btn" onclick="showTab('favorites', this)">❤️ Favorites</button>
-      <button class="tab-btn" onclick="showTab('myGames', this)">📚 My Games</button>
-    </div>
-
-    <!-- FILTERS -->
-    <div class="filters-section">
-      <div class="filter-group">
-        <label>📂 Category:</label>
-        <select id="categoryFilter" onchange="applyFilters()">
-          <option value="">All Categories</option>
-          <option value="puzzle">Puzzle</option>
-          <option value="action">Action</option>
-          <option value="adventure">Adventure</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label>⭐ Min Rating:</label>
-        <select id="ratingFilter" onchange="applyFilters()">
-          <option value="">All Ratings</option>
-          <option value="4">4+ Stars</option>
-          <option value="3">3+ Stars</option>
-          <option value="2">2+ Stars</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label>📅 Sort by:</label>
-        <select id="sortFilter" onchange="applyFilters()">
-          <option value="newest">Newest First</option>
-          <option value="popular">Most Popular</option>
-          <option value="trending">Trending</option>
-          <option value="rating">Highest Rated</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- MAIN VIEW -->
-    <div class="main-view active">
-      <div class="games-container" id="gamesContainer">
-        <div class="no-games">
-          <div class="no-games-icon">🎮</div>
-          <div class="no-games-text">No games found</div>
-          <div class="no-games-subtext">Upload one to get started!</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SETTINGS VIEW -->
-    <div class="settings-view">
-      <div class="settings-header">
-        <button class="back-button" onclick="closeSettingsView()">← Back</button>
-        <h2>⚙️ Settings</h2>
-      </div>
-
-      <div class="settings-container">
-        <!-- APPEARANCE -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <h3>🌓 Appearance</h3>
-            <p>Customize how the website looks</p>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Dark/Light Theme</span>
-              <small>Switch between modes</small>
-            </div>
-            <div class="settings-control">
-              <div class="toggle-switch">
-                <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-                <label for="themeToggle" class="toggle-label">
-                  <span class="toggle-icon">🌙</span>
-                </label>
-              </div>
-              <span id="themeLabel" class="setting-value">Dark</span>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Animations</span>
-              <small>Enable/disable motion effects</small>
-            </div>
-            <div class="settings-control">
-              <div class="toggle-switch">
-                <input type="checkbox" id="animationsToggle" checked onchange="toggleAnimations()">
-                <label for="animationsToggle" class="toggle-label">
-                  <span class="toggle-icon">✨</span>
-                </label>
-              </div>
-              <span id="animationsLabel" class="setting-value">On</span>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Theme</span>
-              <small>Choose a visual theme</small>
-            </div>
-            <select id="themeSelector" onchange="changeTheme(this.value)" class="settings-select">
-              <option value="default">🌌 Default (Purple)</option>
-              <option value="snow">❄️ Snow (Blue)</option>
-              <option value="lava">🔥 Lava (Orange)</option>
-              <option value="nature">🍃 Nature (Green)</option>
-              <option value="ocean">🌊 Ocean (Cyan)</option>
-              <option value="space">🚀 Space (Purple)</option>
-              <option value="cyberpunk">💻 Cyberpunk (Neon)</option>
-              <option value="sunset">🌅 Sunset (Gold)</option>
-              <option value="midnight">🌙 Midnight (Deep Blue)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- GAME DISPLAY -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <h3>🎮 Game Display</h3>
-            <p>Customize game card appearance</p>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Card Size</span>
-              <small>Adjust game card dimensions</small>
-            </div>
-            <select id="cardSizeSelect" onchange="changeCardSize()" class="settings-select">
-              <option value="small">Small (220px)</option>
-              <option value="medium" selected>Medium (320px)</option>
-              <option value="large">Large (420px)</option>
-            </select>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Show Uploader Names</span>
-              <small>Display who uploaded each game</small>
-            </div>
-            <div class="settings-control">
-              <div class="toggle-switch">
-                <input type="checkbox" id="uploaderNamesToggle" checked onchange="toggleUploaderNames()">
-                <label for="uploaderNamesToggle" class="toggle-label">
-                  <span class="toggle-icon">👤</span>
-                </label>
-              </div>
-              <span id="uploaderNamesLabel" class="setting-value">On</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- MUSIC -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <h3>🎵 Background Music</h3>
-            <p>Control music and sound</p>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Music Volume</span>
-              <small>Adjust background music volume</small>
-            </div>
-            <div class="settings-control">
-              <input id="volumeSlider" type="range" min="0" max="100" value="30" onchange="changeVolume()" style="width: 150px;">
-              <span id="volumeValue">30%</span>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-label">
-              <span>Now Playing</span>
-              <small id="musicStatus">Paused</small>
-            </div>
-            <button class="header-btn" id="musicControlBtn2" onclick="toggleMusic()">▶️ Play</button>
-          </div>
-        </div>
-
-        <!-- MY TOKENS -->
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <h3>🔐 My Delete Tokens</h3>
-            <p>View tokens for games you uploaded</p>
-          </div>
-          <div id="tokensContainer" style="display: flex; flex-direction: column; gap: 15px;">
-            <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>
-          </div>
-        </div>
-
-        <!-- RESET -->
-        <button class="reset-button" onclick="resetAllSettings()">🔄 Reset All Settings</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- UPLOAD MODAL -->
-  <div class="modal" id="uploadModal">
-    <div class="modal-content upload-content">
-      <div class="modal-header">
-        <span>📤 Upload Game</span>
-        <button class="modal-close" onclick="closeUploadModal()">✕</button>
-      </div>
-
-      <form onsubmit="uploadFile(event)">
-        <div class="form-group">
-          <label>Game Name *</label>
-          <input type="text" id="gameName" placeholder="Enter game name" required>
-        </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="gameDescription" placeholder="Describe your game..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Your Name</label>
-          <input type="text" id="uploaderName" placeholder="Enter your name">
-        </div>
-
-        <div class="form-group">
-          <label>Your Email (for admin features)</label>
-          <input type="email" id="uploaderEmail" placeholder="your@email.com">
-        </div>
-
-        <div class="form-group">
-          <label>Category</label>
-          <select id="gameCategory">
-            <option value="puzzle">Puzzle</option>
-            <option value="action">Action</option>
-            <option value="adventure">Adventure</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Tags (comma-separated)</label>
-          <input type="text" id="gameTags" placeholder="puzzle, retro, fun">
-        </div>
-
-        <div class="form-group">
-          <label>Game Icon (optional)</label>
-          <input type="file" id="icon" accept="image/*">
-        </div>
-
-        <div class="form-group">
-          <label>HTML Game File *</label>
-          <input type="file" id="file" accept=".html" required>
-        </div>
-
-        <div class="form-group">
-          <div class="toggle-switch">
-            <input type="checkbox" id="passwordProtect" onchange="togglePasswordProtect()">
-            <label for="passwordProtect" class="toggle-label">
-              <span class="toggle-icon">🔐</span>
-            </label>
-          </div>
-          <span style="margin-left: 10px; color: var(--text-secondary);">Password protect this game</span>
-        </div>
-
-        <div class="form-group" id="passwordGroup" style="display: none;">
-          <label>Password</label>
-          <input type="password" id="gamePassword" placeholder="Enter password">
-        </div>
-
-        <button type="submit" class="btn-submit">🚀 Upload Game</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- GAME VIEWER MODAL -->
-  <div class="modal" id="gameModal">
-    <div class="modal-content game-viewer">
-      <div class="modal-header">
-        <span id="modalGameTitle">Game Viewer</span>
-        <button class="modal-close" onclick="closeGameModal()">✕</button>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <iframe id="gameIframe" class="game-viewer-iframe"></iframe>
-      </div>
-
-      <div id="gameDetailsContainer" style="margin-top: 20px;">
-        <!-- Game details will be inserted here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- GAME STATS MODAL -->
-  <div class="modal" id="statsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>📊 Game Statistics</span>
-        <button class="modal-close" onclick="closeStatsModal()">✕</button>
-      </div>
-
-      <div class="stats-grid" id="statsGrid">
-        <!-- Stats will be inserted here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- RATING MODAL -->
-  <div class="modal" id="ratingModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>⭐ Rate This Game</span>
-        <button class="modal-close" onclick="closeRatingModal()">✕</button>
-      </div>
-
-      <div class="rating-section">
-        <div class="rating-title">How do you rate this game?</div>
-        <div class="star-rating" id="starRating">
-          <span class="star" data-rating="1">★</span>
-          <span class="star" data-rating="2">★</span>
-          <span class="star" data-rating="3">★</span>
-          <span class="star" data-rating="4">★</span>
-          <span class="star" data-rating="5">★</span>
-        </div>
-        <button class="btn-submit" onclick="submitRating()">Submit Rating</button>
-      </div>
-
-      <div class="comments-section">
-        <div class="rating-title">Leave a Comment</div>
-        <div class="comment-input-group">
-          <input type="text" id="commentName" class="comment-input" placeholder="Your name" style="flex: 0.5;">
-          <input type="email" id="commentEmail" class="comment-input" placeholder="Your email" style="flex: 0.5;">
-        </div>
-        <div class="comment-input-group">
-          <textarea id="commentText" class="comment-input" placeholder="Write your comment..." style="min-height: 80px; flex: 1;"></textarea>
-        </div>
-        <button class="btn-submit" onclick="submitComment()">Post Comment</button>
-
-        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
-          <div class="rating-title">Comments</div>
-          <div id="commentsContainer">
-            <!-- Comments will be inserted here -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DELETE MODAL -->
-  <div class="modal" id="deleteModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>🗑️ Delete Game</span>
-        <button class="modal-close" onclick="closeDeleteModal()">✕</button>
-      </div>
-
-      <p style="margin-bottom: 20px; color: var(--text-secondary);">
-        Enter your delete token to confirm deletion. You should have saved this when you uploaded the game.
-      </p>
-
-      <div class="form-group">
-        <label>Delete Token</label>
-        <input type="text" id="deleteToken" placeholder="Paste your token here">
-      </div>
-
-      <button onclick="confirmDelete()" style="width: 100%; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-bottom: 10px;">Delete</button>
-    </div>
-  </div>
-
-  <!-- ADMIN DASHBOARD MODAL -->
-  <div class="modal" id="adminModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>👨‍💻 Developer Dashboard</span>
-        <button class="modal-close" onclick="closeAdminModal()">✕</button>
-      </div>
-
-      <div class="stats-grid" id="adminStatsGrid">
-        <!-- Admin stats will be inserted here -->
-      </div>
-
-      <div id="adminGamesContainer" style="margin-top: 20px;">
-        <!-- Admin games list will be inserted here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- SHARE MODAL -->
-  <div class="modal" id="shareModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>🌍 Share Game</span>
-        <button class="modal-close" onclick="closeShareModal()">✕</button>
-      </div>
-
-      <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this link to share this game with others:</p>
-
-      <div class="form-group">
-        <input type="text" id="shareLink" readonly class="comment-input" style="cursor: pointer;">
-      </div>
-
-      <button class="btn-submit" onclick="copyShareLink()">📋 Copy Link</button>
-    </div>
-  </div>
-
-  <!-- AUDIO -->
-  <audio id="bgMusic"></audio>
-
-  <script>
-    // ===== GLOBAL VARIABLES =====
-    let allGames = [];
-    let filteredGames = [];
-    let nextId = 1;
-    let uploaderTokens = {};
-    let isMusicPlaying = false;
-    let currentTheme = 'default';
-    let currentRatingGameId = null;
-    let sessionId = Math.random().toString(36).substring(7);
-    let userFavorites = [];
-    let userEmail = localStorage.getItem('userEmail') || '';
-
-    const ADMIN_EMAIL = 'casen3067@gmail.com';
-    const API_BASE = '';
-
-    const bgMusic = document.getElementById('bgMusic') || new Audio('https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3');
-    bgMusic.volume = 0.3;
-    bgMusic.loop = true;
-
-    // ===== PARTICLE SYSTEM =====
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+const express = require('express');
+const multer = require('multer');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const mongoose = require('mongoose');
+const { GridFSBucket } = require('mongodb');
+
+const app = express();
+
+// ===== ADMIN EMAIL - ONLY THIS EMAIL GETS ADMIN PRIVILEGES =====
+const ADMIN_EMAIL = 'casen3067@gmail.com';
+
+// Increase timeout limits for 100MB uploads
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb' }));
+app.use(cors());
+
+// Set server timeouts
+app.use((req, res, next) => {
+  req.setTimeout(300000);
+  res.setTimeout(300000);
+  next();
+});
+
+// Serve static files from current directory
+app.use(express.static(__dirname));
+
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('⚠️ WARNING: MONGODB_URI not set! Games will not persist.');
+  console.log('Set MONGODB_URI in Render environment variables.');
+}
+
+let db = null;
+let gridFSBucket = null;
+
+async function connectDB() {
+  if (!MONGODB_URI) {
+    console.log('Skipping MongoDB connection - using in-memory storage only');
+    return;
+  }
+
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
+    db = mongoose.connection;
+    gridFSBucket = new GridFSBucket(db.getClient().db('gamevault'));
+    console.log('✅ Connected to MongoDB with GridFS (supports 100MB+ files)');
+    
+    // Load existing games
+    loadGamesFromDB();
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    console.log('Games will be stored in memory only (will not persist on restart)');
+  }
+}
 
-    class DefaultParticle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.radius = Math.random() * 2.5 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.8;
-        this.speedY = (Math.random() - 0.5) * 0.8;
-        this.opacity = Math.random() * 0.5 + 0.3;
-      }
+// ===== SCHEMAS =====
 
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
+// Game Schema
+const gameSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  description: String,
+  uploader: String,
+  uploaderEmail: String,
+  category: String,
+  customSettings: String,
+  icon: String,
+  uploadDate: String,
+  downloads: Number,
+  views: Number,
+  timestamp: Number,
+  htmlFileId: mongoose.Schema.Types.ObjectId,
+  uploaderToken: String,
+  tags: [String],
+  fileSize: Number,
+  playTime: Number,
+  avgRating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  isPasswordProtected: { type: Boolean, default: false },
+  password: String,
+  accessCode: String,
+});
 
-      draw() {
-        const color = currentTheme === 'default' ? '99, 102, 241' :
-                      currentTheme === 'snow' ? '59, 130, 246' :
-                      currentTheme === 'lava' ? '255, 107, 53' :
-                      currentTheme === 'nature' ? '16, 185, 129' :
-                      currentTheme === 'ocean' ? '14, 165, 233' :
-                      currentTheme === 'space' ? '217, 70, 239' :
-                      currentTheme === 'cyberpunk' ? '255, 0, 255' :
-                      currentTheme === 'sunset' ? '249, 115, 22' : '15, 118, 110';
-        ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
+// Rating Schema
+const ratingSchema = new mongoose.Schema({
+  gameId: Number,
+  userId: String,
+  rating: Number, // 1-5 stars
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Comment Schema
+const commentSchema = new mongoose.Schema({
+  gameId: Number,
+  userName: String,
+  userEmail: String,
+  comment: String,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Favorites Schema
+const favoriteSchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// View History Schema
+const viewHistorySchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Play Time Schema
+const playTimeSchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  playDuration: Number, // in milliseconds
+  timestamp: { type: Date, default: Date.now },
+});
+
+let Game, Rating, Comment, Favorite, ViewHistory, PlayTime;
+
+if (MONGODB_URI) {
+  Game = mongoose.model('Game', gameSchema);
+  Rating = mongoose.model('Rating', ratingSchema);
+  Comment = mongoose.model('Comment', commentSchema);
+  Favorite = mongoose.model('Favorite', favoriteSchema);
+  ViewHistory = mongoose.model('ViewHistory', viewHistorySchema);
+  PlayTime = mongoose.model('PlayTime', playTimeSchema);
+}
+
+// In-memory fallback
+let allFiles = [];
+let nextId = 1;
+
+async function loadGamesFromDB() {
+  if (!Game) {
+    console.log('📂 Using in-memory storage (no MongoDB)');
+    return;
+  }
+
+  try {
+    const games = await Game.find().sort({ id: 1 });
+    allFiles = games.map(g => g.toObject());
+    nextId = allFiles.length > 0 ? Math.max(...allFiles.map(g => g.id)) + 1 : 1;
+    console.log(`📂 Loaded ${allFiles.length} games from MongoDB`);
+  } catch (err) {
+    console.error('Error loading games from MongoDB:', err);
+  }
+}
+
+async function saveGamesToDB(game) {
+  if (!Game) {
+    console.log('⚠️ MongoDB not connected - game only saved in memory');
+    return;
+  }
+
+  try {
+    await Game.findOneAndUpdate(
+      { id: game.id },
+      game,
+      { upsert: true, new: true }
+    );
+    console.log(`💾 Game metadata saved to MongoDB: ${game.name}`);
+  } catch (err) {
+    console.error('Error saving game to MongoDB:', err);
+  }
+}
+
+async function deleteGameFromDB(gameId) {
+  if (!Game || !gridFSBucket) return;
+
+  try {
+    const game = await Game.findOne({ id: gameId });
+    if (game && game.htmlFileId) {
+      await gridFSBucket.delete(game.htmlFileId);
+      console.log(`🗑️ HTML file deleted from GridFS`);
     }
+    await Game.deleteOne({ id: gameId });
+    // Also delete associated ratings, comments, favorites
+    if (Rating) await Rating.deleteMany({ gameId });
+    if (Comment) await Comment.deleteMany({ gameId });
+    if (Favorite) await Favorite.deleteMany({ gameId });
+    if (ViewHistory) await ViewHistory.deleteMany({ gameId });
+    if (PlayTime) await PlayTime.deleteMany({ gameId });
+    console.log(`🗑️ Game deleted from MongoDB (ID: ${gameId})`);
+  } catch (err) {
+    console.error('Error deleting game from MongoDB:', err);
+  }
+}
 
-    class Snowflake {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 1.5;
-        this.speedY = Math.random() * 1 + 0.5;
-        this.opacity = Math.random() * 0.7 + 0.3;
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.1;
-      }
+// Utility functions
+function generateToken() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
 
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.rotation += this.rotationSpeed;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
+function isAdmin(email) {
+  return email === ADMIN_EMAIL;
+}
 
-      draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
-        ctx.fillStyle = `rgba(174, 225, 255, ${this.opacity})`;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const angle = (i * Math.PI) / 3;
-          const x = Math.cos(angle) * this.size;
-          const y = Math.sin(angle) * this.size;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      }
+// Active players tracking
+const activeSessions = new Map();
+
+function cleanupInactiveSessions() {
+  const now = Date.now();
+  const timeout = 15000;
+  
+  for (const [sessionId, timestamp] of activeSessions) {
+    if (now - timestamp > timeout) {
+      activeSessions.delete(sessionId);
     }
+  }
+}
 
-    class LavaParticle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.radius = Math.random() * 4 + 2;
-        this.speedX = (Math.random() - 0.5) * 1.2;
-        this.speedY = (Math.random() - 0.5) * 1.2;
-        this.opacity = Math.random() * 0.6 + 0.2;
-        this.lifespan = 100;
-        this.age = 0;
-      }
+setInterval(cleanupInactiveSessions, 10000);
 
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.speedY += 0.05;
-        this.age++;
-        this.opacity = Math.max(0, 0.6 - (this.age / this.lifespan) * 0.6);
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
+// File upload
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024
+  }
+});
 
-      draw() {
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        gradient.addColorStop(0, `rgba(255, 107, 53, ${this.opacity})`);
-        gradient.addColorStop(1, `rgba(255, 0, 0, ${this.opacity * 0.5})`);
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+// ===== ROUTES =====
 
-    class Leaf {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height - canvas.height;
-        this.size = Math.random() * 6 + 4;
-        this.speedX = (Math.random() - 0.5) * 2;
-        this.speedY = Math.random() * 1.5 + 0.5;
-        this.opacity = Math.random() * 0.6 + 0.3;
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.15;
-      }
+// HOME
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-      update() {
-        this.x += this.speedX + Math.sin(this.rotation) * 0.3;
-        this.y += this.speedY;
-        this.rotation += this.rotationSpeed;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-      }
+// UPLOAD GAME
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  console.log('📥 Upload request received');
+  
+  if (!req.file) {
+    console.error('No file received');
+    return res.status(400).json({ error: 'No HTML file uploaded' });
+  }
 
-      draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
-        ctx.fillStyle = `rgba(16, 185, 129, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = `rgba(52, 211, 153, ${this.opacity * 0.7})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(-this.size * 0.3, -this.size * 0.3);
-        ctx.lineTo(this.size * 0.3, this.size * 0.3);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
+  const gameName = req.body.name || 'Unnamed Game';
+  
+  if (!gameName) {
+    return res.status(400).json({ error: 'Game name is required' });
+  }
 
-    class Bubble {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + 20;
-        this.radius = Math.random() * 4 + 2;
-        this.speedX = (Math.random() - 0.5) * 1;
-        this.speedY = -(Math.random() * 1 + 0.5);
-        this.opacity = Math.random() * 0.5 + 0.3;
-        this.wobbleX = 0;
-        this.wobbleSpeed = Math.random() * 0.02 + 0.01;
-      }
+  console.log(`⏳ Processing upload for: ${gameName}`);
+  
+  if (!req.file || !req.file.buffer) {
+    console.error('File buffer not available:', req.file);
+    return res.status(400).json({ error: 'File processing failed' });
+  }
 
-      update() {
-        this.x += this.speedX + Math.sin(this.wobbleX) * 0.3;
-        this.y += this.speedY;
-        this.wobbleX += this.wobbleSpeed;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y < -20) this.y = canvas.height + 20;
-      }
-
-      draw() {
-        const gradient = ctx.createRadialGradient(this.x - this.radius/2, this.y - this.radius/2, 0, this.x, this.y, this.radius);
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${this.opacity * 0.8})`);
-        gradient.addColorStop(1, `rgba(14, 165, 233, ${this.opacity * 0.3})`);
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = `rgba(14, 165, 233, ${this.opacity})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    }
-
-    class ShootingStar {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * (canvas.height * 0.6);
-        this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 3;
-        this.speedY = (Math.random() - 0.5) * 3;
-        this.opacity = Math.random() * 0.7 + 0.3;
-        this.trail = [];
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-        this.trail.push({x: this.x, y: this.y, opacity: this.opacity});
-        if (this.trail.length > 20) this.trail.shift();
-      }
-
-      draw() {
-        this.trail.forEach((point, i) => {
-          const trailOpacity = (i / this.trail.length) * this.opacity;
-          ctx.fillStyle = `rgba(168, 85, 247, ${trailOpacity})`;
-          ctx.beginPath();
-          ctx.arc(point.x, point.y, this.size * (1 - i / this.trail.length), 0, Math.PI * 2);
-          ctx.fill();
-        });
-        ctx.fillStyle = `rgba(236, 72, 217, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    class NeonParticle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.radius = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 2;
-        this.speedY = (Math.random() - 0.5) * 2;
-        this.opacity = Math.random() * 0.6 + 0.3;
-        this.color = ['rgba(255, 0, 255', 'rgba(0, 255, 255', 'rgba(255, 255, 0'][Math.floor(Math.random() * 3)];
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-
-      draw() {
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = this.color + ', ' + this.opacity + ')';
-        ctx.fillStyle = this.color + ', ' + this.opacity + ')';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    class Ember {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + 20;
-        this.radius = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 1.5;
-        this.speedY = -(Math.random() * 2 + 1);
-        this.opacity = Math.random() * 0.8 + 0.2;
-        this.heat = Math.random() * 100 + 100;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.heat -= 1;
-        this.opacity = (this.heat / 200) * 0.8;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y < -20 || this.heat < 0) this.y = canvas.height + 20;
-      }
-
-      draw() {
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        gradient.addColorStop(0, `rgba(249, 115, 22, ${this.opacity})`);
-        gradient.addColorStop(0.5, `rgba(251, 191, 36, ${this.opacity * 0.6})`);
-        gradient.addColorStop(1, `rgba(249, 115, 22, 0)`);
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    let particles = Array(100).fill(null).map(() => new DefaultParticle());
-
-    function createParticles(theme) {
-      currentTheme = theme;
-      if (theme === 'snow') {
-        particles = Array(80).fill(null).map(() => new Snowflake());
-      } else if (theme === 'lava') {
-        particles = Array(120).fill(null).map(() => new LavaParticle());
-      } else if (theme === 'nature') {
-        particles = Array(60).fill(null).map(() => new Leaf());
-      } else if (theme === 'ocean') {
-        particles = Array(100).fill(null).map(() => new Bubble());
-      } else if (theme === 'space') {
-        particles = Array(80).fill(null).map(() => new ShootingStar());
-      } else if (theme === 'cyberpunk') {
-        particles = Array(150).fill(null).map(() => new NeonParticle());
-      } else if (theme === 'sunset') {
-        particles = Array(90).fill(null).map(() => new Ember());
-      } else if (theme === 'midnight') {
-        particles = Array(50).fill(null).map(() => new ShootingStar());
+  let iconBase64 = null;
+  if (req.body.iconData) {
+    try {
+      if (req.body.iconData.includes(',')) {
+        iconBase64 = req.body.iconData.split(',')[1];
       } else {
-        particles = Array(100).fill(null).map(() => new DefaultParticle());
+        iconBase64 = req.body.iconData;
       }
+      if (iconBase64.length > 1024 * 1024) {
+        console.warn('Icon too large, skipping');
+        iconBase64 = null;
+      }
+    } catch (err) {
+      console.error('Icon processing error:', err);
+      iconBase64 = null;
     }
+  }
 
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(particle => {
-        particle.update();
-        particle.draw();
+  let htmlContent = '';
+  try {
+    htmlContent = req.file.buffer.toString('utf-8');
+  } catch (err) {
+    console.error('Error converting file buffer:', err);
+    return res.status(400).json({ error: 'Could not process HTML file' });
+  }
+
+  const uploaderToken = generateToken();
+  const tags = req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : [];
+  
+  const newFile = {
+    id: nextId,
+    name: gameName,
+    description: req.body.description || 'No description',
+    uploader: req.body.uploader || 'Anonymous',
+    uploaderEmail: req.body.uploaderEmail || '',
+    category: req.body.category || 'other',
+    customSettings: req.body.customSettings || '',
+    icon: iconBase64,
+    uploadDate: new Date().toLocaleDateString(),
+    downloads: 0,
+    views: 0,
+    timestamp: Date.now(),
+    uploaderToken: uploaderToken,
+    tags: tags,
+    fileSize: req.file.buffer.length,
+    playTime: 0,
+    avgRating: 0,
+    ratingCount: 0,
+    isPasswordProtected: req.body.isPasswordProtected === 'true',
+    password: req.body.isPasswordProtected === 'true' ? req.body.password : null,
+    accessCode: generateToken().substring(0, 8).toUpperCase(),
+  };
+
+  if (gridFSBucket && Game) {
+    try {
+      const uploadStream = gridFSBucket.openUploadStream(`game-${nextId}.html`, {
+        metadata: { gameId: nextId, gameName: gameName }
       });
 
-      if (currentTheme === 'default') {
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 150) {
-              ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 * (1 - distance / 150)})`;
-              ctx.lineWidth = 1;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-            }
-          }
+      uploadStream.end(htmlContent, async (err) => {
+        if (err) {
+          console.error('GridFS upload failed:', err);
+          return res.status(500).json({ error: 'Failed to save game file' });
         }
-      }
 
-      requestAnimationFrame(animateParticles);
-    }
+        newFile.htmlFileId = uploadStream.id;
+        await saveGamesToDB(newFile);
+        allFiles.push(newFile);
+        nextId++;
 
-    animateParticles();
-
-    // ===== NOTIFICATION SYSTEM =====
-    function showNotification(message, type = 'loading') {
-      const toast = document.getElementById('notificationToast');
-      const text = document.getElementById('notificationText');
-      const spinner = document.getElementById('notificationSpinner');
-
-      text.textContent = message;
-      toast.classList.remove('success', 'error');
-      if (type !== 'loading') {
-        toast.classList.add(type);
-        spinner.style.display = 'none';
-      } else {
-        spinner.style.display = 'block';
-      }
-      toast.classList.add('show');
-    }
-
-    function hideNotification() {
-      const toast = document.getElementById('notificationToast');
-      toast.classList.remove('show');
-    }
-
-    // ===== MAIN APPLICATION =====
-    function loadTokensFromStorage() {
-      try {
-        const saved = localStorage.getItem('uploaderTokens');
-        if (saved) {
-          uploaderTokens = JSON.parse(saved);
-          console.log('✅ Loaded ' + Object.keys(uploaderTokens).length + ' saved delete tokens');
-        }
-      } catch (err) {
-        console.error('Error loading tokens:', err);
-        uploaderTokens = {};
-      }
-    }
-
-    function saveTokensToStorage() {
-      try {
-        localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
-        console.log('💾 Saved ' + Object.keys(uploaderTokens).length + ' delete tokens');
-      } catch (err) {
-        console.error('Error saving tokens:', err);
-      }
-    }
-
-    function loadFavoritesFromStorage() {
-      try {
-        const saved = localStorage.getItem('userFavorites_' + sessionId);
-        if (saved) {
-          userFavorites = JSON.parse(saved);
-        }
-      } catch (err) {
-        console.error('Error loading favorites:', err);
-        userFavorites = [];
-      }
-    }
-
-    function saveFavoritesToStorage() {
-      try {
-        localStorage.setItem('userFavorites_' + sessionId, JSON.stringify(userFavorites));
-      } catch (err) {
-        console.error('Error saving favorites:', err);
-      }
-    }
-
-    // Load settings
-    function loadAllSettings() {
-      // Load theme
-      const savedTheme = localStorage.getItem('colorTheme') || 'default';
-      changeTheme(savedTheme, false);
-      document.getElementById('themeSelector').value = savedTheme;
-
-      const savedVolume = localStorage.getItem('musicVolume') || '30';
-      document.getElementById('volumeSlider').value = savedVolume;
-      document.getElementById('volumeValue').textContent = savedVolume + '%';
-      bgMusic.volume = savedVolume / 100;
-
-      const musicEnabled = localStorage.getItem('musicPlaying') === 'true';
-      if (musicEnabled) {
-        bgMusic.play().catch(() => {
-          isMusicPlaying = false;
-          updateMusicButton();
+        console.log(`✅ Game uploaded successfully: ${newFile.name}`);
+        
+        res.json({ 
+          success: true, 
+          file: newFile,
+          uploaderToken: uploaderToken,
+          accessCode: newFile.accessCode,
+          message: 'Game uploaded successfully!'
         });
-        isMusicPlaying = true;
-      }
-      updateMusicButton();
-
-      const cardSize = localStorage.getItem('cardSize') || 'medium';
-      document.getElementById('cardSizeSelect').value = cardSize;
-      changeCardSize();
-
-      const uploaderNamesShown = localStorage.getItem('uploaderNamesShown') !== 'false';
-      document.getElementById('uploaderNamesToggle').checked = uploaderNamesShown;
-
-      userEmail = localStorage.getItem('userEmail') || '';
+      });
+    } catch (err) {
+      console.error('GridFS error:', err);
+      return res.status(500).json({ error: 'Failed to save game' });
     }
+  } else {
+    newFile.htmlContent = htmlContent;
+    allFiles.push(newFile);
+    nextId++;
 
-    function changeTheme(theme, save = true) {
-      currentTheme = theme;
-      
-      document.documentElement.classList.remove('theme-snow', 'theme-lava', 'theme-nature', 'theme-ocean', 'theme-space', 'theme-cyberpunk', 'theme-sunset', 'theme-midnight');
-      
-      if (theme !== 'default') {
-        document.documentElement.classList.add(`theme-${theme}`);
-      }
-      
-      createParticles(theme);
-      if (save) {
-        localStorage.setItem('colorTheme', theme);
-      }
-      console.log(`🎨 Theme changed to: ${theme}`);
-    }
-
-    // ===== FETCH GAMES =====
-    async function loadGames() {
-      try {
-        const response = await fetch(`${API_BASE}/api/files`);
-        allGames = await response.json();
-        document.getElementById('gameCount').textContent = allGames.length + ' Games';
-        renderGames(allGames);
-        updateCategories();
-      } catch (err) {
-        console.error('Error loading games:', err);
-        showNotification('❌ Error loading games', 'error');
-      }
-    }
-
-    // ===== RENDER GAMES =====
-    function renderGames(games) {
-      const container = document.getElementById('gamesContainer');
-      
-      if (games.length === 0) {
-        container.innerHTML = `
-          <div class="no-games">
-            <div class="no-games-icon">🎮</div>
-            <div class="no-games-text">No games found</div>
-            <div class="no-games-subtext">Upload one to get started!</div>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = games.map(game => `
-        <div class="game-card">
-          <div class="game-thumbnail">
-            ${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}">` : '🎮'}
-          </div>
-
-          <div class="game-info">
-            <div class="game-title">${game.name}</div>
-            
-            ${localStorage.getItem('uploaderNamesShown') !== 'false' ? `
-              <div class="game-meta">👤 By: ${game.uploader || 'Anonymous'}</div>
-            ` : ''}
-
-            <div class="game-description">${game.description}</div>
-
-            ${game.tags && game.tags.length > 0 ? `
-              <div class="game-tags">
-                ${game.tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('')}
-              </div>
-            ` : ''}
-
-            <div class="game-stats">
-              ${game.views ? `<div class="stat">👁️ ${game.views} views</div>` : ''}
-              ${game.downloads ? `<div class="stat">⬇️ ${game.downloads} downloads</div>` : ''}
-              ${game.avgRating ? `<div class="stat">⭐ ${game.avgRating}/5 (${game.ratingCount})</div>` : ''}
-            </div>
-
-            <div class="game-actions">
-              <button class="game-btn" onclick="playGame(${game.id})">▶️ Play</button>
-              <button class="game-btn secondary" onclick="downloadGame(${game.id})">⬇️ Download</button>
-              <button class="fav-btn ${userFavorites.includes(game.id) ? 'favorited' : ''}" onclick="toggleFavorite(${game.id}, event)">❤️</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // ===== SEARCH & FILTER =====
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-      const query = e.target.value.toLowerCase();
-      const resultsDiv = document.getElementById('searchResults');
-
-      if (!query) {
-        resultsDiv.classList.remove('show');
-        return;
-      }
-
-      const results = allGames.filter(game =>
-        game.name.toLowerCase().includes(query) ||
-        game.description.toLowerCase().includes(query)
-      ).slice(0, 5);
-
-      if (results.length > 0) {
-        resultsDiv.innerHTML = results.map(game => `
-          <div class="search-result-item" onclick="playGame(${game.id})">
-            <div class="search-result-title">${game.name}</div>
-            <div class="search-result-desc">${game.description.substring(0, 60)}...</div>
-          </div>
-        `).join('');
-        resultsDiv.classList.add('show');
-      } else {
-        resultsDiv.innerHTML = '<div class="search-result-item" style="cursor: default;">No games found</div>';
-        resultsDiv.classList.add('show');
-      }
+    console.log(`✅ Game uploaded (memory only): ${newFile.name}`);
+    
+    res.json({ 
+      success: true, 
+      file: newFile,
+      uploaderToken: uploaderToken,
+      accessCode: newFile.accessCode,
+      message: 'Game uploaded successfully! (stored in memory)'
     });
+  }
+});
 
-    function filterByTag(tag) {
-      const filtered = allGames.filter(game => game.tags && game.tags.includes(tag));
-      renderGames(filtered);
-      document.getElementById('searchInput').value = `Tag: ${tag}`;
-    }
-
-    function applyFilters() {
-      const categoryFilter = document.getElementById('categoryFilter').value;
-      const ratingFilter = document.getElementById('ratingFilter').value;
-      const sortFilter = document.getElementById('sortFilter').value;
-
-      let filtered = [...allGames];
-
-      // Category filter
-      if (categoryFilter) {
-        filtered = filtered.filter(g => g.category === categoryFilter);
-      }
-
-      // Rating filter
-      if (ratingFilter) {
-        filtered = filtered.filter(g => (g.avgRating || 0) >= parseFloat(ratingFilter));
-      }
-
-      // Sorting
-      if (sortFilter === 'newest') {
-        filtered.sort((a, b) => b.timestamp - a.timestamp);
-      } else if (sortFilter === 'popular') {
-        filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
-      } else if (sortFilter === 'trending') {
-        filtered.sort((a, b) => {
-          const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3 + (a.avgRating || 0) * 0.1;
-          const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3 + (b.avgRating || 0) * 0.1;
-          return scoreB - scoreA;
-        });
-      } else if (sortFilter === 'rating') {
-        filtered.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
-      }
-
-      renderGames(filtered);
-    }
-
-    function updateCategories() {
-      const categories = new Set(allGames.map(g => g.category).filter(Boolean));
-      const select = document.getElementById('categoryFilter');
-      
-      [...categories].forEach(cat => {
-        if (!select.querySelector(`option[value="${cat}"]`)) {
-          const option = document.createElement('option');
-          option.value = cat;
-          option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-          select.appendChild(option);
+// GET ALL GAMES
+app.get('/api/files', async (req, res) => {
+  console.log(`📋 Fetching ${allFiles.length} games`);
+  
+  // Calculate average ratings
+  if (Rating) {
+    try {
+      const ratings = await Rating.find();
+      allFiles.forEach(game => {
+        const gameRatings = ratings.filter(r => r.gameId === game.id);
+        if (gameRatings.length > 0) {
+          game.avgRating = (gameRatings.reduce((sum, r) => sum + r.rating, 0) / gameRatings.length).toFixed(1);
+          game.ratingCount = gameRatings.length;
         }
       });
+    } catch (err) {
+      console.error('Error fetching ratings:', err);
+    }
+  }
+  
+  res.json(allFiles);
+});
+
+// GET GAME STATS
+app.get('/api/game-stats/:id', async (req, res) => {
+  try {
+    const gameId = parseInt(req.params.id);
+    const game = allFiles.find(f => f.id === gameId);
+    
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
-    // ===== TABS =====
-    function showTab(tabName, button) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      button.classList.add('active');
+    let stats = {
+      id: game.id,
+      name: game.name,
+      downloads: game.downloads,
+      views: game.views,
+      fileSize: game.fileSize,
+      uploadDate: game.uploadDate,
+      avgRating: game.avgRating || 0,
+      ratingCount: game.ratingCount || 0,
+      commentCount: 0,
+      favoriteCount: 0,
+    };
 
-      if (tabName === 'home') {
-        renderGames(allGames);
-      } else if (tabName === 'trending') {
-        const trending = [...allGames].sort((a, b) => {
-          const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3;
-          const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3;
-          return scoreB - scoreA;
-        }).slice(0, 10);
-        renderGames(trending);
-      } else if (tabName === 'recent') {
-        const recent = [...allGames].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
-        renderGames(recent);
-      } else if (tabName === 'favorites') {
-        const fav = allGames.filter(g => userFavorites.includes(g.id));
-        renderGames(fav);
-      } else if (tabName === 'myGames') {
-        const myGames = allGames.filter(g => uploaderTokens.hasOwnProperty(g.id));
-        renderGames(myGames);
-      }
+    if (Comment) {
+      const comments = await Comment.find({ gameId });
+      stats.commentCount = comments.length;
+    }
+    if (Favorite) {
+      const favorites = await Favorite.find({ gameId });
+      stats.favoriteCount = favorites.length;
     }
 
-    // ===== MODALS =====
-    function openUploadModal() {
-      document.getElementById('uploadModal').classList.add('show');
+    res.json(stats);
+  } catch (err) {
+    console.error('Stats error:', err);
+    res.status(500).json({ error: 'Error fetching stats' });
+  }
+});
+
+// SEARCH GAMES
+app.get('/api/search', (req, res) => {
+  const query = req.query.q?.toLowerCase() || '';
+  
+  if (!query) {
+    return res.json(allFiles);
+  }
+
+  const results = allFiles.filter(game => 
+    game.name.toLowerCase().includes(query) ||
+    game.description.toLowerCase().includes(query) ||
+    (game.tags && game.tags.some(tag => tag.toLowerCase().includes(query)))
+  );
+
+  console.log(`🔍 Search for "${query}" returned ${results.length} results`);
+  res.json(results);
+});
+
+// GET TRENDING GAMES
+app.get('/api/trending', (req, res) => {
+  const trending = [...allFiles].sort((a, b) => {
+    const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3 + (a.ratingCount || 0) * 0.1;
+    const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3 + (b.ratingCount || 0) * 0.1;
+    return scoreB - scoreA;
+  }).slice(0, 10);
+
+  res.json(trending);
+});
+
+// GET MOST RECENT GAMES
+app.get('/api/recent', (req, res) => {
+  const recent = [...allFiles].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+  res.json(recent);
+});
+
+// RATE A GAME
+app.post('/api/rate', async (req, res) => {
+  try {
+    const { gameId, rating, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
     }
 
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('show');
-      document.getElementById('gameName').value = '';
-      document.getElementById('gameDescription').value = '';
-      document.getElementById('uploaderName').value = '';
-      document.getElementById('uploaderEmail').value = userEmail;
-      document.getElementById('gameTags').value = '';
-      document.getElementById('file').value = '';
-      document.getElementById('icon').value = '';
-      document.getElementById('passwordProtect').checked = false;
-      document.getElementById('passwordGroup').style.display = 'none';
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Rating must be 1-5' });
     }
 
-    function togglePasswordProtect() {
-      const group = document.getElementById('passwordGroup');
-      if (document.getElementById('passwordProtect').checked) {
-        group.style.display = 'block';
-      } else {
-        group.style.display = 'none';
-      }
-    }
+    if (Rating) {
+      // Remove old rating from this user for this game
+      await Rating.deleteOne({ gameId, userId });
+      
+      // Add new rating
+      const newRating = new Rating({ gameId, userId, rating });
+      await newRating.save();
 
-    // ===== UPLOAD GAME =====
-    async function uploadFile(event) {
-      event.preventDefault();
-      const fileInput = document.getElementById('file');
-      const nameInput = document.getElementById('gameName');
-      const descInput = document.getElementById('gameDescription');
-      const uploaderInput = document.getElementById('uploaderName');
-      const emailInput = document.getElementById('uploaderEmail');
-      const tagsInput = document.getElementById('gameTags');
-      const categorySelect = document.getElementById('gameCategory');
-      const iconInput = document.getElementById('icon');
-      const passwordProtect = document.getElementById('passwordProtect').checked;
-      const passwordInput = document.getElementById('gamePassword');
-
-      if (!fileInput.files[0] || !nameInput.value) {
-        showNotification('Please fill in required fields', 'error');
-        setTimeout(hideNotification, 3000);
-        return;
-      }
-
-      showNotification('⏳ Uploading Game...', 'loading');
-      userEmail = emailInput.value;
-      localStorage.setItem('userEmail', userEmail);
-
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-      formData.append('name', nameInput.value);
-      formData.append('description', descInput.value);
-      formData.append('uploader', uploaderInput.value);
-      formData.append('uploaderEmail', emailInput.value);
-      formData.append('category', categorySelect.value);
-      formData.append('tags', tagsInput.value);
-      formData.append('isPasswordProtected', passwordProtect);
-      if (passwordProtect) {
-        formData.append('password', passwordInput.value);
-      }
-
-      if (iconInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          formData.append('iconData', e.target.result);
-          await sendUpload(formData);
-        };
-        reader.readAsDataURL(iconInput.files[0]);
-      } else {
-        await sendUpload(formData);
-      }
-    }
-
-    async function sendUpload(formData) {
-      try {
-        const response = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
-        const result = await response.json();
-
-        if (result.success) {
-          uploaderTokens[result.file.id] = result.uploaderToken;
-          saveTokensToStorage();
-          showNotification('✅ Game uploaded! Check Settings for your delete token.', 'success');
-          setTimeout(() => {
-            hideNotification();
-            closeUploadModal();
-            loadGames();
-          }, 2000);
-        } else {
-          showNotification('❌ ' + result.error, 'error');
-          setTimeout(hideNotification, 3000);
+      // Update game average rating
+      const ratings = await Rating.find({ gameId });
+      if (ratings.length > 0) {
+        const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+        const game = allFiles.find(f => f.id === gameId);
+        if (game) {
+          game.avgRating = parseFloat(avg.toFixed(1));
+          game.ratingCount = ratings.length;
+          await saveGamesToDB(game);
         }
-      } catch (err) {
-        showNotification('❌ Upload failed: ' + err.message, 'error');
-        setTimeout(hideNotification, 3000);
       }
+
+      console.log(`⭐ Game ${gameId} rated ${rating} stars by ${userId}`);
+      res.json({ success: true, message: 'Rating saved' });
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Rating error:', err);
+    res.status(500).json({ error: 'Error saving rating' });
+  }
+});
+
+// POST COMMENT
+app.post('/api/comment', async (req, res) => {
+  try {
+    const { gameId, userName, userEmail, comment } = req.body;
+
+    if (!comment || !userName) {
+      return res.status(400).json({ error: 'Comment and name required' });
     }
 
-    // ===== PLAY GAME =====
-    async function playGame(gameId) {
+    if (Comment) {
+      const newComment = new Comment({ gameId, userName, userEmail, comment });
+      await newComment.save();
+
+      console.log(`💬 Comment added to game ${gameId} by ${userName}`);
+      res.json({ success: true, message: 'Comment saved' });
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Comment error:', err);
+    res.status(500).json({ error: 'Error saving comment' });
+  }
+});
+
+// GET COMMENTS FOR GAME
+app.get('/api/comments/:gameId', async (req, res) => {
+  try {
+    const gameId = parseInt(req.params.gameId);
+
+    if (Comment) {
+      const comments = await Comment.find({ gameId }).sort({ timestamp: -1 });
+      res.json(comments);
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching comments:', err);
+    res.json([]);
+  }
+});
+
+// ADD TO FAVORITES
+app.post('/api/favorite', async (req, res) => {
+  try {
+    const { gameId, sessionId } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID required' });
+    }
+
+    if (Favorite) {
+      // Check if already favorited
+      const existing = await Favorite.findOne({ gameId, sessionId });
+      
+      if (existing) {
+        // Remove from favorites
+        await Favorite.deleteOne({ gameId, sessionId });
+        res.json({ success: true, favorited: false });
+      } else {
+        // Add to favorites
+        const newFav = new Favorite({ gameId, sessionId });
+        await newFav.save();
+        res.json({ success: true, favorited: true });
+      }
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Favorite error:', err);
+    res.status(500).json({ error: 'Error updating favorites' });
+  }
+});
+
+// GET FAVORITES
+app.get('/api/favorites/:sessionId', async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    if (Favorite) {
+      const favorites = await Favorite.find({ sessionId });
+      const favoriteIds = favorites.map(f => f.gameId);
+      res.json(favoriteIds);
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching favorites:', err);
+    res.json([]);
+  }
+});
+
+// TRACK VIEW
+app.post('/api/track-view', async (req, res) => {
+  try {
+    const { gameId, sessionId } = req.body;
+
+    const game = allFiles.find(f => f.id === gameId);
+    if (game) {
+      game.views = (game.views || 0) + 1;
+      await saveGamesToDB(game);
+    }
+
+    if (ViewHistory) {
+      const newView = new ViewHistory({ gameId, sessionId });
+      await newView.save();
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('View tracking error:', err);
+    res.status(500).json({ error: 'Error tracking view' });
+  }
+});
+
+// TRACK PLAY TIME
+app.post('/api/track-playtime', async (req, res) => {
+  try {
+    const { gameId, sessionId, playDuration } = req.body;
+
+    if (PlayTime) {
+      const newPlayTime = new PlayTime({ gameId, sessionId, playDuration });
+      await newPlayTime.save();
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Play time tracking error:', err);
+    res.status(500).json({ error: 'Error tracking play time' });
+  }
+});
+
+// HEARTBEAT
+app.post('/api/heartbeat', (req, res) => {
+  const sessionId = req.body.sessionId;
+  
+  if (!sessionId) {
+    return res.status(400).json({ error: 'Missing sessionId' });
+  }
+  
+  activeSessions.set(sessionId, Date.now());
+  cleanupInactiveSessions();
+  
+  res.json({ success: true, activePlayers: activeSessions.size });
+});
+
+// GET ACTIVE PLAYERS
+app.get('/api/active-players', (req, res) => {
+  cleanupInactiveSessions();
+  const count = activeSessions.size;
+  
+  console.log(`👥 Current active players: ${count}`);
+  res.json({ count });
+});
+
+// VIEW GAME
+app.get('/api/view/:id', async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    console.log(`👁️ View request for game ID: ${fileId}`);
+    
+    const file = allFiles.find(f => f.id === fileId);
+    
+    if (!file) {
+      console.error(`❌ Game not found with ID: ${fileId}`);
+      return res.status(404).send('<h1 style="color:#ef4444;">Game not found</h1>');
+    }
+
+    let htmlContent = file.htmlContent;
+    
+    if (file.htmlFileId && gridFSBucket) {
       try {
-        // Track view
-        await fetch(`${API_BASE}/api/track-view`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gameId, sessionId })
+        const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
+        let content = '';
+        
+        downloadStream.on('data', (chunk) => {
+          content += chunk.toString('utf-8');
         });
-
-        const modal = document.getElementById('gameModal');
-        const iframe = document.getElementById('gameIframe');
-        const game = allGames.find(g => g.id === gameId);
         
-        document.getElementById('modalGameTitle').textContent = game.name;
-        iframe.src = `${API_BASE}/api/view/${gameId}`;
-        modal.classList.add('show');
-
-        currentRatingGameId = gameId;
-        loadGameDetails(gameId);
-      } catch (err) {
-        console.error('Error playing game:', err);
-        showNotification('❌ Error loading game', 'error');
-      }
-    }
-
-    async function loadGameDetails(gameId) {
-      try {
-        const game = allGames.find(g => g.id === gameId);
-        
-        let detailsHTML = `
-          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-              <button class="btn-submit" style="flex: 1; background: #3b82f6;" onclick="openRatingModal(${gameId})">⭐ Rate & Comment</button>
-              <button class="btn-submit" style="flex: 1; background: #ec4899;" onclick="openShareModal(${gameId})">🌍 Share</button>
-              <button class="btn-submit" style="flex: 1; background: #10b981;" onclick="downloadGame(${gameId})">⬇️ Download</button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
-                <div style="font-size: 0.9em; color: var(--text-secondary);">👁️ Views</div>
-                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.views || 0}</div>
-              </div>
-              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
-                <div style="font-size: 0.9em; color: var(--text-secondary);">⬇️ Downloads</div>
-                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.downloads || 0}</div>
-              </div>
-              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
-                <div style="font-size: 0.9em; color: var(--text-secondary);">⭐ Rating</div>
-                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.avgRating || 'N/A'}</div>
-              </div>
-              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
-                <div style="font-size: 0.9em; color: var(--text-secondary);">📅 Uploaded</div>
-                <div style="font-size: 0.95em; font-weight: 800; color: var(--primary);">${game.uploadDate}</div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        document.getElementById('gameDetailsContainer').innerHTML = detailsHTML;
-      } catch (err) {
-        console.error('Error loading game details:', err);
-      }
-    }
-
-    function closeGameModal() {
-      document.getElementById('gameModal').classList.remove('show');
-      document.getElementById('gameIframe').src = '';
-    }
-
-    // ===== DOWNLOAD GAME =====
-    function downloadGame(gameId) {
-      window.location.href = `${API_BASE}/api/download/${gameId}`;
-    }
-
-    // ===== FAVORITES =====
-    function toggleFavorite(gameId, event) {
-      event.stopPropagation();
-      
-      if (userFavorites.includes(gameId)) {
-        userFavorites = userFavorites.filter(id => id !== gameId);
-      } else {
-        userFavorites.push(gameId);
-      }
-      
-      saveFavoritesToStorage();
-      
-      const btn = event.target.closest('.fav-btn');
-      btn.classList.toggle('favorited');
-      
-      showNotification(userFavorites.includes(gameId) ? '❤️ Added to favorites' : '💔 Removed from favorites', 'success');
-      setTimeout(hideNotification, 2000);
-    }
-
-    // ===== RATINGS & COMMENTS =====
-    function openRatingModal(gameId) {
-      document.getElementById('ratingModal').classList.add('show');
-      currentRatingGameId = gameId;
-      loadComments(gameId);
-      resetStarRating();
-    }
-
-    function closeRatingModal() {
-      document.getElementById('ratingModal').classList.remove('show');
-    }
-
-    function resetStarRating() {
-      document.querySelectorAll('.star').forEach(star => {
-        star.classList.remove('active');
-        star.onclick = function() {
-          const rating = this.dataset.rating;
-          document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
-          for (let i = 0; i < rating; i++) {
-            document.querySelectorAll('.star')[i].classList.add('active');
-          }
-        };
-      });
-    }
-
-    async function submitRating() {
-      const rating = document.querySelectorAll('.star.active').length;
-      
-      if (rating === 0) {
-        showNotification('Please select a rating', 'error');
-        setTimeout(hideNotification, 2000);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE}/api/rate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            gameId: currentRatingGameId,
-            rating: rating,
-            userId: sessionId
-          })
+        downloadStream.on('end', () => {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.setHeader('Content-Disposition', 'inline');
+          res.send(content);
         });
-
-        const result = await response.json();
         
-        if (result.success) {
-          showNotification('⭐ Rating saved!', 'success');
-          setTimeout(hideNotification, 2000);
-          loadGames();
-          resetStarRating();
-        }
-      } catch (err) {
-        console.error('Rating error:', err);
-      }
-    }
-
-    async function submitComment() {
-      const name = document.getElementById('commentName').value;
-      const email = document.getElementById('commentEmail').value;
-      const comment = document.getElementById('commentText').value;
-
-      if (!name || !comment) {
-        showNotification('Please fill in name and comment', 'error');
-        setTimeout(hideNotification, 2000);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE}/api/comment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            gameId: currentRatingGameId,
-            userName: name,
-            userEmail: email,
-            comment: comment
-          })
+        downloadStream.on('error', () => {
+          res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
         });
-
-        const result = await response.json();
-        
-        if (result.success) {
-          showNotification('💬 Comment posted!', 'success');
-          setTimeout(hideNotification, 2000);
-          document.getElementById('commentName').value = '';
-          document.getElementById('commentEmail').value = '';
-          document.getElementById('commentText').value = '';
-          loadComments(currentRatingGameId);
-        }
       } catch (err) {
-        console.error('Comment error:', err);
+        res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
       }
+    } else if (htmlContent) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', 'inline');
+      res.send(htmlContent);
+    } else {
+      console.error(`❌ No HTML content for game: ${file.name}`);
+      return res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
+    }
+  } catch (err) {
+    console.error('View error:', err);
+    res.status(500).send('<h1 style="color:#ef4444;">Error loading game</h1>');
+  }
+});
+
+// DOWNLOAD GAME
+app.get('/api/download/:id', async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    const file = allFiles.find(f => f.id === fileId);
+    
+    if (!file) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
-    async function loadComments(gameId) {
+    let htmlContent = file.htmlContent;
+    
+    if (file.htmlFileId && gridFSBucket) {
       try {
-        const response = await fetch(`${API_BASE}/api/comments/${gameId}`);
-        const comments = await response.json();
-
-        const container = document.getElementById('commentsContainer');
+        const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
+        let content = '';
         
-        if (comments.length === 0) {
-          container.innerHTML = '<p style="color: var(--text-secondary);">No comments yet. Be the first!</p>';
-          return;
-        }
-
-        container.innerHTML = comments.map(comment => `
-          <div class="comment-item">
-            <div class="comment-author">${comment.userName}</div>
-            <div class="comment-text">${comment.comment}</div>
-            <div class="comment-time">${new Date(comment.timestamp).toLocaleDateString()}</div>
-          </div>
-        `).join('');
-      } catch (err) {
-        console.error('Error loading comments:', err);
-      }
-    }
-
-    // ===== SHARE =====
-    function openShareModal(gameId) {
-      const game = allGames.find(g => g.id === gameId);
-      const shareLink = `${window.location.origin}?gameId=${gameId}`;
-      document.getElementById('shareLink').value = shareLink;
-      document.getElementById('shareModal').classList.add('show');
-    }
-
-    function closeShareModal() {
-      document.getElementById('shareModal').classList.remove('show');
-    }
-
-    function copyShareLink() {
-      const link = document.getElementById('shareLink');
-      link.select();
-      document.execCommand('copy');
-      showNotification('📋 Link copied!', 'success');
-      setTimeout(hideNotification, 2000);
-    }
-
-    // ===== MUSIC =====
-    function updateMusicButton() {
-      const btn1 = document.getElementById('musicControlBtn');
-      const btn2 = document.getElementById('musicControlBtn2');
-      const status = document.getElementById('musicStatus');
-      
-      if (isMusicPlaying) {
-        btn1.textContent = '⏸️ Pause';
-        btn2.textContent = '⏸️ Pause';
-        status.textContent = 'Now playing';
-      } else {
-        btn1.textContent = '▶️ Play';
-        btn2.textContent = '▶️ Play';
-        status.textContent = 'Paused';
-      }
-    }
-
-    function toggleMusic() {
-      if (isMusicPlaying) {
-        bgMusic.pause();
-        isMusicPlaying = false;
-      } else {
-        bgMusic.play().catch(() => console.log('Could not play music'));
-        isMusicPlaying = true;
-      }
-      localStorage.setItem('musicPlaying', isMusicPlaying);
-      updateMusicButton();
-    }
-
-    function changeVolume() {
-      const volume = document.getElementById('volumeSlider').value;
-      document.getElementById('volumeValue').textContent = volume + '%';
-      bgMusic.volume = volume / 100;
-      localStorage.setItem('musicVolume', volume);
-    }
-
-    // ===== THEME & APPEARANCE =====
-    function toggleTheme() {
-      const isDark = document.getElementById('themeToggle').checked;
-      const label = document.getElementById('themeLabel');
-      label.textContent = isDark ? 'Light' : 'Dark';
-    }
-
-    function toggleAnimations() {
-      const enabled = document.getElementById('animationsToggle').checked;
-      document.getElementById('animationsLabel').textContent = enabled ? 'On' : 'Off';
-      if (!enabled) {
-        document.documentElement.style.setProperty('--animation', 'none');
-      } else {
-        document.documentElement.style.removeProperty('--animation');
-      }
-      localStorage.setItem('animationsEnabled', enabled);
-    }
-
-    function changeCardSize() {
-      const size = document.getElementById('cardSizeSelect').value;
-      const widths = { small: '220px', medium: '320px', large: '420px' };
-      document.documentElement.style.setProperty('--card-min-width', widths[size]);
-      localStorage.setItem('cardSize', size);
-    }
-
-    function toggleUploaderNames() {
-      const show = document.getElementById('uploaderNamesToggle').checked;
-      document.getElementById('uploaderNamesLabel').textContent = show ? 'On' : 'Off';
-      localStorage.setItem('uploaderNamesShown', show);
-      renderGames(allGames);
-    }
-
-    // ===== SETTINGS =====
-    function openSettingsView() {
-      document.querySelector('.main-view').classList.remove('active');
-      document.querySelector('.settings-view').classList.add('active');
-      displayTokens();
-    }
-
-    function closeSettingsView() {
-      document.querySelector('.settings-view').classList.remove('active');
-      document.querySelector('.main-view').classList.add('active');
-    }
-
-    function displayTokens() {
-      const container = document.getElementById('tokensContainer');
-      
-      if (!uploaderTokens || Object.keys(uploaderTokens).length === 0) {
-        container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>';
-        return;
-      }
-
-      const tokenItems = Object.entries(uploaderTokens)
-        .map(([gameId, token]) => {
-          const game = allGames.find(g => g.id === parseInt(gameId));
-          const gameName = game ? game.name : `Game #${gameId}`;
+        downloadStream.on('data', (chunk) => {
+          content += chunk.toString('utf-8');
+        });
+        
+        downloadStream.on('end', () => {
+          file.downloads++;
+          saveGamesToDB(file);
           
-          return `
-            <div class="token-item">
-              <div class="token-info">
-                <div class="token-game-name">📌 ${gameName}</div>
-                <div class="token-value">${token}</div>
-              </div>
-              <button class="token-copy-btn" onclick="copyToken('${token}', this)">📋 Copy</button>
-            </div>
-          `;
-        })
-        .join('');
-
-      container.innerHTML = tokenItems;
-    }
-
-    function copyToken(token, button) {
-      navigator.clipboard.writeText(token).then(() => {
-        const originalText = button.textContent;
-        button.textContent = '✅ Copied!';
-        button.classList.add('copied');
+          console.log(`📥 Downloading: ${file.name}`);
+          
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
+          res.send(content);
+        });
         
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove('copied');
-        }, 2000);
-      }).catch(err => {
-        showNotification('❌ Failed to copy token', 'error');
-        setTimeout(hideNotification, 3000);
-      });
-    }
-
-    function resetAllSettings() {
-      if (confirm('Reset all settings to default?')) {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('music') || key === 'cardSize' || key === 'uploaderNamesShown' || key === 'theme' || key === 'colorTheme' || key === 'animationsEnabled') {
-            localStorage.removeItem(key);
-          }
+        downloadStream.on('error', () => {
+          res.status(404).json({ error: 'Game file not found' });
         });
-        location.reload();
-      }
-    }
-
-    // ===== DELETE GAME =====
-    function openDeleteModal(gameId) {
-      window.currentDeleteId = gameId;
-      document.getElementById('deleteModal').classList.add('show');
-    }
-
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').classList.remove('show');
-    }
-
-    async function confirmDelete() {
-      const token = document.getElementById('deleteToken').value;
-      showNotification('⏳ Deleting game...', 'loading');
-      try {
-        const response = await fetch(`${API_BASE}/api/delete/${window.currentDeleteId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uploaderToken: token })
-        });
-        const result = await response.json();
-        if (result.success) {
-          delete uploaderTokens[window.currentDeleteId];
-          saveTokensToStorage();
-          showNotification('✅ Game deleted successfully!', 'success');
-          setTimeout(() => {
-            hideNotification();
-            closeDeleteModal();
-            loadGames();
-          }, 2000);
-        } else {
-          showNotification('❌ ' + result.error, 'error');
-          setTimeout(hideNotification, 3000);
-        }
       } catch (err) {
-        showNotification('❌ Delete failed: ' + err.message, 'error');
-        setTimeout(hideNotification, 3000);
+        res.status(404).json({ error: 'Game file not found' });
       }
+    } else if (htmlContent) {
+      file.downloads++;
+      saveGamesToDB(file);
+
+      console.log(`📥 Downloading: ${file.name}`);
+      
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
+      res.send(htmlContent);
+    } else {
+      return res.status(404).json({ error: 'Game file not found' });
     }
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Download failed' });
+  }
+});
 
-    // ===== STATS MODAL =====
-    async function openStatsModal(gameId) {
-      try {
-        const response = await fetch(`${API_BASE}/api/game-stats/${gameId}`);
-        const stats = await response.json();
-
-        const grid = document.getElementById('statsGrid');
-        grid.innerHTML = `
-          <div class="stat-box">
-            <div class="stat-label">👁️ Total Views</div>
-            <div class="stat-value">${stats.views || 0}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">⬇️ Total Downloads</div>
-            <div class="stat-value">${stats.downloads || 0}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">⭐ Average Rating</div>
-            <div class="stat-value">${stats.avgRating || 'N/A'}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">📊 Rating Count</div>
-            <div class="stat-value">${stats.ratingCount || 0}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">💬 Comments</div>
-            <div class="stat-value">${stats.commentCount || 0}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">❤️ Favorites</div>
-            <div class="stat-value">${stats.favoriteCount || 0}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">📅 Upload Date</div>
-            <div class="stat-value" style="font-size: 0.9em;">${stats.uploadDate}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">📦 File Size</div>
-            <div class="stat-value" style="font-size: 0.9em;">${(stats.fileSize / 1024 / 1024).toFixed(2)} MB</div>
-          </div>
-        `;
-
-        document.getElementById('statsModal').classList.add('show');
-      } catch (err) {
-        console.error('Stats error:', err);
-        showNotification('❌ Error loading stats', 'error');
-      }
+// DELETE GAME
+app.delete('/api/delete/:id', (req, res) => {
+  try {
+    console.log(`🗑️ Delete request for game ID: ${req.params.id}`);
+    
+    const fileId = parseInt(req.params.id);
+    const uploaderToken = req.body.uploaderToken;
+    
+    console.log(`Checking uploader token...`);
+    
+    const fileIndex = allFiles.findIndex(f => f.id === fileId);
+    
+    if (fileIndex === -1) {
+      console.log(`❌ Game not found`);
+      return res.status(404).json({ error: 'Game not found' });
     }
-
-    function closeStatsModal() {
-      document.getElementById('statsModal').classList.remove('show');
+    
+    const file = allFiles[fileIndex];
+    console.log(`Found game: ${file.name}`);
+    
+    if (!uploaderToken || uploaderToken !== file.uploaderToken) {
+      console.log('❌ Delete attempt with wrong token');
+      return res.status(401).json({ error: 'Invalid token - you did not upload this game' });
     }
-
-    // ===== HEARTBEAT =====
-    let sessionId_local = Math.random().toString(36).substring(7);
-
-    async function sendHeartbeat() {
-      try {
-        const response = await fetch(`${API_BASE}/api/heartbeat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: sessionId_local })
-        });
-        const result = await response.json();
-        if (result.activePlayers) {
-          document.getElementById('playerCount').textContent = '👥 ' + result.activePlayers + ' Active';
-        }
-      } catch (err) {
-        console.error('Heartbeat error:', err);
-      }
-    }
-
-    // ===== KEYBOARD SHORTCUTS =====
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' || e.key === 'e') {
-        closeGameModal();
-        closeUploadModal();
-        closeDeleteModal();
-        closeRatingModal();
-        closeShareModal();
-        closeStatsModal();
-        closeAdminModal();
-      }
-      if (e.key === ' ' && document.activeElement.tagName !== 'INPUT') {
-        e.preventDefault();
-        if (document.getElementById('gameModal').classList.contains('show')) {
-          const game = allGames[Math.floor(Math.random() * allGames.length)];
-          if (game) playGame(game.id);
-        }
-      }
+    
+    console.log(`✅ Token correct, deleting game`);
+    
+    allFiles.splice(fileIndex, 1);
+    deleteGameFromDB(fileId);
+    
+    console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
+    
+    res.json({ 
+      success: true, 
+      message: 'Game deleted successfully!'
     });
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
 
-    // ===== ADMIN DASHBOARD =====
-    async function openAdminDashboard() {
-      if (!userEmail) {
-        showNotification('⚠️ Please enter your email in upload form first', 'error');
-        setTimeout(hideNotification, 3000);
-        return;
-      }
+// EDIT GAME (Admin only)
+app.put('/api/edit/:id', async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    const { uploaderEmail, uploaderToken, name, description, tags } = req.body;
 
-      try {
-        const response = await fetch(`${API_BASE}/api/dashboard/${userEmail}`);
-        const result = await response.json();
-
-        if (result.error) {
-          showNotification('🔐 Admin features only', 'error');
-          setTimeout(hideNotification, 3000);
-          return;
-        }
-
-        const grid = document.getElementById('adminStatsGrid');
-        grid.innerHTML = `
-          <div class="stat-box">
-            <div class="stat-label">📚 Total Games</div>
-            <div class="stat-value">${result.totalGames}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">⬇️ Total Downloads</div>
-            <div class="stat-value">${result.totalDownloads}</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">👁️ Total Views</div>
-            <div class="stat-value">${result.totalViews}</div>
-          </div>
-        `;
-
-        const gamesContainer = document.getElementById('adminGamesContainer');
-        gamesContainer.innerHTML = '<h3 style="margin-bottom: 15px;">Your Games</h3>' + result.games.map(game => `
-          <div style="padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; margin-bottom: 10px;">
-            <div style="font-weight: 700; margin-bottom: 8px;">${game.name}</div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9em;">
-              <div>👁️ Views: ${game.views || 0}</div>
-              <div>⬇️ Downloads: ${game.downloads || 0}</div>
-              <div>⭐ Rating: ${game.avgRating || 'N/A'}</div>
-              <div>📊 Votes: ${game.ratingCount || 0}</div>
-            </div>
-          </div>
-        `).join('');
-
-        document.getElementById('adminModal').classList.add('show');
-      } catch (err) {
-        console.error('Admin dashboard error:', err);
-        showNotification('❌ Error loading dashboard', 'error');
-      }
+    if (!isAdmin(uploaderEmail)) {
+      return res.status(401).json({ error: 'Admin only' });
     }
 
-    function closeAdminModal() {
-      document.getElementById('adminModal').classList.remove('show');
+    const fileIndex = allFiles.findIndex(f => f.id === fileId);
+    
+    if (fileIndex === -1) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
-    // ===== INITIALIZE =====
-    loadTokensFromStorage();
-    loadFavoritesFromStorage();
-    loadAllSettings();
-    loadGames();
-    setInterval(sendHeartbeat, 5000);
-    sendHeartbeat();
+    const file = allFiles[fileIndex];
 
-    // Close modals on escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeGameModal();
-        closeUploadModal();
-        closeDeleteModal();
-        closeRatingModal();
-        closeShareModal();
-        closeStatsModal();
-      }
-    });
-  </script>
-</body>
-</html>
+    if (uploaderToken !== file.uploaderToken) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Update fields
+    if (name) file.name = name;
+    if (description) file.description = description;
+    if (tags) file.tags = tags.split(',').map(t => t.trim());
+
+    await saveGamesToDB(file);
+    
+    console.log(`✏️ Game edited: ${file.name}`);
+    res.json({ success: true, message: 'Game updated successfully!' });
+  } catch (err) {
+    console.error('Edit error:', err);
+    res.status(500).json({ error: 'Error editing game' });
+  }
+});
+
+// GET DEVELOPER DASHBOARD (Admin only)
+app.get('/api/dashboard/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    if (!isAdmin(email)) {
+      return res.status(401).json({ error: 'Admin only' });
+    }
+
+    const stats = {
+      totalGames: allFiles.length,
+      totalDownloads: allFiles.reduce((sum, g) => sum + (g.downloads || 0), 0),
+      totalViews: allFiles.reduce((sum, g) => sum + (g.views || 0), 0),
+      games: allFiles.map(g => ({
+        id: g.id,
+        name: g.name,
+        downloads: g.downloads,
+        views: g.views,
+        avgRating: g.avgRating,
+        ratingCount: g.ratingCount,
+      })),
+    };
+
+    res.json(stats);
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.status(500).json({ error: 'Error fetching dashboard' });
+  }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('❌ Server error:', err);
+  
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large. Max size is 100MB.' });
+  }
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: 'File upload error: ' + err.message });
+  }
+  
+  res.status(500).json({ 
+    error: 'Server error: ' + (err.message || 'Unknown error') 
+  });
+});
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, async () => {
+  console.log(`\n🎮 GameVault running on port ${PORT}`);
+  console.log(`🔐 Admin email: ${ADMIN_EMAIL}`);
+  
+  await connectDB();
+  
+  console.log(`📊 Games loaded: ${allFiles.length}\n`);
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('Shutting down gracefully...');
+  server.close();
+  if (db) {
+    mongoose.connection.close();
+  }
+});
