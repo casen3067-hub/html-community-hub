@@ -8,8 +8,8 @@ const { GridFSBucket } = require('mongodb');
 
 const app = express();
 
-// ===== ADMIN EMAIL - ONLY THIS EMAIL GETS ADMIN PRIVILEGES =====
-const ADMIN_EMAIL = 'casen3067@gmail.com';
+// ===== ADMIN PASSWORD - ENTER THIS IN SETTINGS TO GET ADMIN PRIVILEGES =====
+const ADMIN_PASSWORD = 'Tiu2mc3y!!!'; // Change this to whatever password you want!
 
 // Increase timeout limits for 100MB uploads
 app.use(express.json({ limit: '100mb' }));
@@ -203,8 +203,8 @@ function generateToken() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-function isAdmin(email) {
-  return email === ADMIN_EMAIL;
+function isAdmin(password) {
+  return password === ADMIN_PASSWORD;
 }
 
 // Active players tracking
@@ -763,7 +763,7 @@ app.get('/api/download/:id', async (req, res) => {
 });
 
 // DELETE GAME
-app.delete('/api/delete/:id', (req, res) => {
+app.delete('/api/delete/:id', async (req, res) => {
   try {
     console.log(`🗑️ Delete request for game ID: ${req.params.id}`);
     
@@ -790,7 +790,7 @@ app.delete('/api/delete/:id', (req, res) => {
     console.log(`✅ Token correct, deleting game`);
     
     allFiles.splice(fileIndex, 1);
-    deleteGameFromDB(fileId);
+    await deleteGameFromDB(fileId);
     
     console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
     
@@ -804,14 +804,14 @@ app.delete('/api/delete/:id', (req, res) => {
   }
 });
 
-// EDIT GAME (Admin only)
+// EDIT GAME (Admin only - password protected)
 app.put('/api/edit/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
-    const { uploaderEmail, uploaderToken, name, description, tags } = req.body;
+    const { adminPassword, uploaderToken, name, description, tags } = req.body;
 
-    if (!isAdmin(uploaderEmail)) {
-      return res.status(401).json({ error: 'Admin only' });
+    if (!isAdmin(adminPassword)) {
+      return res.status(401).json({ error: 'Invalid admin password' });
     }
 
     const fileIndex = allFiles.findIndex(f => f.id === fileId);
@@ -841,13 +841,13 @@ app.put('/api/edit/:id', async (req, res) => {
   }
 });
 
-// GET DEVELOPER DASHBOARD (Admin only)
-app.get('/api/dashboard/:email', async (req, res) => {
+// GET DEVELOPER DASHBOARD (Admin only - password protected)
+app.get('/api/dashboard/:password', async (req, res) => {
   try {
-    const email = req.params.email;
+    const password = req.params.password;
 
-    if (!isAdmin(email)) {
-      return res.status(401).json({ error: 'Admin only' });
+    if (!isAdmin(password)) {
+      return res.status(401).json({ error: 'Invalid admin password' });
     }
 
     const stats = {
