@@ -32,6 +32,9 @@ if (!fs.existsSync('uploads')) {
 // DATABASE FILE PATH
 const DB_FILE = path.join(__dirname, 'games-database.json');
 
+// ADMIN PASSWORD FOR DELETING GAMES (Change this to your secret password!)
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
+
 // Setup file upload with optimizations
 const upload = multer({
   dest: 'uploads/',
@@ -122,12 +125,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     uploader: req.body.uploader || 'Anonymous',
     category: req.body.category || 'other',
     customSettings: req.body.customSettings || '',
-    filename: req.file.filename,
-    originalName: req.file.originalname,
     icon: iconBase64,
     uploadDate: new Date().toLocaleDateString(),
     downloads: 0,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    // Store the actual HTML file content in the database
+    htmlContent: req.file.buffer.toString('utf-8')
   };
 
   allFiles.push(newFile);
@@ -154,52 +157,109 @@ app.get('/api/files', (req, res) => {
 
 // VIEW: Display HTML file in browser
 app.get('/api/view/:id', (req, res) => {
-  const fileId = parseInt(req.params.id);
-  const file = allFiles.find(f => f.id === fileId);
-  
-  if (!file) {
-    console.error(`❌ Game not found with ID: ${fileId}`);
-    console.log('Available games:', allFiles.map(f => f.id).join(', '));
-    return res.status(404).send('Game not found');
-  }
+  try {
+    const fileId = parseInt(req.params.id);
+    console.log(`👁️ View request for game ID: ${fileId}`);
+    
+    const file = allFiles.find(f => f.id === fileId);
+    
+    if (!file) {
+      console.error(`❌ Game not found with ID: ${fileId}`);
+      return res.status(404).send('<h1 style="color:#ef4444;">Game not found</h1>');
+    }
 
-  const filePath = path.join(__dirname, 'uploads', file.filename);
-  
-  // Check if file exists
-  if (!fs.existsSync(filePath)) {
-    console.error(`❌ File not found at: ${filePath}`);
-    return res.status(404).send('Game file not found on disk');
-  }
+    if (!file.htmlContent) {
+      console.error(`❌ No HTML content for game: ${file.name}`);
+      return res.status(404).send('<h1 style="color:#ef4444;">Game file not found</h1>');
+    }
 
-  console.log(`👁️ Viewing game: ${file.name}`);
-  
-  // Set header to display as HTML, not download
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Content-Disposition', 'inline');
-  
-  res.sendFile(filePath);
+    console.log(`✅ Serving game: ${file.name}`);
+    
+    // Set header to display as HTML
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', 'inline');
+    
+    res.send(file.htmlContent);
+  } catch (err) {
+    console.error('View error:', err);
+    res.status(500).send('<h1 style="color:#ef4444;">Error loading game</h1>');
+  }
 });
 
 // DOWNLOAD: Download the HTML file
 app.get('/api/download/:id', (req, res) => {
-  const fileId = parseInt(req.params.id);
-  const file = allFiles.find(f => f.id === fileId);
-  
-  if (!file) {
-    return res.status(404).json({ error: 'Game not found' });
-  }
+  try {
+    const fileId = parseInt(req.params.id);
+    const file = allFiles.find(f => f.id === fileId);
+    
+    if (!file) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
 
-  file.downloads++;
-  saveDatabase();
-  
-  const filePath = path.join(__dirname, 'uploads', file.filename);
-  
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'Game file not found' });
-  }
+    if (!file.htmlContent) {
+      return res.status(404).json({ error: 'Game file not found' });
+    }
 
-  console.log(`📥 Downloading: ${file.name}`);
-  res.download(filePath, file.name + '.html');
+    file.downloads++;
+    saveDatabase();
+
+    console.log(`📥 Downloading: ${file.name}`);
+    
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.name}.html"`);
+    res.send(file.htmlContent);
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Download failed' });
+  }
+});
+
+// DELETE: Remove a game (admin only)
+app.delete('/api/delete/:id', (req, res) => {
+  try {
+    console.log(`🗑️ Delete request for game ID: ${req.params.id}`);
+    console.log(`📊 Current games in database: ${allFiles.length}`);
+    
+    const fileId = parseInt(req.params.id);
+    const password = req.body.password;
+    
+    console.log(`Checking password...`);
+    
+    // Check admin password
+    if (!password || password !== ADMIN_PASSWORD) {
+      console.log('❌ Delete attempt with wrong password');
+      return res.status(401).json({ error: 'Invalid admin password' });
+    }
+    
+    console.log(`✅ Password correct, looking for game ID: ${fileId}`);
+    
+    // Find the game
+    const fileIndex = allFiles.findIndex(f => f.id === fileId);
+    
+    console.log(`Found at index: ${fileIndex}, Total games: ${allFiles.length}`);
+    
+    if (fileIndex === -1) {
+      console.log(`❌ Game not found. Available IDs: ${allFiles.map(f => f.id).join(', ')}`);
+      return res.status(404).json({ error: 'Game not found' });
+    }
+    
+    const file = allFiles[fileIndex];
+    console.log(`Found game: ${file.name}`);
+    
+    // Remove from database (no need to delete from disk since we store in DB)
+    allFiles.splice(fileIndex, 1);
+    saveDatabase();
+    
+    console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
+    
+    res.json({ 
+      success: true, 
+      message: 'Game deleted successfully!'
+    });
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
 });
 
 // Error handling middleware (must be AFTER all routes)
