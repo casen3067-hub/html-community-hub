@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GameVault 🎮</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>🎮 GameVault - HTML Community Game Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -112,17 +112,8 @@
       --text-secondary: #9eddff;
     }
 
-    :root.theme-midnight #particleCanvas {
-      background: linear-gradient(135deg, 
-        #0a0e27 0%,
-        #0f1f3f 25%,
-        #1a2f4f 50%,
-        #0f1f3f 75%,
-        #0a0e27 100%) !important;
-    }
-
     html {
-      color-scheme: dark;
+      scroll-behavior: smooth;
     }
 
     body {
@@ -162,7 +153,7 @@
     }
 
     :root.theme-space #particleCanvas {
-      background: linear-gradient(135deg, #1a0f2e 0%, #5a2f8f 50%, #1a0f2e 100%) !important;
+      background: linear-gradient(135deg, #2a1540 0%, #5a2f8f 50%, #2a1540 100%) !important;
     }
 
     :root.theme-cyberpunk #particleCanvas {
@@ -170,424 +161,11 @@
     }
 
     :root.theme-sunset #particleCanvas {
-      background: linear-gradient(135deg, #2a1810 0%, #7a5030 50%, #2a1810 100%) !important;
+      background: linear-gradient(135deg, #4a2810 0%, #7a5030 50%, #4a2810 100%) !important;
     }
 
-    /* MAIN CONTENT WRAPPER */
-    .main-wrapper {
-      position: relative;
-      z-index: 10;
-      min-height: 100vh;
-    }
-
-    .attribution {
-      text-align: center;
-      padding: 12px 20px;
-      background: rgba(99, 102, 241, 0.1);
-      border-bottom: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-size: 0.85em;
-      backdrop-filter: blur(10px);
-    }
-
-    .attribution strong {
-      color: var(--primary);
-    }
-
-    /* HEADER */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 50px;
-      flex-wrap: wrap;
-      gap: 25px;
-      padding: 25px 0;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
-      background: linear-gradient(to bottom, rgba(99, 102, 241, 0.08), transparent);
-      backdrop-filter: blur(10px);
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-    }
-
-    .logo {
-      font-family: 'Outfit', sans-serif;
-      font-size: 3em;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -1.5px;
-      text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
-    }
-
-    .header-stats {
-      display: flex;
-      gap: 15px;
-    }
-
-    .stat-badge {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
-      padding: 12px 22px;
-      border-radius: 30px;
-      border: 1.5px solid var(--primary);
-      color: var(--primary);
-      font-size: 0.95em;
-      font-weight: 700;
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.1);
-      backdrop-filter: blur(5px);
-    }
-
-    .active-players {
-      border-color: var(--neon) !important;
-      color: var(--neon) !important;
-      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.08) 100%) !important;
-      animation: neonGlow 2s ease-in-out infinite;
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.2) !important;
-    }
-
-    @keyframes neonGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); }
-      50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.4); }
-    }
-
-    .header-right {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .search-bar {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.05) 100%);
-      border: 1.5px solid var(--border);
-      padding: 14px 25px;
-      border-radius: 30px;
-      color: var(--text-primary);
-      width: 350px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(5px);
-    }
-
-    .search-bar::placeholder {
-      color: var(--text-secondary);
-    }
-
-    .search-bar:hover {
-      border-color: var(--primary);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-    }
-
-    .search-bar:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
-    }
-
-    .header-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .header-btn {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      padding: 14px 24px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.2em;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s;
-      z-index: -1;
-    }
-
-    .header-btn:hover::before {
-      left: 100%;
-    }
-
-    .header-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
-    }
-
-    .header-btn:active {
-      transform: translateY(-2px);
-    }
-
-    /* CONTAINER */
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 40px 25px;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* CATEGORIES */
-    .categories {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 40px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      scroll-behavior: smooth;
-    }
-
-    .categories::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .categories::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 3px;
-    }
-
-    .category-btn {
-      padding: 12px 26px;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.05) 100%);
-      border: 1.5px solid var(--border);
-      color: var(--text-secondary);
-      border-radius: 30px;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: all 0.3s ease;
-      position: relative;
-      font-size: 0.95em;
-      backdrop-filter: blur(5px);
-    }
-
-    .category-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.08) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.2);
-    }
-
-    .category-btn.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border-color: transparent;
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
-      transform: translateY(-2px);
-    }
-
-    /* GAMES HEADER */
-    .games-header {
-      margin-bottom: 45px;
-      padding-bottom: 25px;
-      border-bottom: 2px solid rgba(99, 102, 241, 0.2);
-    }
-
-    .games-header h2 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 3.5em;
-      font-weight: 900;
-      margin: 0;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -1.5px;
-    }
-
-    /* GAMES GRID */
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 25px;
-    }
-
-    /* GAME CARD - COMPLETELY REDESIGNED */
-    .game-card {
-      background: linear-gradient(135deg, rgba(26, 31, 58, 0.6) 0%, rgba(26, 31, 58, 0.3) 100%);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      transition: all 0.4s ease;
-      cursor: pointer;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
-      backdrop-filter: blur(10px);
-      position: relative;
-    }
-
-    .game-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    .game-card:hover {
-      transform: translateY(-12px);
-      border-color: var(--primary);
-      box-shadow: 0 20px 50px rgba(99, 102, 241, 0.25);
-      background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(26, 31, 58, 0.4) 100%);
-    }
-
-    .game-card:hover::before {
-      opacity: 1;
-    }
-
-    .game-thumbnail {
-      width: 100%;
-      height: 240px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4.5em;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .game-thumbnail::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-      animation: shimmer 3s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .game-thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .game-info {
-      padding: 25px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .game-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.4em;
-      font-weight: 800;
-      margin-bottom: 12px;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
-
-    .game-description {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95em;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    .game-uploader {
-      color: var(--primary);
-      font-size: 0.9em;
-      margin-bottom: 20px;
-      font-weight: 700;
-    }
-
-    .game-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .game-btn {
-      flex: 1;
-      padding: 12px 16px;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
-      color: var(--primary);
-      border: 1.5px solid var(--primary);
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-      font-family: 'Poppins', sans-serif;
-      backdrop-filter: blur(5px);
-    }
-
-    .game-btn:hover {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    .game-btn.delete-btn {
-      color: #ef4444;
-      border-color: #ef4444;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-    }
-
-    .game-btn.delete-btn:hover {
-      background: #ef4444;
-      color: white;
-      box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
-    }
-
-    /* EMPTY STATE */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-secondary);
-    }
-
-    .empty-state-icon {
-      font-size: 5em;
-      margin-bottom: 20px;
-      opacity: 0.7;
-    }
-
-    .empty-state p {
-      font-size: 1.2em;
+    :root.theme-midnight #particleCanvas {
+      background: linear-gradient(135deg, #0a0e27 0%, #1a3a5f 50%, #0a0e27 100%) !important;
     }
 
     /* NOTIFICATION TOAST */
@@ -650,6 +228,444 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* MAIN CONTENT */
+    .main-wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+    }
+
+    .attribution {
+      text-align: center;
+      padding: 12px 20px;
+      background: rgba(99, 102, 241, 0.1);
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      backdrop-filter: blur(10px);
+    }
+
+    /* HEADER */
+    .header {
+      padding: 20px 30px;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      z-index: 20;
+      position: relative;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .logo {
+      font-size: 1.8em;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-badge {
+      padding: 8px 16px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 600;
+      color: var(--neon);
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+      flex: 2;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 12px 20px;
+      background: rgba(45, 55, 72, 0.5);
+      border: 1.5px solid var(--border);
+      border-radius: 25px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95em;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      background: rgba(45, 55, 72, 0.8);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      z-index: 100;
+    }
+
+    .search-results.show {
+      display: block;
+    }
+
+    .search-result-item {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .search-result-item:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .search-result-desc {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+    }
+
+    /* HEADER CONTROLS */
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-btn {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      font-size: 0.95em;
+    }
+
+    .header-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      padding: 20px 30px;
+      background: rgba(10, 14, 39, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      z-index: 15;
+      position: relative;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* FILTERS */
+    .filters-section {
+      padding: 20px 30px;
+      background: rgba(10, 14, 39, 0.5);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      z-index: 12;
+      position: relative;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 8px 12px;
+      background: rgba(45, 55, 72, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-group select:hover,
+    .filter-group input:hover {
+      border-color: var(--primary);
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    }
+
+    /* MAIN VIEW */
+    .main-view {
+      display: none;
+    }
+
+    .main-view.active {
+      display: block;
+    }
+
+    .games-container {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+      z-index: 11;
+      position: relative;
+    }
+
+    /* GAME CARD */
+    .game-card {
+      background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(45, 55, 90, 0.4) 100%);
+      border: 1.5px solid var(--border);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.25);
+    }
+
+    .game-thumbnail {
+      width: 100%;
+      height: 240px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3em;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .game-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .game-thumbnail.shimmer {
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .game-info {
+      padding: 18px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-title {
+      font-size: 1.1em;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .game-meta {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .game-description {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.4;
+      flex-grow: 1;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.8em;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      padding: 4px 10px;
+      background: rgba(99, 102, 241, 0.15);
+      border-radius: 6px;
+      color: var(--neon);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .rating-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9em;
+    }
+
+    .stars {
+      color: #fbbf24;
+      letter-spacing: 2px;
+    }
+
+    .game-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 0.5px solid var(--primary);
+      border-radius: 6px;
+      font-size: 0.8em;
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background: rgba(99, 102, 241, 0.4);
+    }
+
+    .game-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .game-btn {
+      flex: 1;
+      padding: 10px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+
+    .game-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .game-btn.secondary {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .game-btn.secondary:hover {
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .fav-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 8px;
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fav-btn.favorited {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      color: white;
+    }
+
     /* MODALS */
     .modal {
       display: none;
@@ -659,7 +675,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.7);
-      z-index: 100;
+      z-index: 1000;
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(5px);
@@ -669,81 +685,268 @@
       display: flex;
     }
 
-    .modal-content, .upload-content {
-      background: linear-gradient(135deg, rgba(26, 31, 58, 0.95) 0%, rgba(26, 31, 58, 0.85) 100%);
+    .modal-content {
+      background: var(--bg-dark);
       border: 1.5px solid var(--border);
-      border-radius: 25px;
-      padding: 40px;
-      max-width: 500px;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
       width: 90%;
-      box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
-      animation: slideUp 0.3s ease;
+      animation: modalSlide 0.3s ease;
     }
 
-    @keyframes slideUp {
+    @keyframes modalSlide {
       from {
+        transform: translateY(-50px);
         opacity: 0;
-        transform: translateY(30px);
       }
       to {
-        opacity: 1;
         transform: translateY(0);
+        opacity: 1;
       }
     }
 
     .modal-header {
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
+      font-size: 1.5em;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .modal-header h2 {
-      font-size: 1.8em;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .modal-header p {
+    .modal-close {
+      background: none;
+      border: none;
       color: var(--text-secondary);
-      font-size: 0.95em;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    /* SETTINGS PANEL */
+    .modal-close:hover {
+      color: var(--text-primary);
+      transform: rotate(90deg);
+    }
+
+    /* UPLOAD MODAL */
+    .upload-content {
+      max-width: 650px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(45, 55, 72, 0.5);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95em;
+      transition: all 0.3s ease;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      background: rgba(45, 55, 72, 0.8);
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    /* GAME VIEWER MODAL */
+    .game-viewer {
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+
+    .game-viewer-iframe {
+      width: 100%;
+      height: 70vh;
+      border: none;
+      border-radius: 10px;
+      background: black;
+    }
+
+    /* RATING SECTION */
+    .rating-section {
+      margin-bottom: 20px;
+    }
+
+    .rating-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      font-size: 2em;
+      margin-bottom: 12px;
+    }
+
+    .star {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #cccccc;
+    }
+
+    .star:hover,
+    .star.active {
+      color: #fbbf24;
+      transform: scale(1.2);
+    }
+
+    /* COMMENTS SECTION */
+    .comments-section {
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .comment-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .comment-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(45, 55, 72, 0.5);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .comment-item {
+      background: rgba(45, 55, 72, 0.3);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .comment-author {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .comment-text {
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .comment-time {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+
+    /* GAME STATS MODAL */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.05));
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* SETTINGS VIEW */
     .settings-view {
       display: none;
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .settings-view.active {
       display: block;
     }
 
-    .main-view {
-      display: none;
-    }
-
-    .main-view.active {
-      display: block;
-    }
-
     .settings-header {
-      margin-bottom: 40px;
       display: flex;
       align-items: center;
       gap: 20px;
-      padding-bottom: 25px;
-      border-bottom: 2px solid var(--border);
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
     }
 
     .back-button {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
+      padding: 10px 16px;
+      background: transparent;
       border: 1.5px solid var(--border);
-      color: var(--primary);
-      border-radius: 25px;
+      color: var(--text-primary);
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
       font-family: 'Poppins', sans-serif;
@@ -752,101 +955,79 @@
 
     .back-button:hover {
       border-color: var(--primary);
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    .settings-header h2 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 2.8em;
-      font-weight: 900;
-      margin: 0;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
 
     .settings-container {
-      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
     }
 
     .settings-section {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.05) 100%);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 28px;
-      margin-bottom: 25px;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-
-    .settings-section:hover {
-      border-color: var(--primary);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.1);
+      background: linear-gradient(135deg, rgba(26, 31, 58, 0.8), rgba(45, 55, 90, 0.3));
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
     }
 
     .settings-section-header {
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 15px;
     }
 
     .settings-section-header h3 {
-      font-size: 1.4em;
+      font-size: 1.1em;
       font-weight: 800;
-      margin: 0 0 5px 0;
-      color: var(--text-primary);
+      margin-bottom: 4px;
     }
 
     .settings-section-header p {
-      margin: 0;
       font-size: 0.9em;
       color: var(--text-secondary);
     }
 
     .settings-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 18px 0;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
     }
 
     .settings-item:last-child {
       border-bottom: none;
     }
 
+    .settings-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .settings-label span {
       font-weight: 700;
-      font-size: 1.05em;
       color: var(--text-primary);
     }
 
     .settings-label small {
-      font-size: 0.85em;
       color: var(--text-secondary);
-      display: block;
-      margin-top: 4px;
+      font-size: 0.85em;
     }
 
     .settings-control {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
     }
 
     .toggle-switch {
       position: relative;
-      width: 55px;
-      height: 32px;
+      width: 50px;
+      height: 28px;
     }
 
     .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
+      display: none;
     }
 
     .toggle-label {
@@ -856,141 +1037,64 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
+      background: rgba(45, 55, 72, 0.5);
+      border-radius: 20px;
       transition: all 0.3s ease;
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       padding: 0 4px;
     }
 
     .toggle-switch input:checked + .toggle-label {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-color: var(--accent);
     }
 
     .toggle-icon {
       display: block;
       width: 24px;
       height: 24px;
-      background: white;
+      background: var(--bg-dark);
       border-radius: 50%;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1em;
-      margin-left: auto;
+      font-size: 0.8em;
     }
 
     .toggle-switch input:checked + .toggle-label .toggle-icon {
-      margin-left: 0;
-      margin-right: auto;
-    }
-
-    .setting-value {
-      font-size: 1em;
-      font-weight: 700;
-      color: var(--primary);
-      min-width: 60px;
-      text-align: right;
+      transform: translateX(22px);
     }
 
     .settings-select {
-      background: var(--bg-card);
+      padding: 8px 12px;
+      background: rgba(45, 55, 72, 0.5);
       border: 1.5px solid var(--border);
+      border-radius: 8px;
       color: var(--text-primary);
-      padding: 12px 18px;
-      border-radius: 10px;
       font-family: 'Poppins', sans-serif;
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .settings-select:hover {
-      border-color: var(--primary);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
-    }
-
-    .settings-select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
-    }
-
-    .volume-slider {
-      width: 100%;
-      max-width: 250px;
-      height: 8px;
-      border-radius: 5px;
-      background: linear-gradient(to right, var(--bg-card), var(--primary));
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      cursor: pointer;
-      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
-      border: 2px solid white;
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      cursor: pointer;
-      border: 2px solid white;
-      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
-    }
-
-    .setting-button {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    .setting-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(99, 102, 241, 0.4);
     }
 
     .reset-button {
       width: 100%;
-      padding: 15px 20px;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      padding: 14px;
+      background: transparent;
+      border: 2px solid #ef4444;
       color: #ef4444;
-      border: 1.5px solid #ef4444;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 700;
       font-family: 'Poppins', sans-serif;
-      font-size: 1.05em;
+      font-size: 0.95em;
       transition: all 0.3s ease;
     }
 
     .reset-button:hover {
       background: #ef4444;
       color: white;
-      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
     }
 
     /* TOKEN ITEM */
@@ -1003,6 +1107,7 @@
       border: 1.5px solid var(--border);
       border-radius: 12px;
       transition: all 0.3s ease;
+      margin-bottom: 12px;
     }
 
     .token-item:hover {
@@ -1058,72 +1163,95 @@
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
 
-    /* RESPONSIVENESS */
-    @media (max-width: 1024px) {
-      .games-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      }
+    /* NO GAMES MESSAGE */
+    .no-games {
+      text-align: center;
+      padding: 60px 30px;
+      color: var(--text-secondary);
     }
 
+    .no-games-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+    }
+
+    .no-games-text {
+      font-size: 1.2em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .no-games-subtext {
+      color: var(--text-secondary);
+    }
+
+    /* RESPONSIVENESS */
     @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-      }
-
-      .header-right {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .search-bar {
-        width: 100%;
-      }
-
-      .logo {
-        font-size: 2.2em;
-      }
-
-      .games-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      .games-container {
+        grid-template-columns: 1fr;
+        padding: 15px;
         gap: 15px;
       }
 
-      .game-card {
-        border-radius: 15px;
+      .header {
+        flex-direction: column;
+        gap: 12px;
       }
 
-      .modal-content, .upload-content {
-        max-width: 90%;
-        padding: 30px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px 15px;
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
       }
 
-      .games-grid {
-        grid-template-columns: 1fr;
+      .header-controls {
+        width: 100%;
+        flex-direction: column-reverse;
       }
 
-      .header-stats {
+      .header-btn {
+        width: 100%;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+
+      .filters-section {
+        flex-direction: column;
+      }
+
+      .filter-group {
         width: 100%;
         flex-direction: column;
       }
 
-      .stat-badge {
+      .filter-group select,
+      .filter-group input {
         width: 100%;
       }
 
-      .logo {
-        font-size: 1.8em;
+      .modal-content {
+        max-height: 85vh;
+        width: 95%;
       }
 
-      .games-header h2 {
-        font-size: 2em;
+      .game-viewer-iframe {
+        height: 50vh;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        padding: 10px 15px;
+        gap: 5px;
+      }
+
+      .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.9em;
       }
     }
   </style>
@@ -1139,274 +1267,375 @@
   </div>
 
   <div class="main-wrapper">
+    <!-- ATTRIBUTION -->
     <div class="attribution">
-      website made with <strong>java</strong>, by <strong>Casen</strong>
+      🎮 website made with ❤️ by Casen
     </div>
 
-    <div class="container">
-      <!-- HEADER -->
-      <header>
-        <div class="header-left">
-          <div class="logo">🎮 GameVault</div>
-          <div class="header-stats">
-            <div class="stat-badge" id="gameCount">0 Games</div>
-            <div class="stat-badge active-players" id="playerCount">👥 0 Online</div>
-          </div>
-        </div>
-
-        <div class="header-right">
-          <input 
-            type="text" 
-            class="search-bar" 
-            id="searchInput" 
-            placeholder="🔍 Search games or creators..."
-            onkeyup="filterGames(this.value)"
-          >
-          <div class="header-buttons">
-            <button class="header-btn music-toggle" id="musicToggle" onclick="toggleMusic()" title="Toggle Music">🎵</button>
-            <button class="header-btn" onclick="openUploadModal()">+</button>
-            <button class="header-btn" onclick="openSettingsView()">⚙️</button>
-          </div>
-        </div>
-      </header>
-
-      <!-- MAIN VIEW -->
-      <div class="main-view active">
-        <div class="categories" id="categoriesContainer">
-          <button class="category-btn active" onclick="filterCategory('all')">All Games</button>
-        </div>
-
-        <div class="games-header">
-          <h2>games</h2>
-        </div>
-
-        <div class="games-grid" id="gamesGrid">
-          <div class="empty-state">
-            <div class="empty-state-icon">🎮</div>
-            <p>No games yet. Be the first to upload!</p>
-          </div>
-        </div>
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">🎮 GameVault</div>
+        <div class="stat-badge" id="gameCount">0 Games</div>
+        <div class="stat-badge" id="playerCount">👥 0 Active</div>
       </div>
 
-      <!-- SETTINGS VIEW -->
-      <div class="settings-view">
-        <div class="settings-header">
-          <button class="back-button" onclick="closeSettingsView()">← Back</button>
-          <h2>⚙️ Settings</h2>
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="🔎 Search games...">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+
+      <div class="header-controls">
+        <button class="header-btn" onclick="openUploadModal()">➕ Upload</button>
+        <button class="header-btn" onclick="openSettingsView()">⚙️ Settings</button>
+        <button class="header-btn" id="musicControlBtn" onclick="toggleMusic()">▶️ Play Music</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('home', this)">🏠 Home</button>
+      <button class="tab-btn" onclick="showTab('trending', this)">🔥 Trending</button>
+      <button class="tab-btn" onclick="showTab('recent', this)">⏰ Recent</button>
+      <button class="tab-btn" onclick="showTab('favorites', this)">❤️ Favorites</button>
+      <button class="tab-btn" onclick="showTab('myGames', this)">📚 My Games</button>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label>📂 Category:</label>
+        <select id="categoryFilter" onchange="applyFilters()">
+          <option value="">All Categories</option>
+          <option value="puzzle">Puzzle</option>
+          <option value="action">Action</option>
+          <option value="adventure">Adventure</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>⭐ Min Rating:</label>
+        <select id="ratingFilter" onchange="applyFilters()">
+          <option value="">All Ratings</option>
+          <option value="4">4+ Stars</option>
+          <option value="3">3+ Stars</option>
+          <option value="2">2+ Stars</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>📅 Sort by:</label>
+        <select id="sortFilter" onchange="applyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="popular">Most Popular</option>
+          <option value="trending">Trending</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW -->
+    <div class="main-view active">
+      <div class="games-container" id="gamesContainer">
+        <div class="no-games">
+          <div class="no-games-icon">🎮</div>
+          <div class="no-games-text">No games found</div>
+          <div class="no-games-subtext">Upload one to get started!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div class="settings-view">
+      <div class="settings-header">
+        <button class="back-button" onclick="closeSettingsView()">← Back</button>
+        <h2>⚙️ Settings</h2>
+      </div>
+
+      <div class="settings-container">
+        <!-- APPEARANCE -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🌓 Appearance</h3>
+            <p>Customize how the website looks</p>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Dark/Light Theme</span>
+              <small>Switch between modes</small>
+            </div>
+            <div class="settings-control">
+              <div class="toggle-switch">
+                <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                <label for="themeToggle" class="toggle-label">
+                  <span class="toggle-icon">🌙</span>
+                </label>
+              </div>
+              <span id="themeLabel" class="setting-value">Dark</span>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Animations</span>
+              <small>Enable/disable motion effects</small>
+            </div>
+            <div class="settings-control">
+              <div class="toggle-switch">
+                <input type="checkbox" id="animationsToggle" checked onchange="toggleAnimations()">
+                <label for="animationsToggle" class="toggle-label">
+                  <span class="toggle-icon">✨</span>
+                </label>
+              </div>
+              <span id="animationsLabel" class="setting-value">On</span>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Theme</span>
+              <small>Choose a visual theme</small>
+            </div>
+            <select id="themeSelector" onchange="changeTheme(this.value)" class="settings-select">
+              <option value="default">🌌 Default (Purple)</option>
+              <option value="snow">❄️ Snow (Blue)</option>
+              <option value="lava">🔥 Lava (Orange)</option>
+              <option value="nature">🍃 Nature (Green)</option>
+              <option value="ocean">🌊 Ocean (Cyan)</option>
+              <option value="space">🚀 Space (Purple)</option>
+              <option value="cyberpunk">💻 Cyberpunk (Neon)</option>
+              <option value="sunset">🌅 Sunset (Gold)</option>
+              <option value="midnight">🌙 Midnight (Deep Blue)</option>
+            </select>
+          </div>
         </div>
 
-        <div class="settings-container">
-          <!-- APPEARANCE -->
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>🌓 Appearance</h3>
-              <p>Customize how the website looks</p>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Dark/Light Theme</span>
-                <small>Switch between modes</small>
-              </div>
-              <div class="settings-control">
-                <div class="toggle-switch">
-                  <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-                  <label for="themeToggle" class="toggle-label">
-                    <span class="toggle-icon">🌙</span>
-                  </label>
-                </div>
-                <span id="themeLabel" class="setting-value">Dark</span>
-              </div>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Animations</span>
-                <small>Enable/disable motion effects</small>
-              </div>
-              <div class="settings-control">
-                <div class="toggle-switch">
-                  <input type="checkbox" id="animationsToggle" checked onchange="toggleAnimations()">
-                  <label for="animationsToggle" class="toggle-label">
-                    <span class="toggle-icon">✨</span>
-                  </label>
-                </div>
-                <span id="animationsLabel" class="setting-value">On</span>
-              </div>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Theme</span>
-                <small>Choose a visual theme</small>
-              </div>
-              <select id="themeSelector" onchange="changeTheme(this.value)" class="settings-select">
-                <option value="default">🌌 Default (Purple)</option>
-                <option value="snow">❄️ Snow (Blue)</option>
-                <option value="lava">🔥 Lava (Orange)</option>
-                <option value="nature">🍃 Nature (Green)</option>
-                <option value="ocean">🌊 Ocean (Cyan)</option>
-                <option value="space">🚀 Space (Purple)</option>
-                <option value="cyberpunk">💻 Cyberpunk (Neon)</option>
-                <option value="sunset">🌅 Sunset (Gold)</option>
-                <option value="midnight">🌙 Midnight (Deep Blue)</option>
-              </select>
-            </div>
-          </div>
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>🎮 Game Display</h3>
-              <p>Customize game card appearance</p>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Card Size</span>
-                <small>Adjust game card dimensions</small>
-              </div>
-              <select id="cardSizeSelect" onchange="changeCardSize()" class="settings-select">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-              </select>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Show Uploader Names</span>
-                <small>Display creator names on cards</small>
-              </div>
-              <div class="settings-control">
-                <div class="toggle-switch">
-                  <input type="checkbox" id="uploaderNamesToggle" checked onchange="toggleUploaderNames()">
-                  <label for="uploaderNamesToggle" class="toggle-label">
-                    <span class="toggle-icon">👤</span>
-                  </label>
-                </div>
-                <span id="uploaderNamesLabel" class="setting-value">Shown</span>
-              </div>
-            </div>
+        <!-- GAME DISPLAY -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🎮 Game Display</h3>
+            <p>Customize game card appearance</p>
           </div>
 
-          <!-- AUDIO -->
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>🔊 Audio</h3>
-              <p>Control background music</p>
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Card Size</span>
+              <small>Adjust game card dimensions</small>
             </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Music Volume</span>
-                <small>0% - 100%</small>
-              </div>
-              <div class="settings-control">
-                <input type="range" id="volumeSlider" min="0" max="100" value="30" onchange="changeVolume()" class="volume-slider">
-                <span id="volumeValue" class="setting-value">30%</span>
-              </div>
-            </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Music Status</span>
-                <small id="musicStatus">Paused</small>
-              </div>
-              <button class="setting-button" onclick="toggleMusic()" id="musicControlBtn">▶️ Play</button>
-            </div>
+            <select id="cardSizeSelect" onchange="changeCardSize()" class="settings-select">
+              <option value="small">Small (220px)</option>
+              <option value="medium" selected>Medium (320px)</option>
+              <option value="large">Large (420px)</option>
+            </select>
           </div>
 
-          <!-- GAMEPLAY -->
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>🎯 Gameplay</h3>
-              <p>Game behavior settings</p>
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Show Uploader Names</span>
+              <small>Display who uploaded each game</small>
             </div>
-
-            <div class="settings-item">
-              <div class="settings-label">
-                <span>Auto-Play Fullscreen</span>
-                <small>Launch games in fullscreen</small>
+            <div class="settings-control">
+              <div class="toggle-switch">
+                <input type="checkbox" id="uploaderNamesToggle" checked onchange="toggleUploaderNames()">
+                <label for="uploaderNamesToggle" class="toggle-label">
+                  <span class="toggle-icon">👤</span>
+                </label>
               </div>
-              <div class="settings-control">
-                <div class="toggle-switch">
-                  <input type="checkbox" id="autoPlayFullscreenToggle" onchange="toggleAutoPlayFullscreen()">
-                  <label for="autoPlayFullscreenToggle" class="toggle-label">
-                    <span class="toggle-icon">⛶</span>
-                  </label>
-                </div>
-                <span id="autoPlayFullscreenLabel" class="setting-value">Off</span>
-              </div>
+              <span id="uploaderNamesLabel" class="setting-value">On</span>
             </div>
           </div>
-
-          <!-- MY TOKENS -->
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>🔐 My Delete Tokens</h3>
-              <p>View tokens for games you uploaded</p>
-            </div>
-            <div id="tokensContainer" style="display: flex; flex-direction: column; gap: 15px;">
-              <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>
-            </div>
-          </div>
-
-          <!-- RESET -->
-          <button class="reset-button" onclick="resetAllSettings()">🔄 Reset All Settings</button>
         </div>
+
+        <!-- MUSIC -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🎵 Background Music</h3>
+            <p>Control music and sound</p>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Music Volume</span>
+              <small>Adjust background music volume</small>
+            </div>
+            <div class="settings-control">
+              <input id="volumeSlider" type="range" min="0" max="100" value="30" onchange="changeVolume()" style="width: 150px;">
+              <span id="volumeValue">30%</span>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-label">
+              <span>Now Playing</span>
+              <small id="musicStatus">Paused</small>
+            </div>
+            <button class="header-btn" id="musicControlBtn2" onclick="toggleMusic()">▶️ Play</button>
+          </div>
+        </div>
+
+        <!-- MY TOKENS -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🔐 My Delete Tokens</h3>
+            <p>View tokens for games you uploaded</p>
+          </div>
+          <div id="tokensContainer" style="display: flex; flex-direction: column; gap: 15px;">
+            <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No tokens saved yet. Upload a game to get started!</p>
+          </div>
+        </div>
+
+        <!-- RESET -->
+        <button class="reset-button" onclick="resetAllSettings()">🔄 Reset All Settings</button>
       </div>
     </div>
   </div>
 
   <!-- UPLOAD MODAL -->
   <div class="modal" id="uploadModal">
-    <div class="upload-content">
+    <div class="modal-content upload-content">
       <div class="modal-header">
-        <h2>🚀 Share Your Game</h2>
-        <p>Upload to the GameVault community</p>
+        <span>📤 Upload Game</span>
+        <button class="modal-close" onclick="closeUploadModal()">✕</button>
       </div>
 
-      <form onsubmit="uploadFile(event)" style="display: flex; flex-direction: column; gap: 18px;">
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">Game Name *</label>
-          <input type="text" id="gameName" placeholder="My Awesome Game" required style="width: 100%; padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; font-family: 'Poppins';">
+      <form onsubmit="uploadFile(event)">
+        <div class="form-group">
+          <label>Game Name *</label>
+          <input type="text" id="gameName" placeholder="Enter game name" required>
         </div>
 
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">Description</label>
-          <textarea id="gameDescription" placeholder="Describe your game..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; font-family: 'Poppins'; min-height: 80px; resize: vertical;"></textarea>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="gameDescription" placeholder="Describe your game..."></textarea>
         </div>
 
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">Creator Name</label>
-          <input type="text" id="uploaderName" placeholder="Your name or username" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; font-family: 'Poppins';">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" id="uploaderName" placeholder="Enter your name">
         </div>
 
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">Category</label>
-          <select id="gameCategory" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; font-family: 'Poppins'; font-weight: 600;">
-            <option value="other">Other</option>
+        <div class="form-group">
+          <label>Your Email (for admin features)</label>
+          <input type="email" id="uploaderEmail" placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select id="gameCategory">
             <option value="puzzle">Puzzle</option>
             <option value="action">Action</option>
             <option value="adventure">Adventure</option>
-            <option value="arcade">Arcade</option>
+            <option value="other">Other</option>
           </select>
         </div>
 
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">HTML File *</label>
-          <input type="file" id="file" accept=".html" required style="padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; width: 100%; cursor: pointer;">
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="gameTags" placeholder="puzzle, retro, fun">
         </div>
 
-        <div>
-          <label style="font-weight: 700; margin-bottom: 8px; display: block;">Game Icon (Optional)</label>
-          <input type="file" id="icon" accept=".jpg,.jpeg,.png" style="padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; width: 100%; cursor: pointer;">
+        <div class="form-group">
+          <label>Game Icon (optional)</label>
+          <input type="file" id="icon" accept="image/*">
         </div>
 
-        <div id="uploadMessage" class="message"></div>
+        <div class="form-group">
+          <label>HTML Game File *</label>
+          <input type="file" id="file" accept=".html" required>
+        </div>
 
-        <button type="submit" style="padding: 14px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1.05em; margin-top: 10px;">Upload Game</button>
-        <button type="button" onclick="closeUploadModal()" style="padding: 12px; background: transparent; color: var(--text-secondary); border: 1.5px solid var(--border); border-radius: 12px; font-weight: 600; cursor: pointer;">Cancel</button>
+        <div class="form-group">
+          <div class="toggle-switch">
+            <input type="checkbox" id="passwordProtect" onchange="togglePasswordProtect()">
+            <label for="passwordProtect" class="toggle-label">
+              <span class="toggle-icon">🔐</span>
+            </label>
+          </div>
+          <span style="margin-left: 10px; color: var(--text-secondary);">Password protect this game</span>
+        </div>
+
+        <div class="form-group" id="passwordGroup" style="display: none;">
+          <label>Password</label>
+          <input type="password" id="gamePassword" placeholder="Enter password">
+        </div>
+
+        <button type="submit" class="btn-submit">🚀 Upload Game</button>
       </form>
+    </div>
+  </div>
+
+  <!-- GAME VIEWER MODAL -->
+  <div class="modal" id="gameModal">
+    <div class="modal-content game-viewer">
+      <div class="modal-header">
+        <span id="modalGameTitle">Game Viewer</span>
+        <button class="modal-close" onclick="closeGameModal()">✕</button>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <iframe id="gameIframe" class="game-viewer-iframe"></iframe>
+      </div>
+
+      <div id="gameDetailsContainer" style="margin-top: 20px;">
+        <!-- Game details will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME STATS MODAL -->
+  <div class="modal" id="statsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>📊 Game Statistics</span>
+        <button class="modal-close" onclick="closeStatsModal()">✕</button>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <!-- Stats will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- RATING MODAL -->
+  <div class="modal" id="ratingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>⭐ Rate This Game</span>
+        <button class="modal-close" onclick="closeRatingModal()">✕</button>
+      </div>
+
+      <div class="rating-section">
+        <div class="rating-title">How do you rate this game?</div>
+        <div class="star-rating" id="starRating">
+          <span class="star" data-rating="1">★</span>
+          <span class="star" data-rating="2">★</span>
+          <span class="star" data-rating="3">★</span>
+          <span class="star" data-rating="4">★</span>
+          <span class="star" data-rating="5">★</span>
+        </div>
+        <button class="btn-submit" onclick="submitRating()">Submit Rating</button>
+      </div>
+
+      <div class="comments-section">
+        <div class="rating-title">Leave a Comment</div>
+        <div class="comment-input-group">
+          <input type="text" id="commentName" class="comment-input" placeholder="Your name" style="flex: 0.5;">
+          <input type="email" id="commentEmail" class="comment-input" placeholder="Your email" style="flex: 0.5;">
+        </div>
+        <div class="comment-input-group">
+          <textarea id="commentText" class="comment-input" placeholder="Write your comment..." style="min-height: 80px; flex: 1;"></textarea>
+        </div>
+        <button class="btn-submit" onclick="submitComment()">Post Comment</button>
+
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+          <div class="rating-title">Comments</div>
+          <div id="commentsContainer">
+            <!-- Comments will be inserted here -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1414,60 +1643,93 @@
   <div class="modal" id="deleteModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🗑️ Delete Game</h2>
-        <p id="deleteGameName">Game Name</p>
+        <span>🗑️ Delete Game</span>
+        <button class="modal-close" onclick="closeDeleteModal()">✕</button>
       </div>
 
-      <p id="deleteMessage" class="message"></p>
+      <p style="margin-bottom: 20px; color: var(--text-secondary);">
+        Enter your delete token to confirm deletion. You should have saved this when you uploaded the game.
+      </p>
 
-      <div style="margin-bottom: 20px;">
-        <label style="font-weight: 700; margin-bottom: 8px; display: block;">Uploader Token</label>
-        <input type="password" id="deleteToken" placeholder="Enter your token to confirm" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); border-radius: 10px; font-family: 'Poppins';">
+      <div class="form-group">
+        <label>Delete Token</label>
+        <input type="text" id="deleteToken" placeholder="Paste your token here">
       </div>
 
       <button onclick="confirmDelete()" style="width: 100%; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-bottom: 10px;">Delete</button>
-      <button onclick="closeDeleteModal()" style="width: 100%; padding: 12px; background: transparent; border: 1.5px solid var(--border); color: var(--text-primary); border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
     </div>
   </div>
 
-  <!-- GAME VIEW MODAL -->
-  <div class="modal" id="gameModal" style="z-index: 200;">
-    <div style="position: relative; width: 95vw; height: 95vh; background: var(--bg-card); border-radius: 20px; border: 1.5px solid var(--border); overflow: hidden;">
-      <button onclick="closeGameModal()" style="position: absolute; top: 20px; right: 20px; z-index: 10; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color: white; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
-      <button onclick="toggleFullscreen()" style="position: absolute; bottom: 20px; right: 20px; z-index: 10; padding: 12px 20px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">⛶ Fullscreen</button>
-      <iframe id="gameFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+  <!-- ADMIN DASHBOARD MODAL -->
+  <div class="modal" id="adminModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>👨‍💻 Developer Dashboard</span>
+        <button class="modal-close" onclick="closeAdminModal()">✕</button>
+      </div>
+
+      <div class="stats-grid" id="adminStatsGrid">
+        <!-- Admin stats will be inserted here -->
+      </div>
+
+      <div id="adminGamesContainer" style="margin-top: 20px;">
+        <!-- Admin games list will be inserted here -->
+      </div>
     </div>
   </div>
+
+  <!-- SHARE MODAL -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>🌍 Share Game</span>
+        <button class="modal-close" onclick="closeShareModal()">✕</button>
+      </div>
+
+      <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this link to share this game with others:</p>
+
+      <div class="form-group">
+        <input type="text" id="shareLink" readonly class="comment-input" style="cursor: pointer;">
+      </div>
+
+      <button class="btn-submit" onclick="copyShareLink()">📋 Copy Link</button>
+    </div>
+  </div>
+
+  <!-- AUDIO -->
+  <audio id="bgMusic"></audio>
 
   <script>
-    function showNotification(message, type = 'loading') {
-      const toast = document.getElementById('notificationToast');
-      const text = document.getElementById('notificationText');
-      const spinner = document.getElementById('notificationSpinner');
+    // ===== GLOBAL VARIABLES =====
+    let allGames = [];
+    let filteredGames = [];
+    let nextId = 1;
+    let uploaderTokens = {};
+    let isMusicPlaying = false;
+    let currentTheme = 'default';
+    let currentRatingGameId = null;
+    let sessionId = Math.random().toString(36).substring(7);
+    let userFavorites = [];
+    let userEmail = localStorage.getItem('userEmail') || '';
 
-      text.textContent = message;
-      toast.classList.remove('success', 'error');
-      if (type !== 'loading') {
-        toast.classList.add(type);
-        spinner.style.display = 'none';
-      } else {
-        spinner.style.display = 'block';
-      }
-      toast.classList.add('show');
-    }
+    const ADMIN_EMAIL = 'casen3067@gmail.com';
+    const API_BASE = '';
 
-    function hideNotification() {
-      const toast = document.getElementById('notificationToast');
-      toast.classList.remove('show');
-    }
+    const bgMusic = document.getElementById('bgMusic') || new Audio('https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3');
+    bgMusic.volume = 0.3;
+    bgMusic.loop = true;
 
-    // ===== PARTICLE BACKGROUND =====
+    // ===== PARTICLE SYSTEM =====
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
-    let currentTheme = 'default';
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
 
     class DefaultParticle {
       constructor() {
@@ -1491,7 +1753,12 @@
       draw() {
         const color = currentTheme === 'default' ? '99, 102, 241' :
                       currentTheme === 'snow' ? '59, 130, 246' :
-                      currentTheme === 'lava' ? '255, 107, 53' : '16, 185, 129';
+                      currentTheme === 'lava' ? '255, 107, 53' :
+                      currentTheme === 'nature' ? '16, 185, 129' :
+                      currentTheme === 'ocean' ? '14, 165, 233' :
+                      currentTheme === 'space' ? '217, 70, 239' :
+                      currentTheme === 'cyberpunk' ? '255, 0, 255' :
+                      currentTheme === 'sunset' ? '249, 115, 22' : '15, 118, 110';
         ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -1515,7 +1782,6 @@
         this.x += this.speedX;
         this.y += this.speedY;
         this.rotation += this.rotationSpeed;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y > canvas.height) this.y = 0;
@@ -1559,7 +1825,6 @@
         this.speedY += 0.05;
         this.age++;
         this.opacity = Math.max(0, 0.6 - (this.age / this.lifespan) * 0.6);
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y > canvas.height) this.y = 0;
@@ -1587,14 +1852,12 @@
         this.opacity = Math.random() * 0.6 + 0.3;
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 0.15;
-        this.wobble = Math.random() * 0.5;
       }
 
       update() {
         this.x += this.speedX + Math.sin(this.rotation) * 0.3;
         this.y += this.speedY;
         this.rotation += this.rotationSpeed;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y > canvas.height) this.y = 0;
@@ -1634,7 +1897,6 @@
         this.x += this.speedX + Math.sin(this.wobbleX) * 0.3;
         this.y += this.speedY;
         this.wobbleX += this.wobbleSpeed;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y < -20) this.y = canvas.height + 20;
@@ -1668,12 +1930,10 @@
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y > canvas.height) this.y = 0;
         if (this.y < 0) this.y = canvas.height;
-
         this.trail.push({x: this.x, y: this.y, opacity: this.opacity});
         if (this.trail.length > 20) this.trail.shift();
       }
@@ -1686,7 +1946,6 @@
           ctx.arc(point.x, point.y, this.size * (1 - i / this.trail.length), 0, Math.PI * 2);
           ctx.fill();
         });
-
         ctx.fillStyle = `rgba(236, 72, 217, ${this.opacity})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -1708,7 +1967,6 @@
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y > canvas.height) this.y = 0;
@@ -1742,7 +2000,6 @@
         this.y += this.speedY;
         this.heat -= 1;
         this.opacity = (this.heat / 200) * 0.8;
-
         if (this.x > canvas.width) this.x = 0;
         if (this.x < 0) this.x = canvas.width;
         if (this.y < -20 || this.heat < 0) this.y = canvas.height + 20;
@@ -1756,40 +2013,6 @@
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    class AuroraWave {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 4 + 2;
-        this.speedX = (Math.random() - 0.5) * 1;
-        this.speedY = (Math.random() - 0.5) * 1;
-        this.opacity = Math.random() * 0.5 + 0.2;
-        this.wave = Math.random() * Math.PI * 2;
-        this.color = ['rgba(16, 185, 129', 'rgba(168, 85, 247', 'rgba(59, 130, 246'][Math.floor(Math.random() * 3)];
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY + Math.sin(this.wave) * 0.5;
-        this.wave += 0.05;
-
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-
-      draw() {
-        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-        gradient.addColorStop(0, this.color + ', ' + this.opacity + ')');
-        gradient.addColorStop(1, this.color + ', 0)');
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -1827,7 +2050,6 @@
         particle.draw();
       });
 
-      // Draw connections for default theme
       if (currentTheme === 'default') {
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
@@ -1852,21 +2074,29 @@
 
     animateParticles();
 
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
+    // ===== NOTIFICATION SYSTEM =====
+    function showNotification(message, type = 'loading') {
+      const toast = document.getElementById('notificationToast');
+      const text = document.getElementById('notificationText');
+      const spinner = document.getElementById('notificationSpinner');
+
+      text.textContent = message;
+      toast.classList.remove('success', 'error');
+      if (type !== 'loading') {
+        toast.classList.add(type);
+        spinner.style.display = 'none';
+      } else {
+        spinner.style.display = 'block';
+      }
+      toast.classList.add('show');
+    }
+
+    function hideNotification() {
+      const toast = document.getElementById('notificationToast');
+      toast.classList.remove('show');
+    }
 
     // ===== MAIN APPLICATION =====
-    let allGames = [];
-    let nextId = 1;
-    let uploaderTokens = {};
-    let isMusicPlaying = false;
-    const bgMusic = document.getElementById('bgMusic') || new Audio('https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ambient%20Iris.mp3');
-    bgMusic.volume = 0.3;
-    bgMusic.loop = true;
-
-    // Load tokens from localStorage
     function loadTokensFromStorage() {
       try {
         const saved = localStorage.getItem('uploaderTokens');
@@ -1880,13 +2110,32 @@
       }
     }
 
-    // Save tokens to localStorage
     function saveTokensToStorage() {
       try {
         localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
         console.log('💾 Saved ' + Object.keys(uploaderTokens).length + ' delete tokens');
       } catch (err) {
         console.error('Error saving tokens:', err);
+      }
+    }
+
+    function loadFavoritesFromStorage() {
+      try {
+        const saved = localStorage.getItem('userFavorites_' + sessionId);
+        if (saved) {
+          userFavorites = JSON.parse(saved);
+        }
+      } catch (err) {
+        console.error('Error loading favorites:', err);
+        userFavorites = [];
+      }
+    }
+
+    function saveFavoritesToStorage() {
+      try {
+        localStorage.setItem('userFavorites_' + sessionId, JSON.stringify(userFavorites));
+      } catch (err) {
+        console.error('Error saving favorites:', err);
       }
     }
 
@@ -1911,15 +2160,22 @@
         isMusicPlaying = true;
       }
       updateMusicButton();
+
+      const cardSize = localStorage.getItem('cardSize') || 'medium';
+      document.getElementById('cardSizeSelect').value = cardSize;
+      changeCardSize();
+
+      const uploaderNamesShown = localStorage.getItem('uploaderNamesShown') !== 'false';
+      document.getElementById('uploaderNamesToggle').checked = uploaderNamesShown;
+
+      userEmail = localStorage.getItem('userEmail') || '';
     }
 
     function changeTheme(theme, save = true) {
       currentTheme = theme;
       
-      // Remove ALL theme classes
       document.documentElement.classList.remove('theme-snow', 'theme-lava', 'theme-nature', 'theme-ocean', 'theme-space', 'theme-cyberpunk', 'theme-sunset', 'theme-midnight');
       
-      // Add new theme class
       if (theme !== 'default') {
         document.documentElement.classList.add(`theme-${theme}`);
       }
@@ -1931,167 +2187,222 @@
       console.log(`🎨 Theme changed to: ${theme}`);
     }
 
-    function toggleMusic() {
-      if (isMusicPlaying) {
-        bgMusic.pause();
-        isMusicPlaying = false;
-      } else {
-        bgMusic.play().catch(() => console.log('Could not play music'));
-        isMusicPlaying = true;
-      }
-      localStorage.setItem('musicPlaying', isMusicPlaying);
-      updateMusicButton();
-    }
-
-    function updateMusicButton() {
-      const btn = document.getElementById('musicToggle');
-      if (isMusicPlaying) {
-        btn.classList.add('playing');
-        btn.textContent = '🎵';
-      } else {
-        btn.classList.remove('playing');
-        btn.textContent = '🔇';
-      }
-    }
-
-    function changeVolume() {
-      const volume = document.getElementById('volumeSlider').value;
-      localStorage.setItem('musicVolume', volume);
-      document.getElementById('volumeValue').textContent = volume + '%';
-      bgMusic.volume = volume / 100;
-    }
-
-    function changeCardSize() {
-      const size = document.getElementById('cardSizeSelect').value;
-      localStorage.setItem('cardSize', size);
-      const grid = document.querySelector('.games-grid');
-      let minSize = '320px';
-      if (size === 'small') minSize = '220px';
-      if (size === 'large') minSize = '420px';
-      grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minSize}, 1fr))`;
-    }
-
-    function toggleUploaderNames() {
-      const isShown = document.getElementById('uploaderNamesToggle').checked;
-      localStorage.setItem('uploaderNamesShown', isShown);
-      document.getElementById('uploaderNamesLabel').textContent = isShown ? 'Shown' : 'Hidden';
-      renderGames(allGames);
-    }
-
-    function toggleAnimations() {
-      const isEnabled = document.getElementById('animationsToggle').checked;
-      localStorage.setItem('animationsEnabled', isEnabled);
-      document.getElementById('animationsLabel').textContent = isEnabled ? 'On' : 'Off';
-    }
-
-    function toggleTheme() {
-      const isDark = document.documentElement.style.colorScheme !== 'light';
-      document.documentElement.style.colorScheme = isDark ? 'light' : 'dark';
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-      document.getElementById('themeLabel').textContent = isDark ? 'Light' : 'Dark';
-    }
-
-    function toggleAutoPlayFullscreen() {
-      const isEnabled = document.getElementById('autoPlayFullscreenToggle').checked;
-      localStorage.setItem('autoPlayFullscreen', isEnabled);
-      document.getElementById('autoPlayFullscreenLabel').textContent = isEnabled ? 'On' : 'Off';
-    }
-
-    function resetAllSettings() {
-      if (confirm('Reset all settings to default?')) {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('music') || key === 'cardSize' || key === 'uploaderNamesShown' || key === 'theme' || key === 'colorTheme' || key === 'animationsEnabled') {
-            localStorage.removeItem(key);
-          }
-        });
-        location.reload();
-      }
-    }
-
-    // API functions
+    // ===== FETCH GAMES =====
     async function loadGames() {
       try {
-        const response = await fetch('/api/files');
+        const response = await fetch(`${API_BASE}/api/files`);
         allGames = await response.json();
         document.getElementById('gameCount').textContent = allGames.length + ' Games';
         renderGames(allGames);
         updateCategories();
       } catch (err) {
         console.error('Error loading games:', err);
+        showNotification('❌ Error loading games', 'error');
       }
     }
 
+    // ===== RENDER GAMES =====
     function renderGames(games) {
-      const grid = document.getElementById('gamesGrid');
+      const container = document.getElementById('gamesContainer');
+      
       if (games.length === 0) {
-        grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">
-          <div class="empty-state-icon">🎮</div>
-          <p>No games found</p>
-        </div>`;
+        container.innerHTML = `
+          <div class="no-games">
+            <div class="no-games-icon">🎮</div>
+            <div class="no-games-text">No games found</div>
+            <div class="no-games-subtext">Upload one to get started!</div>
+          </div>
+        `;
         return;
       }
 
-      const uploaderNamesShown = localStorage.getItem('uploaderNamesShown') !== 'false';
-      grid.innerHTML = games.map(game => `
+      container.innerHTML = games.map(game => `
         <div class="game-card">
           <div class="game-thumbnail">
-            ${game.icon ? `<img src="data:image/jpeg;base64,${game.icon}" alt="${game.name}">` : '🎮'}
+            ${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}">` : '🎮'}
           </div>
+
           <div class="game-info">
             <div class="game-title">${game.name}</div>
-            <div class="game-description">${game.description || 'No description'}</div>
-            ${uploaderNamesShown ? `<div class="game-uploader">By: ${game.uploader || 'Anonymous'}</div>` : ''}
+            
+            ${localStorage.getItem('uploaderNamesShown') !== 'false' ? `
+              <div class="game-meta">👤 By: ${game.uploader || 'Anonymous'}</div>
+            ` : ''}
+
+            <div class="game-description">${game.description}</div>
+
+            ${game.tags && game.tags.length > 0 ? `
+              <div class="game-tags">
+                ${game.tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('')}
+              </div>
+            ` : ''}
+
+            <div class="game-stats">
+              ${game.views ? `<div class="stat">👁️ ${game.views} views</div>` : ''}
+              ${game.downloads ? `<div class="stat">⬇️ ${game.downloads} downloads</div>` : ''}
+              ${game.avgRating ? `<div class="stat">⭐ ${game.avgRating}/5 (${game.ratingCount})</div>` : ''}
+            </div>
+
             <div class="game-actions">
-              <button class="game-btn" onclick="playGame(${game.id}, '${game.name}')">🎮 Play</button>
-              <button class="game-btn" onclick="downloadGame(${game.id})">📥</button>
-              <button class="game-btn delete-btn" onclick="openDeleteModal(${game.id})">🗑️</button>
+              <button class="game-btn" onclick="playGame(${game.id})">▶️ Play</button>
+              <button class="game-btn secondary" onclick="downloadGame(${game.id})">⬇️ Download</button>
+              <button class="fav-btn ${userFavorites.includes(game.id) ? 'favorited' : ''}" onclick="toggleFavorite(${game.id}, event)">❤️</button>
             </div>
           </div>
         </div>
       `).join('');
     }
 
-    function updateCategories() {
-      const categories = new Set(['all']);
-      allGames.forEach(game => {
-        if (game.category) categories.add(game.category);
-      });
-      const container = document.getElementById('categoriesContainer');
-      container.innerHTML = Array.from(categories).map(cat => `
-        <button class="category-btn ${cat === 'all' ? 'active' : ''}" onclick="filterCategory('${cat}')">
-          ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-        </button>
-      `).join('');
-    }
+    // ===== SEARCH & FILTER =====
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      const resultsDiv = document.getElementById('searchResults');
 
-    function filterCategory(category) {
-      const buttons = document.querySelectorAll('.category-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-
-      if (category === 'all') {
-        renderGames(allGames);
-      } else {
-        renderGames(allGames.filter(g => g.category === category));
+      if (!query) {
+        resultsDiv.classList.remove('show');
+        return;
       }
+
+      const results = allGames.filter(game =>
+        game.name.toLowerCase().includes(query) ||
+        game.description.toLowerCase().includes(query)
+      ).slice(0, 5);
+
+      if (results.length > 0) {
+        resultsDiv.innerHTML = results.map(game => `
+          <div class="search-result-item" onclick="playGame(${game.id})">
+            <div class="search-result-title">${game.name}</div>
+            <div class="search-result-desc">${game.description.substring(0, 60)}...</div>
+          </div>
+        `).join('');
+        resultsDiv.classList.add('show');
+      } else {
+        resultsDiv.innerHTML = '<div class="search-result-item" style="cursor: default;">No games found</div>';
+        resultsDiv.classList.add('show');
+      }
+    });
+
+    function filterByTag(tag) {
+      const filtered = allGames.filter(game => game.tags && game.tags.includes(tag));
+      renderGames(filtered);
+      document.getElementById('searchInput').value = `Tag: ${tag}`;
     }
 
-    function filterGames(query) {
-      const filtered = allGames.filter(game =>
-        game.name.toLowerCase().includes(query.toLowerCase()) ||
-        game.uploader.toLowerCase().includes(query.toLowerCase())
-      );
+    function applyFilters() {
+      const categoryFilter = document.getElementById('categoryFilter').value;
+      const ratingFilter = document.getElementById('ratingFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
+
+      let filtered = [...allGames];
+
+      // Category filter
+      if (categoryFilter) {
+        filtered = filtered.filter(g => g.category === categoryFilter);
+      }
+
+      // Rating filter
+      if (ratingFilter) {
+        filtered = filtered.filter(g => (g.avgRating || 0) >= parseFloat(ratingFilter));
+      }
+
+      // Sorting
+      if (sortFilter === 'newest') {
+        filtered.sort((a, b) => b.timestamp - a.timestamp);
+      } else if (sortFilter === 'popular') {
+        filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      } else if (sortFilter === 'trending') {
+        filtered.sort((a, b) => {
+          const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3 + (a.avgRating || 0) * 0.1;
+          const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3 + (b.avgRating || 0) * 0.1;
+          return scoreB - scoreA;
+        });
+      } else if (sortFilter === 'rating') {
+        filtered.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
+      }
+
       renderGames(filtered);
     }
 
+    function updateCategories() {
+      const categories = new Set(allGames.map(g => g.category).filter(Boolean));
+      const select = document.getElementById('categoryFilter');
+      
+      [...categories].forEach(cat => {
+        if (!select.querySelector(`option[value="${cat}"]`)) {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+          select.appendChild(option);
+        }
+      });
+    }
+
+    // ===== TABS =====
+    function showTab(tabName, button) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+
+      if (tabName === 'home') {
+        renderGames(allGames);
+      } else if (tabName === 'trending') {
+        const trending = [...allGames].sort((a, b) => {
+          const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3;
+          const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3;
+          return scoreB - scoreA;
+        }).slice(0, 10);
+        renderGames(trending);
+      } else if (tabName === 'recent') {
+        const recent = [...allGames].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+        renderGames(recent);
+      } else if (tabName === 'favorites') {
+        const fav = allGames.filter(g => userFavorites.includes(g.id));
+        renderGames(fav);
+      } else if (tabName === 'myGames') {
+        const myGames = allGames.filter(g => uploaderTokens.hasOwnProperty(g.id));
+        renderGames(myGames);
+      }
+    }
+
+    // ===== MODALS =====
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('show');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('show');
+      document.getElementById('gameName').value = '';
+      document.getElementById('gameDescription').value = '';
+      document.getElementById('uploaderName').value = '';
+      document.getElementById('uploaderEmail').value = userEmail;
+      document.getElementById('gameTags').value = '';
+      document.getElementById('file').value = '';
+      document.getElementById('icon').value = '';
+      document.getElementById('passwordProtect').checked = false;
+      document.getElementById('passwordGroup').style.display = 'none';
+    }
+
+    function togglePasswordProtect() {
+      const group = document.getElementById('passwordGroup');
+      if (document.getElementById('passwordProtect').checked) {
+        group.style.display = 'block';
+      } else {
+        group.style.display = 'none';
+      }
+    }
+
+    // ===== UPLOAD GAME =====
     async function uploadFile(event) {
       event.preventDefault();
       const fileInput = document.getElementById('file');
       const nameInput = document.getElementById('gameName');
       const descInput = document.getElementById('gameDescription');
       const uploaderInput = document.getElementById('uploaderName');
+      const emailInput = document.getElementById('uploaderEmail');
+      const tagsInput = document.getElementById('gameTags');
       const categorySelect = document.getElementById('gameCategory');
       const iconInput = document.getElementById('icon');
+      const passwordProtect = document.getElementById('passwordProtect').checked;
+      const passwordInput = document.getElementById('gamePassword');
 
       if (!fileInput.files[0] || !nameInput.value) {
         showNotification('Please fill in required fields', 'error');
@@ -2100,13 +2411,21 @@
       }
 
       showNotification('⏳ Uploading Game...', 'loading');
+      userEmail = emailInput.value;
+      localStorage.setItem('userEmail', userEmail);
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       formData.append('name', nameInput.value);
       formData.append('description', descInput.value);
       formData.append('uploader', uploaderInput.value);
+      formData.append('uploaderEmail', emailInput.value);
       formData.append('category', categorySelect.value);
+      formData.append('tags', tagsInput.value);
+      formData.append('isPasswordProtected', passwordProtect);
+      if (passwordProtect) {
+        formData.append('password', passwordInput.value);
+      }
 
       if (iconInput.files[0]) {
         const reader = new FileReader();
@@ -2122,7 +2441,7 @@
 
     async function sendUpload(formData) {
       try {
-        const response = await fetch('/api/upload', { method: 'POST', body: formData });
+        const response = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
         const result = await response.json();
 
         if (result.success) {
@@ -2144,90 +2463,318 @@
       }
     }
 
-    function openUploadModal() {
-      document.getElementById('uploadModal').classList.add('show');
-    }
-
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('show');
-      document.getElementById('gameName').value = '';
-      document.getElementById('gameDescription').value = '';
-      document.getElementById('uploaderName').value = '';
-      document.getElementById('file').value = '';
-      document.getElementById('icon').value = '';
-    }
-
-    function openDeleteModal(gameId) {
-      const game = allGames.find(g => g.id === gameId);
-      if (!game) return;
-      window.currentDeleteId = gameId;
-      document.getElementById('deleteGameName').textContent = game.name;
-      const saved = uploaderTokens[gameId] || '';
-      document.getElementById('deleteToken').value = saved;
-      document.getElementById('deleteModal').classList.add('show');
-    }
-
-    function closeDeleteModal() {
-      document.getElementById('deleteModal').classList.remove('show');
-    }
-
-    async function confirmDelete() {
-      const token = document.getElementById('deleteToken').value;
-      showNotification('⏳ Deleting game...', 'loading');
+    // ===== PLAY GAME =====
+    async function playGame(gameId) {
       try {
-        const response = await fetch(`/api/delete/${window.currentDeleteId}`, {
-          method: 'DELETE',
+        // Track view
+        await fetch(`${API_BASE}/api/track-view`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uploaderToken: token })
+          body: JSON.stringify({ gameId, sessionId })
         });
-        const result = await response.json();
-        if (result.success) {
-          delete uploaderTokens[window.currentDeleteId];
-          saveTokensToStorage();
-          showNotification('✅ Game deleted successfully!', 'success');
-          setTimeout(() => {
-            hideNotification();
-            closeDeleteModal();
-            loadGames();
-          }, 2000);
-        } else {
-          showNotification('❌ ' + result.error, 'error');
-          setTimeout(hideNotification, 3000);
-        }
+
+        const modal = document.getElementById('gameModal');
+        const iframe = document.getElementById('gameIframe');
+        const game = allGames.find(g => g.id === gameId);
+        
+        document.getElementById('modalGameTitle').textContent = game.name;
+        iframe.src = `${API_BASE}/api/view/${gameId}`;
+        modal.classList.add('show');
+
+        currentRatingGameId = gameId;
+        loadGameDetails(gameId);
       } catch (err) {
-        showNotification('❌ Delete failed: ' + err.message, 'error');
-        setTimeout(hideNotification, 3000);
+        console.error('Error playing game:', err);
+        showNotification('❌ Error loading game', 'error');
       }
     }
 
-    async function downloadGame(gameId) {
-      window.location.href = `/api/download/${gameId}`;
-    }
+    async function loadGameDetails(gameId) {
+      try {
+        const game = allGames.find(g => g.id === gameId);
+        
+        let detailsHTML = `
+          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+              <button class="btn-submit" style="flex: 1; background: #3b82f6;" onclick="openRatingModal(${gameId})">⭐ Rate & Comment</button>
+              <button class="btn-submit" style="flex: 1; background: #ec4899;" onclick="openShareModal(${gameId})">🌍 Share</button>
+              <button class="btn-submit" style="flex: 1; background: #10b981;" onclick="downloadGame(${gameId})">⬇️ Download</button>
+            </div>
 
-    function playGame(gameId, gameName) {
-      document.getElementById('gameFrame').src = `/api/view/${gameId}`;
-      document.getElementById('gameModal').classList.add('show');
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
+                <div style="font-size: 0.9em; color: var(--text-secondary);">👁️ Views</div>
+                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.views || 0}</div>
+              </div>
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
+                <div style="font-size: 0.9em; color: var(--text-secondary);">⬇️ Downloads</div>
+                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.downloads || 0}</div>
+              </div>
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
+                <div style="font-size: 0.9em; color: var(--text-secondary);">⭐ Rating</div>
+                <div style="font-size: 1.5em; font-weight: 800; color: var(--primary);">${game.avgRating || 'N/A'}</div>
+              </div>
+              <div style="padding: 12px; background: rgba(99, 102, 241, 0.1); border-radius: 8px;">
+                <div style="font-size: 0.9em; color: var(--text-secondary);">📅 Uploaded</div>
+                <div style="font-size: 0.95em; font-weight: 800; color: var(--primary);">${game.uploadDate}</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('gameDetailsContainer').innerHTML = detailsHTML;
+      } catch (err) {
+        console.error('Error loading game details:', err);
+      }
     }
 
     function closeGameModal() {
       document.getElementById('gameModal').classList.remove('show');
-      document.getElementById('gameFrame').src = '';
+      document.getElementById('gameIframe').src = '';
     }
 
-    function toggleFullscreen() {
-      const frame = document.getElementById('gameFrame');
-      if (frame.requestFullscreen) {
-        frame.requestFullscreen();
+    // ===== DOWNLOAD GAME =====
+    function downloadGame(gameId) {
+      window.location.href = `${API_BASE}/api/download/${gameId}`;
+    }
+
+    // ===== FAVORITES =====
+    function toggleFavorite(gameId, event) {
+      event.stopPropagation();
+      
+      if (userFavorites.includes(gameId)) {
+        userFavorites = userFavorites.filter(id => id !== gameId);
+      } else {
+        userFavorites.push(gameId);
+      }
+      
+      saveFavoritesToStorage();
+      
+      const btn = event.target.closest('.fav-btn');
+      btn.classList.toggle('favorited');
+      
+      showNotification(userFavorites.includes(gameId) ? '❤️ Added to favorites' : '💔 Removed from favorites', 'success');
+      setTimeout(hideNotification, 2000);
+    }
+
+    // ===== RATINGS & COMMENTS =====
+    function openRatingModal(gameId) {
+      document.getElementById('ratingModal').classList.add('show');
+      currentRatingGameId = gameId;
+      loadComments(gameId);
+      resetStarRating();
+    }
+
+    function closeRatingModal() {
+      document.getElementById('ratingModal').classList.remove('show');
+    }
+
+    function resetStarRating() {
+      document.querySelectorAll('.star').forEach(star => {
+        star.classList.remove('active');
+        star.onclick = function() {
+          const rating = this.dataset.rating;
+          document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+          for (let i = 0; i < rating; i++) {
+            document.querySelectorAll('.star')[i].classList.add('active');
+          }
+        };
+      });
+    }
+
+    async function submitRating() {
+      const rating = document.querySelectorAll('.star.active').length;
+      
+      if (rating === 0) {
+        showNotification('Please select a rating', 'error');
+        setTimeout(hideNotification, 2000);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameId: currentRatingGameId,
+            rating: rating,
+            userId: sessionId
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          showNotification('⭐ Rating saved!', 'success');
+          setTimeout(hideNotification, 2000);
+          loadGames();
+          resetStarRating();
+        }
+      } catch (err) {
+        console.error('Rating error:', err);
       }
     }
 
+    async function submitComment() {
+      const name = document.getElementById('commentName').value;
+      const email = document.getElementById('commentEmail').value;
+      const comment = document.getElementById('commentText').value;
+
+      if (!name || !comment) {
+        showNotification('Please fill in name and comment', 'error');
+        setTimeout(hideNotification, 2000);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/comment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameId: currentRatingGameId,
+            userName: name,
+            userEmail: email,
+            comment: comment
+          })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          showNotification('💬 Comment posted!', 'success');
+          setTimeout(hideNotification, 2000);
+          document.getElementById('commentName').value = '';
+          document.getElementById('commentEmail').value = '';
+          document.getElementById('commentText').value = '';
+          loadComments(currentRatingGameId);
+        }
+      } catch (err) {
+        console.error('Comment error:', err);
+      }
+    }
+
+    async function loadComments(gameId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/comments/${gameId}`);
+        const comments = await response.json();
+
+        const container = document.getElementById('commentsContainer');
+        
+        if (comments.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-secondary);">No comments yet. Be the first!</p>';
+          return;
+        }
+
+        container.innerHTML = comments.map(comment => `
+          <div class="comment-item">
+            <div class="comment-author">${comment.userName}</div>
+            <div class="comment-text">${comment.comment}</div>
+            <div class="comment-time">${new Date(comment.timestamp).toLocaleDateString()}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading comments:', err);
+      }
+    }
+
+    // ===== SHARE =====
+    function openShareModal(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      const shareLink = `${window.location.origin}?gameId=${gameId}`;
+      document.getElementById('shareLink').value = shareLink;
+      document.getElementById('shareModal').classList.add('show');
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').classList.remove('show');
+    }
+
+    function copyShareLink() {
+      const link = document.getElementById('shareLink');
+      link.select();
+      document.execCommand('copy');
+      showNotification('📋 Link copied!', 'success');
+      setTimeout(hideNotification, 2000);
+    }
+
+    // ===== MUSIC =====
+    function updateMusicButton() {
+      const btn1 = document.getElementById('musicControlBtn');
+      const btn2 = document.getElementById('musicControlBtn2');
+      const status = document.getElementById('musicStatus');
+      
+      if (isMusicPlaying) {
+        btn1.textContent = '⏸️ Pause';
+        btn2.textContent = '⏸️ Pause';
+        status.textContent = 'Now playing';
+      } else {
+        btn1.textContent = '▶️ Play';
+        btn2.textContent = '▶️ Play';
+        status.textContent = 'Paused';
+      }
+    }
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgMusic.pause();
+        isMusicPlaying = false;
+      } else {
+        bgMusic.play().catch(() => console.log('Could not play music'));
+        isMusicPlaying = true;
+      }
+      localStorage.setItem('musicPlaying', isMusicPlaying);
+      updateMusicButton();
+    }
+
+    function changeVolume() {
+      const volume = document.getElementById('volumeSlider').value;
+      document.getElementById('volumeValue').textContent = volume + '%';
+      bgMusic.volume = volume / 100;
+      localStorage.setItem('musicVolume', volume);
+    }
+
+    // ===== THEME & APPEARANCE =====
+    function toggleTheme() {
+      const isDark = document.getElementById('themeToggle').checked;
+      const label = document.getElementById('themeLabel');
+      label.textContent = isDark ? 'Light' : 'Dark';
+    }
+
+    function toggleAnimations() {
+      const enabled = document.getElementById('animationsToggle').checked;
+      document.getElementById('animationsLabel').textContent = enabled ? 'On' : 'Off';
+      if (!enabled) {
+        document.documentElement.style.setProperty('--animation', 'none');
+      } else {
+        document.documentElement.style.removeProperty('--animation');
+      }
+      localStorage.setItem('animationsEnabled', enabled);
+    }
+
+    function changeCardSize() {
+      const size = document.getElementById('cardSizeSelect').value;
+      const widths = { small: '220px', medium: '320px', large: '420px' };
+      document.documentElement.style.setProperty('--card-min-width', widths[size]);
+      localStorage.setItem('cardSize', size);
+    }
+
+    function toggleUploaderNames() {
+      const show = document.getElementById('uploaderNamesToggle').checked;
+      document.getElementById('uploaderNamesLabel').textContent = show ? 'On' : 'Off';
+      localStorage.setItem('uploaderNamesShown', show);
+      renderGames(allGames);
+    }
+
+    // ===== SETTINGS =====
     function openSettingsView() {
       document.querySelector('.main-view').classList.remove('active');
       document.querySelector('.settings-view').classList.add('active');
-      const musicStatus = document.getElementById('musicStatus');
-      document.getElementById('musicControlBtn').textContent = isMusicPlaying ? '⏸️ Pause' : '▶️ Play';
-      musicStatus.textContent = isMusicPlaying ? 'Now playing' : 'Paused';
       displayTokens();
+    }
+
+    function closeSettingsView() {
+      document.querySelector('.settings-view').classList.remove('active');
+      document.querySelector('.main-view').classList.add('active');
     }
 
     function displayTokens() {
@@ -2274,29 +2821,209 @@
       });
     }
 
-    function closeSettingsView() {
-      document.querySelector('.settings-view').classList.remove('active');
-      document.querySelector('.main-view').classList.add('active');
-    }
-
-    // Heartbeat for active players
-    let sessionId = Math.random().toString(36).substring(7);
-    async function sendHeartbeat() {
-      try {
-        const response = await fetch('/api/heartbeat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId })
+    function resetAllSettings() {
+      if (confirm('Reset all settings to default?')) {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('music') || key === 'cardSize' || key === 'uploaderNamesShown' || key === 'theme' || key === 'colorTheme' || key === 'animationsEnabled') {
+            localStorage.removeItem(key);
+          }
         });
-        const result = await response.json();
-        document.getElementById('playerCount').textContent = '👥 ' + result.activePlayers + ' Online';
-      } catch (err) {
-        console.error('Heartbeat failed:', err);
+        location.reload();
       }
     }
 
-    // Initialize
+    // ===== DELETE GAME =====
+    function openDeleteModal(gameId) {
+      window.currentDeleteId = gameId;
+      document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+    }
+
+    async function confirmDelete() {
+      const token = document.getElementById('deleteToken').value;
+      showNotification('⏳ Deleting game...', 'loading');
+      try {
+        const response = await fetch(`${API_BASE}/api/delete/${window.currentDeleteId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uploaderToken: token })
+        });
+        const result = await response.json();
+        if (result.success) {
+          delete uploaderTokens[window.currentDeleteId];
+          saveTokensToStorage();
+          showNotification('✅ Game deleted successfully!', 'success');
+          setTimeout(() => {
+            hideNotification();
+            closeDeleteModal();
+            loadGames();
+          }, 2000);
+        } else {
+          showNotification('❌ ' + result.error, 'error');
+          setTimeout(hideNotification, 3000);
+        }
+      } catch (err) {
+        showNotification('❌ Delete failed: ' + err.message, 'error');
+        setTimeout(hideNotification, 3000);
+      }
+    }
+
+    // ===== STATS MODAL =====
+    async function openStatsModal(gameId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/game-stats/${gameId}`);
+        const stats = await response.json();
+
+        const grid = document.getElementById('statsGrid');
+        grid.innerHTML = `
+          <div class="stat-box">
+            <div class="stat-label">👁️ Total Views</div>
+            <div class="stat-value">${stats.views || 0}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">⬇️ Total Downloads</div>
+            <div class="stat-value">${stats.downloads || 0}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">⭐ Average Rating</div>
+            <div class="stat-value">${stats.avgRating || 'N/A'}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">📊 Rating Count</div>
+            <div class="stat-value">${stats.ratingCount || 0}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">💬 Comments</div>
+            <div class="stat-value">${stats.commentCount || 0}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">❤️ Favorites</div>
+            <div class="stat-value">${stats.favoriteCount || 0}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">📅 Upload Date</div>
+            <div class="stat-value" style="font-size: 0.9em;">${stats.uploadDate}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">📦 File Size</div>
+            <div class="stat-value" style="font-size: 0.9em;">${(stats.fileSize / 1024 / 1024).toFixed(2)} MB</div>
+          </div>
+        `;
+
+        document.getElementById('statsModal').classList.add('show');
+      } catch (err) {
+        console.error('Stats error:', err);
+        showNotification('❌ Error loading stats', 'error');
+      }
+    }
+
+    function closeStatsModal() {
+      document.getElementById('statsModal').classList.remove('show');
+    }
+
+    // ===== HEARTBEAT =====
+    let sessionId_local = Math.random().toString(36).substring(7);
+
+    async function sendHeartbeat() {
+      try {
+        const response = await fetch(`${API_BASE}/api/heartbeat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: sessionId_local })
+        });
+        const result = await response.json();
+        if (result.activePlayers) {
+          document.getElementById('playerCount').textContent = '👥 ' + result.activePlayers + ' Active';
+        }
+      } catch (err) {
+        console.error('Heartbeat error:', err);
+      }
+    }
+
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'e') {
+        closeGameModal();
+        closeUploadModal();
+        closeDeleteModal();
+        closeRatingModal();
+        closeShareModal();
+        closeStatsModal();
+        closeAdminModal();
+      }
+      if (e.key === ' ' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        if (document.getElementById('gameModal').classList.contains('show')) {
+          const game = allGames[Math.floor(Math.random() * allGames.length)];
+          if (game) playGame(game.id);
+        }
+      }
+    });
+
+    // ===== ADMIN DASHBOARD =====
+    async function openAdminDashboard() {
+      if (!userEmail) {
+        showNotification('⚠️ Please enter your email in upload form first', 'error');
+        setTimeout(hideNotification, 3000);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/dashboard/${userEmail}`);
+        const result = await response.json();
+
+        if (result.error) {
+          showNotification('🔐 Admin features only', 'error');
+          setTimeout(hideNotification, 3000);
+          return;
+        }
+
+        const grid = document.getElementById('adminStatsGrid');
+        grid.innerHTML = `
+          <div class="stat-box">
+            <div class="stat-label">📚 Total Games</div>
+            <div class="stat-value">${result.totalGames}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">⬇️ Total Downloads</div>
+            <div class="stat-value">${result.totalDownloads}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">👁️ Total Views</div>
+            <div class="stat-value">${result.totalViews}</div>
+          </div>
+        `;
+
+        const gamesContainer = document.getElementById('adminGamesContainer');
+        gamesContainer.innerHTML = '<h3 style="margin-bottom: 15px;">Your Games</h3>' + result.games.map(game => `
+          <div style="padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; margin-bottom: 10px;">
+            <div style="font-weight: 700; margin-bottom: 8px;">${game.name}</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9em;">
+              <div>👁️ Views: ${game.views || 0}</div>
+              <div>⬇️ Downloads: ${game.downloads || 0}</div>
+              <div>⭐ Rating: ${game.avgRating || 'N/A'}</div>
+              <div>📊 Votes: ${game.ratingCount || 0}</div>
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('adminModal').classList.add('show');
+      } catch (err) {
+        console.error('Admin dashboard error:', err);
+        showNotification('❌ Error loading dashboard', 'error');
+      }
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.remove('show');
+    }
+
+    // ===== INITIALIZE =====
     loadTokensFromStorage();
+    loadFavoritesFromStorage();
     loadAllSettings();
     loadGames();
     setInterval(sendHeartbeat, 5000);
@@ -2308,10 +3035,11 @@
         closeGameModal();
         closeUploadModal();
         closeDeleteModal();
+        closeRatingModal();
+        closeShareModal();
+        closeStatsModal();
       }
     });
   </script>
 </body>
 </html>
-EOFNEW
-echo "✅ Complete UI revamp with particle background created!"
