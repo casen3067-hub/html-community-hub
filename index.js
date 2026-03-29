@@ -37,6 +37,23 @@ function generateToken() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+// Active players tracking
+const activeSessions = new Map(); // sessionId -> timestamp
+
+function cleanupInactiveSessions() {
+  const now = Date.now();
+  const timeout = 15000; // 15 seconds
+  
+  for (const [sessionId, timestamp] of activeSessions) {
+    if (now - timestamp > timeout) {
+      activeSessions.delete(sessionId);
+    }
+  }
+}
+
+// Run cleanup every 10 seconds
+setInterval(cleanupInactiveSessions, 10000);
+
 // Setup file upload with memory storage (so we can store in database)
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -76,6 +93,13 @@ function saveDatabase() {
     console.log(`💾 Database saved with ${allFiles.length} games`);
   } catch (err) {
     console.error('Error saving database:', err);
+    // Try to create the file if it doesn't exist
+    try {
+      fs.writeFileSync(DB_FILE, JSON.stringify({ games: allFiles, nextId }, null, 2), 'utf8');
+      console.log('✅ Database file created and saved');
+    } catch (retryErr) {
+      console.error('Failed to save database even after retry:', retryErr);
+    }
   }
 }
 
@@ -172,6 +196,32 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 app.get('/api/files', (req, res) => {
   console.log(`📋 Fetching ${allFiles.length} games`);
   res.json(allFiles);
+});
+
+// HEARTBEAT: Track active players
+app.post('/api/heartbeat', (req, res) => {
+  const sessionId = req.body.sessionId;
+  
+  if (!sessionId) {
+    return res.status(400).json({ error: 'Missing sessionId' });
+  }
+  
+  // Update or create session
+  activeSessions.set(sessionId, Date.now());
+  
+  // Clean up old sessions
+  cleanupInactiveSessions();
+  
+  res.json({ success: true, activePlayers: activeSessions.size });
+});
+
+// GET ACTIVE PLAYERS: Return current player count
+app.get('/api/active-players', (req, res) => {
+  cleanupInactiveSessions();
+  const count = activeSessions.size;
+  
+  console.log(`👥 Current active players: ${count}`);
+  res.json({ count });
 });
 
 // VIEW: Display HTML file in browser
