@@ -352,7 +352,7 @@
 
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
     }
 
@@ -377,12 +377,12 @@
 
     .game-thumbnail {
       width: 100%;
-      height: 180px;
+      height: 220px;
       background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3.5em;
+      font-size: 4em;
       overflow: hidden;
     }
 
@@ -393,7 +393,7 @@
     }
 
     .game-info {
-      padding: 16px;
+      padding: 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -401,17 +401,26 @@
 
     .game-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.1em;
+      font-size: 1.3em;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: var(--text-primary);
     }
 
-    .game-meta {
+    .game-description {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9em;
       color: var(--text-secondary);
-      font-size: 0.8em;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      line-height: 1.4;
       flex: 1;
+    }
+
+    .game-uploader {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-bottom: 15px;
+      font-weight: 600;
     }
 
     .game-actions {
@@ -795,7 +804,7 @@
       }
 
       .games-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       }
 
       .settings-grid {
@@ -1232,7 +1241,8 @@
           </div>
           <div class="game-info">
             <div class="game-title">${game.name}</div>
-            <div class="game-meta">${game.uploader || 'Anonymous'}</div>
+            <div class="game-description">${game.description || 'No description'}</div>
+            <div class="game-uploader">By: ${game.uploader || 'Anonymous'}</div>
             <div class="game-actions">
               <button class="game-btn" onclick="playGame(${game.id}, '${game.name}')">🎮 Play</button>
               <button class="game-btn" onclick="downloadGame(${game.id})">📥</button>
