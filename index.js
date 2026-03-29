@@ -8,6 +8,9 @@ const { GridFSBucket } = require('mongodb');
 
 const app = express();
 
+// ===== ADMIN EMAIL - ONLY THIS EMAIL GETS ADMIN PRIVILEGES =====
+const ADMIN_EMAIL = 'casen3067@gmail.com';
+
 // Increase timeout limits for 100MB uploads
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb' }));
@@ -57,29 +60,85 @@ async function connectDB() {
   }
 }
 
-// Game Schema (stores metadata only - HTML is in GridFS)
+// ===== SCHEMAS =====
+
+// Game Schema
 const gameSchema = new mongoose.Schema({
   id: Number,
   name: String,
   description: String,
   uploader: String,
+  uploaderEmail: String,
   category: String,
   customSettings: String,
   icon: String,
   uploadDate: String,
   downloads: Number,
+  views: Number,
   timestamp: Number,
-  htmlFileId: mongoose.Schema.Types.ObjectId, // Reference to GridFS file
+  htmlFileId: mongoose.Schema.Types.ObjectId,
   uploaderToken: String,
+  tags: [String],
+  fileSize: Number,
+  playTime: Number,
+  avgRating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  isPasswordProtected: { type: Boolean, default: false },
+  password: String,
+  accessCode: String,
 });
 
-let Game = null;
+// Rating Schema
+const ratingSchema = new mongoose.Schema({
+  gameId: Number,
+  userId: String,
+  rating: Number, // 1-5 stars
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Comment Schema
+const commentSchema = new mongoose.Schema({
+  gameId: Number,
+  userName: String,
+  userEmail: String,
+  comment: String,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Favorites Schema
+const favoriteSchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// View History Schema
+const viewHistorySchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  timestamp: { type: Date, default: Date.now },
+});
+
+// Play Time Schema
+const playTimeSchema = new mongoose.Schema({
+  sessionId: String,
+  gameId: Number,
+  playDuration: Number, // in milliseconds
+  timestamp: { type: Date, default: Date.now },
+});
+
+let Game, Rating, Comment, Favorite, ViewHistory, PlayTime;
 
 if (MONGODB_URI) {
   Game = mongoose.model('Game', gameSchema);
+  Rating = mongoose.model('Rating', ratingSchema);
+  Comment = mongoose.model('Comment', commentSchema);
+  Favorite = mongoose.model('Favorite', favoriteSchema);
+  ViewHistory = mongoose.model('ViewHistory', viewHistorySchema);
+  PlayTime = mongoose.model('PlayTime', playTimeSchema);
 }
 
-// In-memory fallback for HTML content
+// In-memory fallback
 let allFiles = [];
 let nextId = 1;
 
@@ -123,21 +182,29 @@ async function deleteGameFromDB(gameId) {
   try {
     const game = await Game.findOne({ id: gameId });
     if (game && game.htmlFileId) {
-      // Delete file from GridFS
       await gridFSBucket.delete(game.htmlFileId);
       console.log(`🗑️ HTML file deleted from GridFS`);
     }
-    // Delete metadata
     await Game.deleteOne({ id: gameId });
+    // Also delete associated ratings, comments, favorites
+    if (Rating) await Rating.deleteMany({ gameId });
+    if (Comment) await Comment.deleteMany({ gameId });
+    if (Favorite) await Favorite.deleteMany({ gameId });
+    if (ViewHistory) await ViewHistory.deleteMany({ gameId });
+    if (PlayTime) await PlayTime.deleteMany({ gameId });
     console.log(`🗑️ Game deleted from MongoDB (ID: ${gameId})`);
   } catch (err) {
     console.error('Error deleting game from MongoDB:', err);
   }
 }
 
-// Utility function to generate a unique token
+// Utility functions
 function generateToken() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+function isAdmin(email) {
+  return email === ADMIN_EMAIL;
 }
 
 // Active players tracking
@@ -156,20 +223,22 @@ function cleanupInactiveSessions() {
 
 setInterval(cleanupInactiveSessions, 10000);
 
-// Setup file upload with memory storage
+// File upload
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 100 * 1024 * 1024 // 100MB
+    fileSize: 100 * 1024 * 1024
   }
 });
 
-// HOME: Serve index.html
+// ===== ROUTES =====
+
+// HOME
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// UPLOAD: When someone uploads a file
+// UPLOAD GAME
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   console.log('📥 Upload request received');
   
@@ -199,7 +268,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       } else {
         iconBase64 = req.body.iconData;
       }
-      // Limit icon to 1MB
       if (iconBase64.length > 1024 * 1024) {
         console.warn('Icon too large, skipping');
         iconBase64 = null;
@@ -219,26 +287,34 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 
   const uploaderToken = generateToken();
+  const tags = req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : [];
   
-  // Create game metadata object
   const newFile = {
     id: nextId,
     name: gameName,
     description: req.body.description || 'No description',
     uploader: req.body.uploader || 'Anonymous',
+    uploaderEmail: req.body.uploaderEmail || '',
     category: req.body.category || 'other',
     customSettings: req.body.customSettings || '',
     icon: iconBase64,
     uploadDate: new Date().toLocaleDateString(),
     downloads: 0,
+    views: 0,
     timestamp: Date.now(),
-    uploaderToken: uploaderToken
+    uploaderToken: uploaderToken,
+    tags: tags,
+    fileSize: req.file.buffer.length,
+    playTime: 0,
+    avgRating: 0,
+    ratingCount: 0,
+    isPasswordProtected: req.body.isPasswordProtected === 'true',
+    password: req.body.isPasswordProtected === 'true' ? req.body.password : null,
+    accessCode: generateToken().substring(0, 8).toUpperCase(),
   };
 
-  // If MongoDB is connected, save to GridFS
   if (gridFSBucket && Game) {
     try {
-      // Upload HTML content to GridFS
       const uploadStream = gridFSBucket.openUploadStream(`game-${nextId}.html`, {
         metadata: { gameId: nextId, gameName: gameName }
       });
@@ -250,20 +326,17 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         }
 
         newFile.htmlFileId = uploadStream.id;
-        
-        // Save metadata to MongoDB
         await saveGamesToDB(newFile);
-        
-        // Also store in memory for quick access
         allFiles.push(newFile);
         nextId++;
 
-        console.log(`✅ Game uploaded successfully: ${newFile.name} (${(req.file.buffer.length / 1024 / 1024).toFixed(2)}MB)`);
+        console.log(`✅ Game uploaded successfully: ${newFile.name}`);
         
         res.json({ 
           success: true, 
           file: newFile,
           uploaderToken: uploaderToken,
+          accessCode: newFile.accessCode,
           message: 'Game uploaded successfully!'
         });
       });
@@ -272,7 +345,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       return res.status(500).json({ error: 'Failed to save game' });
     }
   } else {
-    // Fallback: store HTML in memory if MongoDB not available
     newFile.htmlContent = htmlContent;
     allFiles.push(newFile);
     nextId++;
@@ -283,18 +355,285 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       success: true, 
       file: newFile,
       uploaderToken: uploaderToken,
+      accessCode: newFile.accessCode,
       message: 'Game uploaded successfully! (stored in memory)'
     });
   }
 });
 
-// GET ALL: Show all uploaded files
-app.get('/api/files', (req, res) => {
+// GET ALL GAMES
+app.get('/api/files', async (req, res) => {
   console.log(`📋 Fetching ${allFiles.length} games`);
+  
+  // Calculate average ratings
+  if (Rating) {
+    try {
+      const ratings = await Rating.find();
+      allFiles.forEach(game => {
+        const gameRatings = ratings.filter(r => r.gameId === game.id);
+        if (gameRatings.length > 0) {
+          game.avgRating = (gameRatings.reduce((sum, r) => sum + r.rating, 0) / gameRatings.length).toFixed(1);
+          game.ratingCount = gameRatings.length;
+        }
+      });
+    } catch (err) {
+      console.error('Error fetching ratings:', err);
+    }
+  }
+  
   res.json(allFiles);
 });
 
-// HEARTBEAT: Track active players
+// GET GAME STATS
+app.get('/api/game-stats/:id', async (req, res) => {
+  try {
+    const gameId = parseInt(req.params.id);
+    const game = allFiles.find(f => f.id === gameId);
+    
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    let stats = {
+      id: game.id,
+      name: game.name,
+      downloads: game.downloads,
+      views: game.views,
+      fileSize: game.fileSize,
+      uploadDate: game.uploadDate,
+      avgRating: game.avgRating || 0,
+      ratingCount: game.ratingCount || 0,
+      commentCount: 0,
+      favoriteCount: 0,
+    };
+
+    if (Comment) {
+      const comments = await Comment.find({ gameId });
+      stats.commentCount = comments.length;
+    }
+    if (Favorite) {
+      const favorites = await Favorite.find({ gameId });
+      stats.favoriteCount = favorites.length;
+    }
+
+    res.json(stats);
+  } catch (err) {
+    console.error('Stats error:', err);
+    res.status(500).json({ error: 'Error fetching stats' });
+  }
+});
+
+// SEARCH GAMES
+app.get('/api/search', (req, res) => {
+  const query = req.query.q?.toLowerCase() || '';
+  
+  if (!query) {
+    return res.json(allFiles);
+  }
+
+  const results = allFiles.filter(game => 
+    game.name.toLowerCase().includes(query) ||
+    game.description.toLowerCase().includes(query) ||
+    (game.tags && game.tags.some(tag => tag.toLowerCase().includes(query)))
+  );
+
+  console.log(`🔍 Search for "${query}" returned ${results.length} results`);
+  res.json(results);
+});
+
+// GET TRENDING GAMES
+app.get('/api/trending', (req, res) => {
+  const trending = [...allFiles].sort((a, b) => {
+    const scoreA = (a.views || 0) * 0.6 + (a.downloads || 0) * 0.3 + (a.ratingCount || 0) * 0.1;
+    const scoreB = (b.views || 0) * 0.6 + (b.downloads || 0) * 0.3 + (b.ratingCount || 0) * 0.1;
+    return scoreB - scoreA;
+  }).slice(0, 10);
+
+  res.json(trending);
+});
+
+// GET MOST RECENT GAMES
+app.get('/api/recent', (req, res) => {
+  const recent = [...allFiles].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+  res.json(recent);
+});
+
+// RATE A GAME
+app.post('/api/rate', async (req, res) => {
+  try {
+    const { gameId, rating, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Rating must be 1-5' });
+    }
+
+    if (Rating) {
+      // Remove old rating from this user for this game
+      await Rating.deleteOne({ gameId, userId });
+      
+      // Add new rating
+      const newRating = new Rating({ gameId, userId, rating });
+      await newRating.save();
+
+      // Update game average rating
+      const ratings = await Rating.find({ gameId });
+      if (ratings.length > 0) {
+        const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+        const game = allFiles.find(f => f.id === gameId);
+        if (game) {
+          game.avgRating = parseFloat(avg.toFixed(1));
+          game.ratingCount = ratings.length;
+          await saveGamesToDB(game);
+        }
+      }
+
+      console.log(`⭐ Game ${gameId} rated ${rating} stars by ${userId}`);
+      res.json({ success: true, message: 'Rating saved' });
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Rating error:', err);
+    res.status(500).json({ error: 'Error saving rating' });
+  }
+});
+
+// POST COMMENT
+app.post('/api/comment', async (req, res) => {
+  try {
+    const { gameId, userName, userEmail, comment } = req.body;
+
+    if (!comment || !userName) {
+      return res.status(400).json({ error: 'Comment and name required' });
+    }
+
+    if (Comment) {
+      const newComment = new Comment({ gameId, userName, userEmail, comment });
+      await newComment.save();
+
+      console.log(`💬 Comment added to game ${gameId} by ${userName}`);
+      res.json({ success: true, message: 'Comment saved' });
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Comment error:', err);
+    res.status(500).json({ error: 'Error saving comment' });
+  }
+});
+
+// GET COMMENTS FOR GAME
+app.get('/api/comments/:gameId', async (req, res) => {
+  try {
+    const gameId = parseInt(req.params.gameId);
+
+    if (Comment) {
+      const comments = await Comment.find({ gameId }).sort({ timestamp: -1 });
+      res.json(comments);
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching comments:', err);
+    res.json([]);
+  }
+});
+
+// ADD TO FAVORITES
+app.post('/api/favorite', async (req, res) => {
+  try {
+    const { gameId, sessionId } = req.body;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID required' });
+    }
+
+    if (Favorite) {
+      // Check if already favorited
+      const existing = await Favorite.findOne({ gameId, sessionId });
+      
+      if (existing) {
+        // Remove from favorites
+        await Favorite.deleteOne({ gameId, sessionId });
+        res.json({ success: true, favorited: false });
+      } else {
+        // Add to favorites
+        const newFav = new Favorite({ gameId, sessionId });
+        await newFav.save();
+        res.json({ success: true, favorited: true });
+      }
+    } else {
+      res.status(500).json({ error: 'Database not available' });
+    }
+  } catch (err) {
+    console.error('Favorite error:', err);
+    res.status(500).json({ error: 'Error updating favorites' });
+  }
+});
+
+// GET FAVORITES
+app.get('/api/favorites/:sessionId', async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    if (Favorite) {
+      const favorites = await Favorite.find({ sessionId });
+      const favoriteIds = favorites.map(f => f.gameId);
+      res.json(favoriteIds);
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching favorites:', err);
+    res.json([]);
+  }
+});
+
+// TRACK VIEW
+app.post('/api/track-view', async (req, res) => {
+  try {
+    const { gameId, sessionId } = req.body;
+
+    const game = allFiles.find(f => f.id === gameId);
+    if (game) {
+      game.views = (game.views || 0) + 1;
+      await saveGamesToDB(game);
+    }
+
+    if (ViewHistory) {
+      const newView = new ViewHistory({ gameId, sessionId });
+      await newView.save();
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('View tracking error:', err);
+    res.status(500).json({ error: 'Error tracking view' });
+  }
+});
+
+// TRACK PLAY TIME
+app.post('/api/track-playtime', async (req, res) => {
+  try {
+    const { gameId, sessionId, playDuration } = req.body;
+
+    if (PlayTime) {
+      const newPlayTime = new PlayTime({ gameId, sessionId, playDuration });
+      await newPlayTime.save();
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Play time tracking error:', err);
+    res.status(500).json({ error: 'Error tracking play time' });
+  }
+});
+
+// HEARTBEAT
 app.post('/api/heartbeat', (req, res) => {
   const sessionId = req.body.sessionId;
   
@@ -308,7 +647,7 @@ app.post('/api/heartbeat', (req, res) => {
   res.json({ success: true, activePlayers: activeSessions.size });
 });
 
-// GET ACTIVE PLAYERS: Return current player count
+// GET ACTIVE PLAYERS
 app.get('/api/active-players', (req, res) => {
   cleanupInactiveSessions();
   const count = activeSessions.size;
@@ -317,7 +656,7 @@ app.get('/api/active-players', (req, res) => {
   res.json({ count });
 });
 
-// VIEW: Display HTML file in browser
+// VIEW GAME
 app.get('/api/view/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
@@ -330,9 +669,8 @@ app.get('/api/view/:id', async (req, res) => {
       return res.status(404).send('<h1 style="color:#ef4444;">Game not found</h1>');
     }
 
-    let htmlContent = file.htmlContent; // From memory storage
+    let htmlContent = file.htmlContent;
     
-    // If stored in GridFS, retrieve from there
     if (file.htmlFileId && gridFSBucket) {
       try {
         const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
@@ -368,7 +706,7 @@ app.get('/api/view/:id', async (req, res) => {
   }
 });
 
-// DOWNLOAD: Download the HTML file
+// DOWNLOAD GAME
 app.get('/api/download/:id', async (req, res) => {
   try {
     const fileId = parseInt(req.params.id);
@@ -380,7 +718,6 @@ app.get('/api/download/:id', async (req, res) => {
 
     let htmlContent = file.htmlContent;
     
-    // If stored in GridFS, retrieve from there
     if (file.htmlFileId && gridFSBucket) {
       try {
         const downloadStream = gridFSBucket.openDownloadStream(file.htmlFileId);
@@ -425,7 +762,7 @@ app.get('/api/download/:id', async (req, res) => {
   }
 });
 
-// DELETE: Remove a game (only uploader can delete)
+// DELETE GAME
 app.delete('/api/delete/:id', (req, res) => {
   try {
     console.log(`🗑️ Delete request for game ID: ${req.params.id}`);
@@ -452,10 +789,7 @@ app.delete('/api/delete/:id', (req, res) => {
     
     console.log(`✅ Token correct, deleting game`);
     
-    // Remove from memory
     allFiles.splice(fileIndex, 1);
-    
-    // Delete from MongoDB/GridFS
     deleteGameFromDB(fileId);
     
     console.log(`✅ Game deleted: ${file.name} (ID: ${fileId})`);
@@ -467,6 +801,73 @@ app.delete('/api/delete/:id', (req, res) => {
   } catch (err) {
     console.error('Delete error:', err);
     res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+});
+
+// EDIT GAME (Admin only)
+app.put('/api/edit/:id', async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    const { uploaderEmail, uploaderToken, name, description, tags } = req.body;
+
+    if (!isAdmin(uploaderEmail)) {
+      return res.status(401).json({ error: 'Admin only' });
+    }
+
+    const fileIndex = allFiles.findIndex(f => f.id === fileId);
+    
+    if (fileIndex === -1) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    const file = allFiles[fileIndex];
+
+    if (uploaderToken !== file.uploaderToken) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Update fields
+    if (name) file.name = name;
+    if (description) file.description = description;
+    if (tags) file.tags = tags.split(',').map(t => t.trim());
+
+    await saveGamesToDB(file);
+    
+    console.log(`✏️ Game edited: ${file.name}`);
+    res.json({ success: true, message: 'Game updated successfully!' });
+  } catch (err) {
+    console.error('Edit error:', err);
+    res.status(500).json({ error: 'Error editing game' });
+  }
+});
+
+// GET DEVELOPER DASHBOARD (Admin only)
+app.get('/api/dashboard/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    if (!isAdmin(email)) {
+      return res.status(401).json({ error: 'Admin only' });
+    }
+
+    const stats = {
+      totalGames: allFiles.length,
+      totalDownloads: allFiles.reduce((sum, g) => sum + (g.downloads || 0), 0),
+      totalViews: allFiles.reduce((sum, g) => sum + (g.views || 0), 0),
+      games: allFiles.map(g => ({
+        id: g.id,
+        name: g.name,
+        downloads: g.downloads,
+        views: g.views,
+        avgRating: g.avgRating,
+        ratingCount: g.ratingCount,
+      })),
+    };
+
+    res.json(stats);
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.status(500).json({ error: 'Error fetching dashboard' });
   }
 });
 
@@ -490,8 +891,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, async () => {
   console.log(`\n🎮 GameVault running on port ${PORT}`);
+  console.log(`🔐 Admin email: ${ADMIN_EMAIL}`);
   
-  // Connect to MongoDB with GridFS
   await connectDB();
   
   console.log(`📊 Games loaded: ${allFiles.length}\n`);
