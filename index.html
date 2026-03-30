@@ -1265,22 +1265,47 @@
 
     async function loadGames() {
       try {
+        console.log('🎮 loadGames() called');
+        console.log('   API_BASE:', API_BASE);
+        console.log('   Fetching from:', `${API_BASE}/api/files`);
+        
         const response = await fetch(`${API_BASE}/api/files`);
+        console.log('   Response received:', response.status, response.statusText);
+        
         allGames = await response.json();
+        console.log('   allGames array length:', allGames.length);
+        
+        if (allGames.length > 0) {
+          console.log('   First game:', allGames[0].name);
+          console.log('   All game names:', allGames.map(g => g.name).join(', '));
+        } else {
+          console.warn('   ⚠️ allGames is EMPTY!');
+        }
+        
+        console.log('   Calling renderGames with', allGames.length, 'games');
         renderGames(allGames);
       } catch (err) {
-        console.error('Error loading games:', err);
+        console.error('❌ Error loading games:', err);
       }
     }
 
     function renderGames(games) {
+      console.log('🎨 renderGames() called with', games.length, 'games');
+      
       const container = document.getElementById('gamesContainer');
       
+      if (!container) {
+        console.error('❌ gamesContainer element NOT FOUND!');
+        return;
+      }
+      
       if (games.length === 0) {
+        console.warn('⚠️ No games to render - showing empty state');
         container.innerHTML = `<div class="no-games"><div class="no-games-icon">🎮</div><div style="font-size: 1.2em; font-weight: 700; margin-bottom: 10px;">No games found</div></div>`;
         return;
       }
 
+      console.log('✅ Rendering', games.length, 'games');
       container.innerHTML = games.map(game => `
         <div class="game-card">
           <div class="game-thumbnail">${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}" style="width:100%;height:100%;object-fit:cover;">` : '🎮'}</div>
@@ -1301,6 +1326,7 @@
           </div>
         </div>
       `).join('');
+      console.log('✅ Render complete');
     }
 
     function showTab(tabName, btn) {
@@ -1789,6 +1815,10 @@
     }
 
     // INIT
+    console.log('🚀 Page initialization starting...');
+    console.log('   API_BASE:', API_BASE);
+    console.log('   sessionId:', sessionId);
+    console.log('   Calling loadGames()...');
     loadGames();
     initializePlayer();
     uploaderTokens = JSON.parse(localStorage.getItem('uploaderTokens') || '{}');
