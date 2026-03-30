@@ -1119,8 +1119,9 @@
       <div id="players-tab" class="settings-tab-content">
         <div class="settings-section">
           <div class="settings-section-header">
-            <h3>👥 Active Players</h3>
+            <h3>👥 Active Players <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8em; margin-left: 10px;" id="activePlayerCount">0</span></h3>
             <p>Monitor player activity and current games</p>
+            <button onclick="refreshPlayersList()" style="margin-top: 10px; padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em;">🔄 Refresh</button>
           </div>
           <div id="adminPlayersList" style="display: flex; flex-direction: column; gap: 15px;"></div>
         </div>
@@ -1538,6 +1539,8 @@
       localStorage.setItem('playerUsername', playerUsername);
       localStorage.setItem('playerId', playerId);
       
+      console.log('✅ Username set:', playerUsername, 'Player ID:', playerId);
+      
       document.getElementById('usernameModal').classList.remove('show');
       showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
     }
@@ -1552,7 +1555,9 @@
           playerId: playerId,
           timestamp: Date.now()
         };
+        console.log('🎮 Tracking player in game:', { playerUsername, playerId, gameName: game.name });
         localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
+        console.log('✅ Saved to localStorage:', 'currentGamePlaying_' + playerId);
       }
     }
 
@@ -1580,6 +1585,49 @@
         }
       }
       return players;
+    }
+
+    function refreshPlayersList() {
+      const activePlayers = getAllActivePlayers();
+      console.log('Active players found:', activePlayers);
+      const playersList = document.getElementById('adminPlayersList');
+      const activePlayerCount = document.getElementById('activePlayerCount');
+      
+      if (activePlayerCount) {
+        activePlayerCount.textContent = activePlayers.length;
+      }
+      
+      if (playersList) {
+        if (activePlayers.length === 0) {
+          playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
+        } else {
+          playersList.innerHTML = activePlayers.map(player => `
+            <div class="token-item">
+              <div class="token-info">
+                <div class="token-game-name">👤 ${player.playerUsername}</div>
+                <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                  🎮 Playing: <strong>${player.gameName}</strong><br>
+                  🆔 ${player.playerId}
+                </div>
+              </div>
+              <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function showDebugInfo() {
+      console.log('=== DEBUG INFO ===');
+      console.log('Current player username:', playerUsername);
+      console.log('Current player ID:', playerId);
+      console.log('localStorage keys:');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(`  ${key}:`, localStorage.getItem(key));
+      }
+      console.log('Active players:', getAllActivePlayers());
+      console.log('=== END DEBUG ===');
     }
 
     function switchAdminTab(tabName, button) {
@@ -1656,6 +1704,13 @@
         // Update players tab
         const activePlayers = getAllActivePlayers();
         const playersList = document.getElementById('adminPlayersList');
+        const activePlayerCount = document.getElementById('activePlayerCount');
+        
+        console.log('🎮 Players found:', activePlayers.length, activePlayers);
+        
+        if (activePlayerCount) {
+          activePlayerCount.textContent = activePlayers.length;
+        }
         
         if (playersList) {
           if (activePlayers.length === 0) {
