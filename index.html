@@ -1027,12 +1027,128 @@
     </div>
   </div>
 
+  <!-- USERNAME SELECTION MODAL (First Visit) -->
+  <div class="modal" id="usernameModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <span>👤 Welcome to GameVault!</span>
+      </div>
+      <p style="color: var(--text-secondary); margin-bottom: 20px; text-align: center;">
+        Choose a username to get started. You'll get a unique player ID!
+      </p>
+      <div class="form-group">
+        <label>Your Username</label>
+        <input type="text" id="usernameInput" placeholder="Enter your username..." maxlength="20">
+        <small style="color: var(--text-secondary); margin-top: 5px; display: block;">Letters, numbers, and underscores only</small>
+      </div>
+      <button class="btn-submit" onclick="setUsername()">🎮 Get Started</button>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD MODAL -->
+  <div class="modal" id="adminModal">
+    <div class="modal-content" style="max-width: 1200px; max-height: 95vh;">
+      <div class="modal-header">
+        <span>👨‍💻 Admin Dashboard</span>
+        <button class="modal-close" onclick="closeAdminDashboard()">✕</button>
+      </div>
+
+      <!-- ADMIN TABS -->
+      <div class="settings-tabs" style="margin-bottom: 20px;">
+        <button class="settings-tab-btn active" onclick="switchAdminTab('overview', this)">📊 Overview</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('players', this)">👥 Players</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('games', this)">🎮 Games</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('stats', this)">📈 Analytics</button>
+      </div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="overview-tab" class="settings-tab-content active">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>🎮 Total Games</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: var(--primary); margin-top: 10px;" id="totalGamesCount">0</div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>👁️ Total Views</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: var(--neon); margin-top: 10px;" id="totalViewsCount">0</div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>⬇️ Total Downloads</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: var(--accent); margin-top: 10px;" id="totalDownloadsCount">0</div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>⭐ Avg Rating</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: #fbbf24; margin-top: 10px;" id="avgRatingCount">0</div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>💬 Total Comments</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: #10b981; margin-top: 10px;" id="totalCommentsCount">0</div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-header"><h3>❤️ Total Favorites</h3></div>
+            <div style="font-size: 2.5em; font-weight: 800; color: #ef4444; margin-top: 10px;" id="totalFavoritesCount">0</div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-header"><h3>📋 System Information</h3></div>
+          <div class="settings-item" style="border-bottom: 1px solid var(--border);"><span>Admin Mode Active</span><span style="color: var(--neon);">✅</span></div>
+          <div class="settings-item" style="border-bottom: 1px solid var(--border);"><span>API Base URL</span><span style="font-family: monospace; color: var(--text-secondary); font-size: 0.9em;">Local Server</span></div>
+          <div class="settings-item" style="border-bottom: 1px solid var(--border);"><span>Database Status</span><span style="color: var(--neon);">🟢 Connected</span></div>
+          <div class="settings-item"><span>Session Type</span><span style="font-family: monospace; color: var(--text-secondary); font-size: 0.9em;">Administrator</span></div>
+        </div>
+      </div>
+
+      <!-- PLAYERS TAB -->
+      <div id="players-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>👥 Active Players</h3>
+            <p>Monitor player activity and current games</p>
+          </div>
+          <div id="adminPlayersList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
+      </div>
+
+      <!-- GAMES TAB -->
+      <div id="games-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header"><h3>🎮 All Games</h3><p>Manage and delete games</p></div>
+          <div id="adminGamesList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
+      </div>
+
+      <!-- STATS TAB -->
+      <div id="stats-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header"><h3>📈 Game Analytics</h3><p>Detailed statistics for each game</p></div>
+          <div id="adminStatsTable" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Game Name</th>
+                  <th style="text-align: center; padding: 12px; font-weight: 700;">Views</th>
+                  <th style="text-align: center; padding: 12px; font-weight: 700;">Downloads</th>
+                  <th style="text-align: center; padding: 12px; font-weight: 700;">Rating</th>
+                  <th style="text-align: center; padding: 12px; font-weight: 700;">Comments</th>
+                </tr>
+              </thead>
+              <tbody id="adminStatsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let allGames = [];
     let uploaderTokens = {};
     let isAdminMode = false;
     let userFavorites = [];
     let sessionId = Math.random().toString(36).substring(7);
+    let playerUsername = '';
+    let playerId = '';
+    let currentGamePlaying = null;
     const API_BASE = '';
     const ADMIN_PASSWORD = 'Tiu2mc3y!!!';
 
@@ -1210,9 +1326,15 @@
       document.getElementById('modalGameTitle').textContent = game.name;
       document.getElementById('gameIframe').src = `${API_BASE}/api/view/${gameId}`;
       document.getElementById('gameModal').classList.add('show');
+      
+      // Track player playing this game
+      trackPlayerInGame(gameId);
     }
 
-    function closeGameModal() { document.getElementById('gameModal').classList.remove('show'); }
+    function closeGameModal() { 
+      document.getElementById('gameModal').classList.remove('show');
+      clearCurrentGame();
+    }
     function downloadGame(gameId) { window.location.href = `${API_BASE}/api/download/${gameId}`; }
 
     function toggleFavorite(gameId, event) {
@@ -1307,11 +1429,6 @@
       }
     }
 
-    function openAdminDashboard() {
-      if (!isAdminMode) { showNotification('❌ Not in admin mode'); return; }
-      showNotification('✅ Admin dashboard would open here');
-    }
-
     function displayTokens() {
       const container = document.getElementById('tokensContainer');
       if (Object.keys(uploaderTokens).length === 0) {
@@ -1333,15 +1450,197 @@
       }).join('');
     }
 
-    function resetAllSettings() {
-      if (confirm('Reset all settings?')) {
-        localStorage.clear();
-        location.reload();
+    function generatePlayerId() {
+      return 'PLAYER-' + Math.random().toString(36).substring(2, 11).toUpperCase();
+    }
+
+    function initializePlayer() {
+      // Check if player already has username
+      const savedUsername = localStorage.getItem('playerUsername');
+      const savedPlayerId = localStorage.getItem('playerId');
+      
+      if (savedUsername && savedPlayerId) {
+        playerUsername = savedUsername;
+        playerId = savedPlayerId;
+      } else {
+        // First time - show username modal
+        document.getElementById('usernameModal').classList.add('show');
+      }
+    }
+
+    function setUsername() {
+      const usernameInput = document.getElementById('usernameInput').value.trim();
+      
+      if (!usernameInput) {
+        showNotification('❌ Please enter a username');
+        return;
+      }
+      
+      if (!/^[a-zA-Z0-9_]+$/.test(usernameInput)) {
+        showNotification('❌ Only letters, numbers, and underscores allowed');
+        return;
+      }
+      
+      if (usernameInput.length > 20) {
+        showNotification('❌ Username must be 20 characters or less');
+        return;
+      }
+      
+      playerUsername = usernameInput;
+      playerId = generatePlayerId();
+      
+      localStorage.setItem('playerUsername', playerUsername);
+      localStorage.setItem('playerId', playerId);
+      
+      document.getElementById('usernameModal').classList.remove('show');
+      showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
+    }
+
+    function trackPlayerInGame(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (game) {
+        currentGamePlaying = {
+          gameId: gameId,
+          gameName: game.name,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
+      }
+    }
+
+    function clearCurrentGame() {
+      currentGamePlaying = null;
+      localStorage.removeItem('currentGamePlaying_' + playerId);
+    }
+
+    function getAllActivePlayers() {
+      // Get all active players from localStorage
+      const players = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('currentGamePlaying_')) {
+          const playerId = key.replace('currentGamePlaying_', '');
+          const gameData = JSON.parse(localStorage.getItem(key));
+          
+          // Find username from storage (would need to store player info separately)
+          // For now, we'll just show player ID
+          players.push({
+            playerId: playerId,
+            gameId: gameData.gameId,
+            gameName: gameData.gameName,
+            timestamp: gameData.timestamp
+          });
+        }
+      }
+      return players;
+    }
+
+    function switchAdminTab(tabName, button) {
+      document.querySelectorAll('.settings-tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.settings-tabs .settings-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName + '-tab').classList.add('active');
+      button.classList.add('active');
+    }
+
+    function openAdminDashboard() {
+      if (!isAdminMode) {
+        showNotification('❌ Not in admin mode');
+        return;
+      }
+      loadAdminDashboard();
+      document.getElementById('adminModal').classList.add('show');
+    }
+
+    function closeAdminDashboard() {
+      document.getElementById('adminModal').classList.remove('show');
+    }
+
+    function loadAdminDashboard() {
+      // Calculate stats
+      const totalGames = allGames.length;
+      const totalViews = allGames.reduce((sum, g) => sum + (g.views || 0), 0);
+      const totalDownloads = allGames.reduce((sum, g) => sum + (g.downloads || 0), 0);
+      const avgRating = allGames.length > 0 ? (allGames.reduce((sum, g) => sum + (g.avgRating || 0), 0) / allGames.length).toFixed(2) : '0';
+
+      // Update overview tab
+      document.getElementById('totalGamesCount').textContent = totalGames;
+      document.getElementById('totalViewsCount').textContent = totalViews;
+      document.getElementById('totalDownloadsCount').textContent = totalDownloads;
+      document.getElementById('avgRatingCount').textContent = avgRating;
+      document.getElementById('totalCommentsCount').textContent = '0'; // Would come from API
+      document.getElementById('totalFavoritesCount').textContent = userFavorites.length;
+
+      // Update games tab
+      const gamesList = document.getElementById('adminGamesList');
+      gamesList.innerHTML = allGames.map(game => `
+        <div class="token-item">
+          <div class="token-info">
+            <div class="token-game-name">${game.name}</div>
+            <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+              👁️ ${game.views || 0} views | ⬇️ ${game.downloads || 0} downloads | ⭐ ${game.avgRating || 'N/A'}/5
+            </div>
+          </div>
+          <button class="token-copy-btn" style="background: #ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
+        </div>
+      `).join('');
+
+      // Update stats tab
+      const statsBody = document.getElementById('adminStatsBody');
+      statsBody.innerHTML = allGames.map(game => `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 12px; text-align: left;">${game.name}</td>
+          <td style="padding: 12px; text-align: center;">${game.views || 0}</td>
+          <td style="padding: 12px; text-align: center;">${game.downloads || 0}</td>
+          <td style="padding: 12px; text-align: center;">⭐ ${game.avgRating ? game.avgRating.toFixed(1) : 'N/A'}</td>
+          <td style="padding: 12px; text-align: center;">0</td>
+        </tr>
+      `).join('');
+
+      // Update players tab
+      const activePlayers = getAllActivePlayers();
+      const playersList = document.getElementById('adminPlayersList');
+      
+      if (activePlayers.length === 0) {
+        playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
+      } else {
+        playersList.innerHTML = activePlayers.map(player => `
+          <div class="token-item">
+            <div class="token-info">
+              <div class="token-game-name">👤 ${player.playerId}</div>
+              <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                🎮 Playing: <strong>${player.gameName}</strong>
+              </div>
+            </div>
+            <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy ID</button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function adminDeleteGame(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (confirm(`Delete "${game.name}" and all its data?\n\nThis action cannot be undone!`)) {
+        fetch(`${API_BASE}/api/delete/${gameId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: localStorage.getItem('adminPassword') })
+        }).then(r => r.json()).then(result => {
+          if (result.success) {
+            delete uploaderTokens[gameId];
+            localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
+            showNotification('✅ Game deleted by admin!');
+            loadGames();
+            loadAdminDashboard();
+          } else {
+            showNotification('❌ Delete failed: ' + result.error);
+          }
+        });
       }
     }
 
     // INIT
     loadGames();
+    initializePlayer();
     uploaderTokens = JSON.parse(localStorage.getItem('uploaderTokens') || '{}');
     userFavorites = JSON.parse(localStorage.getItem('userFavorites_' + sessionId) || '[]');
     const savedTheme = localStorage.getItem('colorTheme') || 'default';
