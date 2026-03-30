@@ -704,6 +704,82 @@ app.post('/api/archive/:id', async (req, res) => {
   }
 });
 
+// Appeals storage
+const appeals = new Map(); // appealId -> appeal object
+
+// SUBMIT APPEAL
+app.post('/api/appeal', (req, res) => {
+  const { playerId, playerUsername, banReason, appealText } = req.body;
+  if (!playerId) return res.status(400).json({ error: 'Player ID required' });
+  if (!appealText || !appealText.trim()) return res.status(400).json({ error: 'Appeal text required' });
+
+  // Only allow one pending appeal per player
+  for (const [, appeal] of appeals) {
+    if (appeal.playerId === playerId && appeal.status === 'pending') {
+      return res.status(400).json({ error: 'You already have a pending appeal.' });
+    }
+  }
+
+  const appealId = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+  appeals.set(appealId, {
+    id: appealId,
+    playerId,
+    playerUsername: playerUsername || 'Unknown',
+    banReason: banReason || 'No reason given',
+    appealText: appealText.trim(),
+    status: 'pending', // pending | approved | denied
+    submittedAt: new Date().toISOString()
+  });
+
+  console.log(`📨 Appeal submitted by ${playerUsername} (${playerId})`);
+  res.json({ success: true, message: 'Appeal submitted!' });
+});
+
+// GET ALL APPEALS (admin)
+app.get('/api/appeals', (req, res) => {
+  const { adminPassword } = req.query;
+  if (!isAdmin(adminPassword)) return res.status(401).json({ error: 'Invalid admin password' });
+
+  const list = [];
+  appeals.forEach(a => list.push(a));
+  list.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  res.json({ success: true, count: list.length, appeals: list });
+});
+
+// APPROVE APPEAL (admin) - also unbans the player
+app.post('/api/appeals/:id/approve', (req, res) => {
+  const { adminPassword } = req.body;
+  if (!isAdmin(adminPassword)) return res.status(401).json({ error: 'Invalid admin password' });
+
+  const appeal = appeals.get(req.params.id);
+  if (!appeal) return res.status(404).json({ error: 'Appeal not found' });
+
+  appeal.status = 'approved';
+  appeal.reviewedAt = new Date().toISOString();
+
+  // Unban the player automatically
+  bannedPlayers.delete(appeal.playerId);
+
+  console.log(`✅ Appeal approved for ${appeal.playerUsername} — player unbanned`);
+  res.json({ success: true, message: 'Appeal approved and player unbanned!' });
+});
+
+// DENY APPEAL (admin)
+app.post('/api/appeals/:id/deny', (req, res) => {
+  const { adminPassword } = req.body;
+  if (!isAdmin(adminPassword)) return res.status(401).json({ error: 'Invalid admin password' });
+
+  const appeal = appeals.get(req.params.id);
+  if (!appeal) return res.status(404).json({ error: 'Appeal not found' });
+
+  appeal.status = 'denied';
+  appeal.reviewedAt = new Date().toISOString();
+
+  console.log(`❌ Appeal denied for ${appeal.playerUsername}`);
+  res.json({ success: true, message: 'Appeal denied.' });
+});
+
 // BAN PLAYER
 app.post('/api/ban', (req, res) => {
   const { adminPassword, playerId, playerUsername, reason } = req.body;
