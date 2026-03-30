@@ -52,8 +52,9 @@ async function connectDB() {
     gridFSBucket = new GridFSBucket(db.getClient().db('gamevault'));
     console.log('✅ Connected to MongoDB with GridFS (supports 100MB+ files)');
     
-    // Load existing games
-    loadGamesFromDB();
+    // Load existing games and WAIT for it to complete
+    await loadGamesFromDB();
+    console.log(`✅ Games ready to serve: ${allFiles.length} games available`);
   } catch (err) {
     console.error('❌ MongoDB connection failed:', err.message);
     console.log('Games will be stored in memory only (will not persist on restart)');
@@ -361,6 +362,23 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       message: 'Game uploaded successfully! (stored in memory)'
     });
   }
+});
+
+// HEALTH CHECK
+app.get('/api/health', async (req, res) => {
+  const mongoConnected = Game ? 'Connected' : 'Not Connected';
+  const gamesCount = allFiles.length;
+  const gridFSConnected = gridFSBucket ? 'Connected' : 'Not Connected';
+  
+  res.json({
+    status: 'ok',
+    mongodb: mongoConnected,
+    gridfs: gridFSConnected,
+    gamesInMemory: gamesCount,
+    databaseUrl: process.env.MONGODB_URI ? 'Configured' : 'Not configured',
+    nextId: nextId,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // GET ALL GAMES
