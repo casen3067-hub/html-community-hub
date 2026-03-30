@@ -796,7 +796,7 @@
     <div class="header">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div class="logo">🎮 GameVault</div>
-        <button onclick="openChangelog()" style="padding: 4px 10px; background: rgba(99,102,241,0.15); border: 1.5px solid var(--primary); border-radius: 20px; color: var(--primary); font-size: 0.75em; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(99,102,241,0.3)'" onmouseout="this.style.background='rgba(99,102,241,0.15)'">v1.6</button>
+        <button onclick="openChangelog()" style="padding: 4px 10px; background: rgba(99,102,241,0.15); border: 1.5px solid var(--primary); border-radius: 20px; color: var(--primary); font-size: 0.75em; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(99,102,241,0.3)'" onmouseout="this.style.background='rgba(99,102,241,0.15)'">v1.7</button>
         <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 500;">Made with Java, By Casen</span>
       </div>
       <div class="search-container">
@@ -1014,6 +1014,18 @@
           <label>Your Name</label>
           <input type="text" id="uploaderName" placeholder="Enter your name">
         </div>
+        <div id="adminOnlyToggleGroup" style="display:none; margin-bottom:20px;">
+          <label style="display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none;">
+            <div class="toggle-switch" style="flex-shrink:0;">
+              <input type="checkbox" id="adminOnlyCheck">
+              <label for="adminOnlyCheck" class="toggle-label"><span class="toggle-icon"></span></label>
+            </div>
+            <div>
+              <span style="font-weight:700;">🔐 Admin Only</span>
+              <div style="font-size:0.82em;color:var(--text-secondary);margin-top:2px;">Only visible to admins — hidden from regular players</div>
+            </div>
+          </label>
+        </div>
         <div class="form-group">
           <label>Cover Image <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span></label>
           <input type="file" id="iconFile" accept="image/*" onchange="previewCover(event)">
@@ -1068,8 +1080,24 @@
 
         <div class="settings-section" style="margin-bottom:0;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="font-size:1em;">v1.6 — Cover Images & Upload Fix</strong>
+            <strong style="font-size:1em;">v1.7 — Admin Power Tools</strong>
             <span style="font-size:0.75em; color:var(--primary); background:rgba(99,102,241,0.15); padding:2px 8px; border-radius:10px;">Latest</span>
+          </div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Uploader name now shown on every game card</li>
+            <li>Admin-only games — hidden from regular players, toggle at upload or anytime</li>
+            <li>Ban screen now blocks the whole page instantly, not just on game open</li>
+            <li>Ban appeal form on the ban screen with admin Appeals tab</li>
+            <li>Admin can approve (auto-unban) or deny appeals</li>
+            <li>File editor & version history moved to Updates tab in Admin Dashboard</li>
+            <li>Admin Games tab: search, filter, archive, admin-only toggle, and delete</li>
+            <li>Admin-only games persist to MongoDB across restarts</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="font-size:1em;">v1.6 — Cover Images & Upload Fix</strong>
           </div>
           <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
             <li>Added cover image upload with live preview</li>
@@ -1479,11 +1507,20 @@
         return;
       }
 
-      container.innerHTML = games.filter(game => !game.archived || isAdminMode).map(game => `
+      container.innerHTML = games.filter(game => {
+        if (game.adminOnly && !isAdminMode) return false;
+        if (game.archived && !isAdminMode) return false;
+        return true;
+      }).map(game => `
         <div class="game-card">
           <div class="game-thumbnail">${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}" style="width:100%;height:100%;object-fit:cover;">` : '🎮'}</div>
           <div class="game-info">
-            <div class="game-title">${game.name}</div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+              <div class="game-title" style="margin-bottom:0;">${game.name}</div>
+              ${game.adminOnly ? `<span style="font-size:0.7em;padding:2px 7px;background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.5);color:#a78bfa;border-radius:8px;font-weight:700;white-space:nowrap;">🔐 Admin Only</span>` : ''}
+              ${game.archived ? `<span style="font-size:0.7em;padding:2px 7px;background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.3);color:var(--text-secondary);border-radius:8px;font-weight:700;">📦 Archived</span>` : ''}
+            </div>
+            <div style="font-size:0.8em;color:var(--text-secondary);margin-bottom:6px;">👤 ${game.uploader || 'Anonymous'}</div>
             <div class="game-description">${game.description || 'No description'}</div>
             <div class="game-stats">
               ${game.views ? `<div class="stat">👁️ ${game.views}</div>` : ''}
@@ -1512,9 +1549,14 @@
       else if (tabName === 'myGames') renderGames(allGames.filter(g => uploaderTokens.hasOwnProperty(g.id)));
     }
 
-    function openUploadModal() { document.getElementById('uploadModal').classList.add('show'); }
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('show');
+      // Show admin-only option only for admins
+      document.getElementById('adminOnlyToggleGroup').style.display = isAdminMode ? 'block' : 'none';
+    }
     function closeUploadModal() { 
       document.getElementById('uploadModal').classList.remove('show');
+      document.getElementById('adminOnlyCheck').checked = false;
       removeCover();
     }
 
@@ -1559,6 +1601,7 @@
       formData.append('name', document.getElementById('gameName').value);
       formData.append('description', document.getElementById('gameDescription').value);
       formData.append('uploader', document.getElementById('uploaderName').value);
+      formData.append('adminOnly', isAdminMode && document.getElementById('adminOnlyCheck').checked ? 'true' : 'false');
       if (iconData) formData.append('iconData', iconData);
 
       try {
@@ -2262,10 +2305,13 @@
                   </div>
                 </div>
                 <div style="display:flex; gap:8px; flex-shrink:0;">
-                  <button class="token-copy-btn" style="background:${game.archived ? '#10b981' : '#f59e0b'};" onclick="adminToggleArchive(${game.id})">
+                  <button onclick="adminToggleArchive(${game.id})" style="padding:6px 10px; background:${game.archived ? '#10b981' : '#f59e0b'}; color:white; border:none; border-radius:7px; cursor:pointer; font-weight:700; font-size:0.82em; font-family:'Poppins',sans-serif;">
                     ${game.archived ? '📤 Unarchive' : '📦 Archive'}
                   </button>
-                  <button class="token-copy-btn" style="background:#ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
+                  <button onclick="adminToggleAdminOnly(${game.id})" style="padding:6px 10px; background:${game.adminOnly ? 'rgba(139,92,246,0.4)' : 'rgba(45,55,72,0.5)'}; color:${game.adminOnly ? '#a78bfa' : 'var(--text-secondary)'}; border:1.5px solid ${game.adminOnly ? 'rgba(139,92,246,0.6)' : 'var(--border)'}; border-radius:7px; cursor:pointer; font-weight:700; font-size:0.82em; font-family:'Poppins',sans-serif;">
+                    🔐 ${game.adminOnly ? 'Admin Only' : 'Public'}
+                  </button>
+                  <button onclick="adminDeleteGame(${game.id})" style="padding:6px 10px; background:#ef4444; color:white; border:none; border-radius:7px; cursor:pointer; font-weight:700; font-size:0.82em; font-family:'Poppins',sans-serif;">🗑️</button>
                 </div>
               </div>
             `).join('');
@@ -2310,6 +2356,28 @@
         console.error('Error loading dashboard:', err);
         showNotification('❌ Error loading dashboard data');
       });
+    }
+
+    function adminToggleAdminOnly(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) { showNotification('❌ Game not found'); return; }
+      const making = !game.adminOnly;
+      if (!confirm(`${making ? '🔐 Make "' + game.name + '" admin-only?' : '🌐 Make "' + game.name + '" public again?'}\n\n${making ? 'Regular players will no longer see this game.' : 'Everyone will be able to see this game.'}`)) return;
+
+      fetch(`${API_BASE}/api/admin-only/${gameId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: ADMIN_PASSWORD })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          game.adminOnly = result.adminOnly;
+          showNotification(result.adminOnly ? '🔐 Game is now admin-only!' : '🌐 Game is now public!');
+          loadGames();
+          loadAdminDashboard();
+        } else {
+          showNotification('❌ ' + (result.error || 'Failed'));
+        }
+      }).catch(err => showNotification('❌ Error: ' + err.message));
     }
 
     function adminToggleArchive(gameId) {
