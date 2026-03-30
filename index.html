@@ -1181,12 +1181,11 @@
       canvas.height = window.innerHeight;
     });
 
-    let currentPrimaryColor = '99, 102, 241'; // Default indigo in RGB
+    let currentPrimaryColor = '99, 102, 241';
 
     function getPrimaryColorRGB() {
       const styles = getComputedStyle(document.documentElement);
       const color = styles.getPropertyValue('--primary').trim();
-      // Parse hex color like #6366f1
       if (color.startsWith('#')) {
         const hex = color.slice(1);
         const r = parseInt(hex.substring(0, 2), 16);
@@ -1222,17 +1221,6 @@
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
       }
-
-      getRgbFromColor(color) {
-        // Convert CSS color to RGB values
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, 1, 1);
-        const imageData = ctx.getImageData(0, 0, 1, 1);
-        const data = imageData.data;
-        return `${data[0]}, ${data[1]}, ${data[2]}`;
-      }
     }
 
     let particles = Array(100).fill(null).map(() => new Particle());
@@ -1248,7 +1236,6 @@
     }
     animateParticles();
 
-    // FUNCTIONS
     function showNotification(msg) {
       const toast = document.getElementById('notificationToast');
       document.getElementById('notificationText').textContent = msg;
@@ -1265,24 +1252,8 @@
 
     async function loadGames() {
       try {
-        console.log('🎮 loadGames() called');
-        console.log('   API_BASE:', API_BASE);
-        console.log('   Fetching from:', `${API_BASE}/api/files`);
-        
         const response = await fetch(`${API_BASE}/api/files`);
-        console.log('   Response received:', response.status, response.statusText);
-        
         allGames = await response.json();
-        console.log('   allGames array length:', allGames.length);
-        
-        if (allGames.length > 0) {
-          console.log('   First game:', allGames[0].name);
-          console.log('   All game names:', allGames.map(g => g.name).join(', '));
-        } else {
-          console.warn('   ⚠️ allGames is EMPTY!');
-        }
-        
-        console.log('   Calling renderGames with', allGames.length, 'games');
         renderGames(allGames);
       } catch (err) {
         console.error('❌ Error loading games:', err);
@@ -1290,22 +1261,14 @@
     }
 
     function renderGames(games) {
-      console.log('🎨 renderGames() called with', games.length, 'games');
-      
       const container = document.getElementById('gamesContainer');
-      
-      if (!container) {
-        console.error('❌ gamesContainer element NOT FOUND!');
-        return;
-      }
-      
+      if (!container) return;
+
       if (games.length === 0) {
-        console.warn('⚠️ No games to render - showing empty state');
         container.innerHTML = `<div class="no-games"><div class="no-games-icon">🎮</div><div style="font-size: 1.2em; font-weight: 700; margin-bottom: 10px;">No games found</div></div>`;
         return;
       }
 
-      console.log('✅ Rendering', games.length, 'games');
       container.innerHTML = games.map(game => `
         <div class="game-card">
           <div class="game-thumbnail">${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}" style="width:100%;height:100%;object-fit:cover;">` : '🎮'}</div>
@@ -1326,7 +1289,6 @@
           </div>
         </div>
       `).join('');
-      console.log('✅ Render complete');
     }
 
     function showTab(tabName, btn) {
@@ -1372,8 +1334,6 @@
       document.getElementById('gameIframe').src = `${API_BASE}/api/view/${gameId}`;
       document.getElementById('gameLoadingSpinner').style.display = 'block';
       document.getElementById('gameModal').classList.add('show');
-      
-      // Track player playing this game
       trackPlayerInGame(gameId);
     }
 
@@ -1394,17 +1354,15 @@
       document.getElementById('gameIframeFullscreen').src = '';
     }
 
-    // Keyboard shortcut for fullscreen exit
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeGameFullscreen();
-      }
+      if (e.key === 'Escape') closeGameFullscreen();
     });
 
-    function closeGameModal() { 
+    function closeGameModal() {
       document.getElementById('gameModal').classList.remove('show');
       clearCurrentGame();
     }
+
     function downloadGame(gameId) { window.location.href = `${API_BASE}/api/download/${gameId}`; }
 
     function toggleFavorite(gameId, event) {
@@ -1453,8 +1411,6 @@
         document.documentElement.classList.add(`theme-${theme}`);
       }
       localStorage.setItem('colorTheme', theme);
-      
-      // Update particle canvas background and colors
       setTimeout(() => {
         const styles = getComputedStyle(document.documentElement);
         const bgDark = styles.getPropertyValue('--bg-dark').trim();
@@ -1463,30 +1419,17 @@
       }, 0);
     }
 
-    function toggleTheme() {
-      // Light/dark toggle
-    }
-
-    function toggleAnimations() {
-      // Animation toggle
-    }
-
-    function changeCardSize() {
-      // Card size change
-    }
-
-    function toggleUploaderNames() {
-      // Uploader names toggle
-    }
+    function toggleTheme() {}
+    function toggleAnimations() {}
+    function changeCardSize() {}
+    function toggleUploaderNames() {}
 
     function changeVolume() {
       const vol = document.getElementById('volumeSlider').value;
       document.getElementById('volumeValue').textContent = vol + '%';
     }
 
-    function toggleMusic() {
-      // Music toggle
-    }
+    function toggleMusic() {}
 
     function unlockAdminMode() {
       const password = document.getElementById('adminPassword').value;
@@ -1495,7 +1438,6 @@
         localStorage.setItem('adminPassword', password);
         document.getElementById('adminStatusDiv').style.display = 'block';
         showNotification('✅ Admin mode activated!');
-        // Re-render current view to show admin delete buttons
         renderGames(allGames);
       } else {
         showNotification('❌ Invalid password');
@@ -1528,45 +1470,30 @@
     }
 
     function initializePlayer() {
-      // Check if player already has username
       const savedUsername = localStorage.getItem('playerUsername');
       const savedPlayerId = localStorage.getItem('playerId');
-      
+
       if (savedUsername && savedPlayerId) {
         playerUsername = savedUsername;
         playerId = savedPlayerId;
       } else {
-        // First time - show username modal
         document.getElementById('usernameModal').classList.add('show');
       }
     }
 
     function setUsername() {
       const usernameInput = document.getElementById('usernameInput').value.trim();
-      
-      if (!usernameInput) {
-        showNotification('❌ Please enter a username');
-        return;
-      }
-      
-      if (!/^[a-zA-Z0-9_]+$/.test(usernameInput)) {
-        showNotification('❌ Only letters, numbers, and underscores allowed');
-        return;
-      }
-      
-      if (usernameInput.length > 20) {
-        showNotification('❌ Username must be 20 characters or less');
-        return;
-      }
-      
+
+      if (!usernameInput) { showNotification('❌ Please enter a username'); return; }
+      if (!/^[a-zA-Z0-9_]+$/.test(usernameInput)) { showNotification('❌ Only letters, numbers, and underscores allowed'); return; }
+      if (usernameInput.length > 20) { showNotification('❌ Username must be 20 characters or less'); return; }
+
       playerUsername = usernameInput;
       playerId = generatePlayerId();
-      
+
       localStorage.setItem('playerUsername', playerUsername);
       localStorage.setItem('playerId', playerId);
-      
-      console.log('✅ Username set:', playerUsername, 'Player ID:', playerId);
-      
+
       document.getElementById('usernameModal').classList.remove('show');
       showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
     }
@@ -1574,34 +1501,12 @@
     function trackPlayerInGame(gameId) {
       const game = allGames.find(g => g.id === gameId);
       if (game) {
-        currentGamePlaying = {
-          gameId: gameId,
-          gameName: game.name,
-          playerUsername: playerUsername,
-          playerId: playerId,
-          timestamp: Date.now()
-        };
-        
-        console.log('🎮 Tracking player in game:', currentGamePlaying);
-        
-        // Send heartbeat to backend
+        currentGamePlaying = { gameId, gameName: game.name, playerUsername, playerId, timestamp: Date.now() };
         fetch(`${API_BASE}/api/heartbeat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: sessionId,
-            playerUsername: playerUsername,
-            playerId: playerId,
-            gameId: gameId,
-            gameName: game.name
-          })
-        }).then(r => r.json()).then(result => {
-          console.log('✅ Heartbeat sent to server:', result);
-        }).catch(err => {
-          console.error('❌ Heartbeat failed:', err);
-        });
-        
-        // Also save to localStorage for local reference
+          body: JSON.stringify({ sessionId, playerUsername, playerId, gameId, gameName: game.name })
+        }).catch(err => console.error('❌ Heartbeat failed:', err));
         localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
       }
     }
@@ -1611,18 +1516,10 @@
       localStorage.removeItem('currentGamePlaying_' + playerId);
     }
 
-    function getAllActivePlayers() {
-      // This function will now be async, but we'll handle it in loadAdminDashboard
-      // For now, return empty - will be called via API in loadAdminDashboard
-      return [];
-    }
-
     async function getActivePlayers() {
-      // Fetch active players from backend API
       try {
         const response = await fetch(`${API_BASE}/api/active-players`);
         const data = await response.json();
-        console.log('📊 Active players from API:', data);
         return data.players || [];
       } catch (err) {
         console.error('❌ Failed to fetch active players:', err);
@@ -1632,19 +1529,13 @@
 
     function refreshPlayersList() {
       getActivePlayers().then(activePlayers => {
-        console.log('Active players found:', activePlayers);
         const playersList = document.getElementById('adminPlayersList');
         const activePlayerCount = document.getElementById('activePlayerCount');
-        
-        if (activePlayerCount) {
-          activePlayerCount.textContent = activePlayers.length;
-        }
-        
+        if (activePlayerCount) activePlayerCount.textContent = activePlayers.length;
         if (playersList) {
-          if (activePlayers.length === 0) {
-            playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
-          } else {
-            playersList.innerHTML = activePlayers.map(player => `
+          playersList.innerHTML = activePlayers.length === 0
+            ? '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>'
+            : activePlayers.map(player => `
               <div class="token-item">
                 <div class="token-info">
                   <div class="token-game-name">👤 ${player.playerUsername}</div>
@@ -1656,22 +1547,8 @@
                 <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
               </div>
             `).join('');
-          }
         }
       });
-    }
-
-    function showDebugInfo() {
-      console.log('=== DEBUG INFO ===');
-      console.log('Current player username:', playerUsername);
-      console.log('Current player ID:', playerId);
-      console.log('localStorage keys:');
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        console.log(`  ${key}:`, localStorage.getItem(key));
-      }
-      console.log('Active players:', getAllActivePlayers());
-      console.log('=== END DEBUG ===');
     }
 
     function switchAdminTab(tabName, button) {
@@ -1682,10 +1559,7 @@
     }
 
     function openAdminDashboard() {
-      if (!isAdminMode) {
-        showNotification('❌ Not in admin mode');
-        return;
-      }
+      if (!isAdminMode) { showNotification('❌ Not in admin mode'); return; }
       loadAdminDashboard();
       document.getElementById('adminModal').classList.add('show');
     }
@@ -1694,29 +1568,25 @@
       document.getElementById('adminModal').classList.remove('show');
     }
 
+    // ✅ FIX: Made the .then() callback async so await works inside it
     function loadAdminDashboard() {
-      // Reload games first to ensure we have latest data
-      fetch(`${API_BASE}/api/files`).then(r => r.json()).then(games => {
+      fetch(`${API_BASE}/api/files`).then(r => r.json()).then(async games => {
         allGames = games;
-        
-        // Calculate stats
-        const totalGames = allGames.length;
+
         const totalViews = allGames.reduce((sum, g) => sum + (g.views || 0), 0);
         const totalDownloads = allGames.reduce((sum, g) => sum + (g.downloads || 0), 0);
         const avgRating = allGames.length > 0 ? (allGames.reduce((sum, g) => sum + (g.avgRating || 0), 0) / allGames.length).toFixed(2) : '0';
 
-        // Update overview tab
-        document.getElementById('totalGamesCount').textContent = totalGames;
+        document.getElementById('totalGamesCount').textContent = allGames.length;
         document.getElementById('totalViewsCount').textContent = totalViews;
         document.getElementById('totalDownloadsCount').textContent = totalDownloads;
         document.getElementById('avgRatingCount').textContent = avgRating;
         document.getElementById('totalCommentsCount').textContent = '0';
         document.getElementById('totalFavoritesCount').textContent = userFavorites.length;
 
-        // Update games tab
         const gamesList = document.getElementById('adminGamesList');
         if (gamesList) {
-          gamesList.innerHTML = allGames.length === 0 
+          gamesList.innerHTML = allGames.length === 0
             ? '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No games in system</p>'
             : allGames.map(game => `
               <div class="token-item">
@@ -1731,7 +1601,6 @@
             `).join('');
         }
 
-        // Update stats tab
         const statsBody = document.getElementById('adminStatsBody');
         if (statsBody) {
           statsBody.innerHTML = allGames.map(game => `
@@ -1745,22 +1614,16 @@
           `).join('');
         }
 
-        // Update players tab - fetch from API
+        // ✅ Now await works because the callback is async
         const activePlayers = await getActivePlayers();
         const playersList = document.getElementById('adminPlayersList');
         const activePlayerCount = document.getElementById('activePlayerCount');
-        
-        console.log('🎮 Players found from API:', activePlayers.length, activePlayers);
-        
-        if (activePlayerCount) {
-          activePlayerCount.textContent = activePlayers.length;
-        }
-        
+
+        if (activePlayerCount) activePlayerCount.textContent = activePlayers.length;
         if (playersList) {
-          if (activePlayers.length === 0) {
-            playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
-          } else {
-            playersList.innerHTML = activePlayers.map(player => `
+          playersList.innerHTML = activePlayers.length === 0
+            ? '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>'
+            : activePlayers.map(player => `
               <div class="token-item">
                 <div class="token-info">
                   <div class="token-game-name">👤 ${player.playerUsername}</div>
@@ -1772,7 +1635,6 @@
                 <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
               </div>
             `).join('');
-          }
         }
       }).catch(err => {
         console.error('Error loading dashboard:', err);
@@ -1782,22 +1644,15 @@
 
     function adminDeleteGame(gameId) {
       const game = allGames.find(g => g.id === gameId);
-      if (!game) {
-        showNotification('❌ Game not found');
-        return;
-      }
-      
-      if (!isAdminMode) {
-        showNotification('❌ Admin mode not active');
-        return;
-      }
-      
-      if (confirm(`🗑️ DELETE GAME?\n\n"${game.name}"\n\nThis will delete:\n✗ Game file\n✗ Views & downloads\n✗ Ratings & comments\n✗ Favorites\n\nThis CANNOT be undone!`)) {
+      if (!game) { showNotification('❌ Game not found'); return; }
+      if (!isAdminMode) { showNotification('❌ Admin mode not active'); return; }
+
+      if (confirm(`🗑️ DELETE GAME?\n\n"${game.name}"\n\nThis CANNOT be undone!`)) {
         const adminPassword = localStorage.getItem('adminPassword') || ADMIN_PASSWORD;
         fetch(`${API_BASE}/api/delete/${gameId}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPassword: adminPassword })
+          body: JSON.stringify({ adminPassword })
         }).then(r => r.json()).then(result => {
           if (result.success) {
             delete uploaderTokens[gameId];
@@ -1808,17 +1663,11 @@
           } else {
             showNotification('❌ Delete failed: ' + (result.error || 'Unknown error'));
           }
-        }).catch(err => {
-          showNotification('❌ Error: ' + err.message);
-        });
+        }).catch(err => showNotification('❌ Error: ' + err.message));
       }
     }
 
     // INIT
-    console.log('🚀 Page initialization starting...');
-    console.log('   API_BASE:', API_BASE);
-    console.log('   sessionId:', sessionId);
-    console.log('   Calling loadGames()...');
     loadGames();
     initializePlayer();
     uploaderTokens = JSON.parse(localStorage.getItem('uploaderTokens') || '{}');
@@ -1826,15 +1675,13 @@
     const savedTheme = localStorage.getItem('colorTheme') || 'default';
     changeTheme(savedTheme);
     document.getElementById('themeSelector').value = savedTheme;
-    
-    // Restore admin mode if password was saved
+
     const savedAdminPassword = localStorage.getItem('adminPassword');
     if (savedAdminPassword && savedAdminPassword === ADMIN_PASSWORD) {
       isAdminMode = true;
       document.getElementById('adminStatusDiv').style.display = 'block';
       document.getElementById('adminPassword').value = savedAdminPassword;
       document.getElementById('adminPassword').disabled = true;
-      // Re-render games after a brief delay to ensure they're loaded
       setTimeout(() => renderGames(allGames), 100);
     }
   </script>
