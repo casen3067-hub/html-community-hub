@@ -1548,6 +1548,8 @@
         currentGamePlaying = {
           gameId: gameId,
           gameName: game.name,
+          playerUsername: playerUsername,
+          playerId: playerId,
           timestamp: Date.now()
         };
         localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
@@ -1568,10 +1570,9 @@
           const playerId = key.replace('currentGamePlaying_', '');
           const gameData = JSON.parse(localStorage.getItem(key));
           
-          // Find username from storage (would need to store player info separately)
-          // For now, we'll just show player ID
           players.push({
             playerId: playerId,
+            playerUsername: gameData.playerUsername || 'Unknown',
             gameId: gameData.gameId,
             gameName: gameData.gameName,
             timestamp: gameData.timestamp
@@ -1602,65 +1603,82 @@
     }
 
     function loadAdminDashboard() {
-      // Calculate stats
-      const totalGames = allGames.length;
-      const totalViews = allGames.reduce((sum, g) => sum + (g.views || 0), 0);
-      const totalDownloads = allGames.reduce((sum, g) => sum + (g.downloads || 0), 0);
-      const avgRating = allGames.length > 0 ? (allGames.reduce((sum, g) => sum + (g.avgRating || 0), 0) / allGames.length).toFixed(2) : '0';
+      // Reload games first to ensure we have latest data
+      fetch(`${API_BASE}/api/files`).then(r => r.json()).then(games => {
+        allGames = games;
+        
+        // Calculate stats
+        const totalGames = allGames.length;
+        const totalViews = allGames.reduce((sum, g) => sum + (g.views || 0), 0);
+        const totalDownloads = allGames.reduce((sum, g) => sum + (g.downloads || 0), 0);
+        const avgRating = allGames.length > 0 ? (allGames.reduce((sum, g) => sum + (g.avgRating || 0), 0) / allGames.length).toFixed(2) : '0';
 
-      // Update overview tab
-      document.getElementById('totalGamesCount').textContent = totalGames;
-      document.getElementById('totalViewsCount').textContent = totalViews;
-      document.getElementById('totalDownloadsCount').textContent = totalDownloads;
-      document.getElementById('avgRatingCount').textContent = avgRating;
-      document.getElementById('totalCommentsCount').textContent = '0'; // Would come from API
-      document.getElementById('totalFavoritesCount').textContent = userFavorites.length;
+        // Update overview tab
+        document.getElementById('totalGamesCount').textContent = totalGames;
+        document.getElementById('totalViewsCount').textContent = totalViews;
+        document.getElementById('totalDownloadsCount').textContent = totalDownloads;
+        document.getElementById('avgRatingCount').textContent = avgRating;
+        document.getElementById('totalCommentsCount').textContent = '0';
+        document.getElementById('totalFavoritesCount').textContent = userFavorites.length;
 
-      // Update games tab
-      const gamesList = document.getElementById('adminGamesList');
-      gamesList.innerHTML = allGames.map(game => `
-        <div class="token-item">
-          <div class="token-info">
-            <div class="token-game-name">${game.name}</div>
-            <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
-              👁️ ${game.views || 0} views | ⬇️ ${game.downloads || 0} downloads | ⭐ ${game.avgRating || 'N/A'}/5
-            </div>
-          </div>
-          <button class="token-copy-btn" style="background: #ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
-        </div>
-      `).join('');
-
-      // Update stats tab
-      const statsBody = document.getElementById('adminStatsBody');
-      statsBody.innerHTML = allGames.map(game => `
-        <tr style="border-bottom: 1px solid var(--border);">
-          <td style="padding: 12px; text-align: left;">${game.name}</td>
-          <td style="padding: 12px; text-align: center;">${game.views || 0}</td>
-          <td style="padding: 12px; text-align: center;">${game.downloads || 0}</td>
-          <td style="padding: 12px; text-align: center;">⭐ ${game.avgRating ? game.avgRating.toFixed(1) : 'N/A'}</td>
-          <td style="padding: 12px; text-align: center;">0</td>
-        </tr>
-      `).join('');
-
-      // Update players tab
-      const activePlayers = getAllActivePlayers();
-      const playersList = document.getElementById('adminPlayersList');
-      
-      if (activePlayers.length === 0) {
-        playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
-      } else {
-        playersList.innerHTML = activePlayers.map(player => `
-          <div class="token-item">
-            <div class="token-info">
-              <div class="token-game-name">👤 ${player.playerId}</div>
-              <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
-                🎮 Playing: <strong>${player.gameName}</strong>
+        // Update games tab
+        const gamesList = document.getElementById('adminGamesList');
+        if (gamesList) {
+          gamesList.innerHTML = allGames.length === 0 
+            ? '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No games in system</p>'
+            : allGames.map(game => `
+              <div class="token-item">
+                <div class="token-info">
+                  <div class="token-game-name">${game.name}</div>
+                  <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                    👁️ ${game.views || 0} views | ⬇️ ${game.downloads || 0} downloads | ⭐ ${game.avgRating || 'N/A'}/5
+                  </div>
+                </div>
+                <button class="token-copy-btn" style="background: #ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
               </div>
-            </div>
-            <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy ID</button>
-          </div>
-        `).join('');
-      }
+            `).join('');
+        }
+
+        // Update stats tab
+        const statsBody = document.getElementById('adminStatsBody');
+        if (statsBody) {
+          statsBody.innerHTML = allGames.map(game => `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px; text-align: left;">${game.name}</td>
+              <td style="padding: 12px; text-align: center;">${game.views || 0}</td>
+              <td style="padding: 12px; text-align: center;">${game.downloads || 0}</td>
+              <td style="padding: 12px; text-align: center;">⭐ ${game.avgRating ? game.avgRating.toFixed(1) : 'N/A'}</td>
+              <td style="padding: 12px; text-align: center;">0</td>
+            </tr>
+          `).join('');
+        }
+
+        // Update players tab
+        const activePlayers = getAllActivePlayers();
+        const playersList = document.getElementById('adminPlayersList');
+        
+        if (playersList) {
+          if (activePlayers.length === 0) {
+            playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
+          } else {
+            playersList.innerHTML = activePlayers.map(player => `
+              <div class="token-item">
+                <div class="token-info">
+                  <div class="token-game-name">👤 ${player.playerUsername}</div>
+                  <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                    🎮 Playing: <strong>${player.gameName}</strong><br>
+                    🆔 ${player.playerId}
+                  </div>
+                </div>
+                <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
+              </div>
+            `).join('');
+          }
+        }
+      }).catch(err => {
+        console.error('Error loading dashboard:', err);
+        showNotification('❌ Error loading dashboard data');
+      });
     }
 
     function adminDeleteGame(gameId) {
