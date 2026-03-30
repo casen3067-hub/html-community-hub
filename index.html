@@ -1555,9 +1555,28 @@
           playerId: playerId,
           timestamp: Date.now()
         };
-        console.log('🎮 Tracking player in game:', { playerUsername, playerId, gameName: game.name });
+        
+        console.log('🎮 Tracking player in game:', currentGamePlaying);
+        
+        // Send heartbeat to backend
+        fetch(`${API_BASE}/api/heartbeat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            playerUsername: playerUsername,
+            playerId: playerId,
+            gameId: gameId,
+            gameName: game.name
+          })
+        }).then(r => r.json()).then(result => {
+          console.log('✅ Heartbeat sent to server:', result);
+        }).catch(err => {
+          console.error('❌ Heartbeat failed:', err);
+        });
+        
+        // Also save to localStorage for local reference
         localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
-        console.log('✅ Saved to localStorage:', 'currentGamePlaying_' + playerId);
       }
     }
 
@@ -1567,54 +1586,53 @@
     }
 
     function getAllActivePlayers() {
-      // Get all active players from localStorage
-      const players = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('currentGamePlaying_')) {
-          const playerId = key.replace('currentGamePlaying_', '');
-          const gameData = JSON.parse(localStorage.getItem(key));
-          
-          players.push({
-            playerId: playerId,
-            playerUsername: gameData.playerUsername || 'Unknown',
-            gameId: gameData.gameId,
-            gameName: gameData.gameName,
-            timestamp: gameData.timestamp
-          });
-        }
+      // This function will now be async, but we'll handle it in loadAdminDashboard
+      // For now, return empty - will be called via API in loadAdminDashboard
+      return [];
+    }
+
+    async function getActivePlayers() {
+      // Fetch active players from backend API
+      try {
+        const response = await fetch(`${API_BASE}/api/active-players`);
+        const data = await response.json();
+        console.log('📊 Active players from API:', data);
+        return data.players || [];
+      } catch (err) {
+        console.error('❌ Failed to fetch active players:', err);
+        return [];
       }
-      return players;
     }
 
     function refreshPlayersList() {
-      const activePlayers = getAllActivePlayers();
-      console.log('Active players found:', activePlayers);
-      const playersList = document.getElementById('adminPlayersList');
-      const activePlayerCount = document.getElementById('activePlayerCount');
-      
-      if (activePlayerCount) {
-        activePlayerCount.textContent = activePlayers.length;
-      }
-      
-      if (playersList) {
-        if (activePlayers.length === 0) {
-          playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
-        } else {
-          playersList.innerHTML = activePlayers.map(player => `
-            <div class="token-item">
-              <div class="token-info">
-                <div class="token-game-name">👤 ${player.playerUsername}</div>
-                <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
-                  🎮 Playing: <strong>${player.gameName}</strong><br>
-                  🆔 ${player.playerId}
-                </div>
-              </div>
-              <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
-            </div>
-          `).join('');
+      getActivePlayers().then(activePlayers => {
+        console.log('Active players found:', activePlayers);
+        const playersList = document.getElementById('adminPlayersList');
+        const activePlayerCount = document.getElementById('activePlayerCount');
+        
+        if (activePlayerCount) {
+          activePlayerCount.textContent = activePlayers.length;
         }
-      }
+        
+        if (playersList) {
+          if (activePlayers.length === 0) {
+            playersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players currently playing</p>';
+          } else {
+            playersList.innerHTML = activePlayers.map(player => `
+              <div class="token-item">
+                <div class="token-info">
+                  <div class="token-game-name">👤 ${player.playerUsername}</div>
+                  <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                    ${player.gameName ? `🎮 Playing: <strong>${player.gameName}</strong><br>` : ''}
+                    🆔 ${player.playerId}
+                  </div>
+                </div>
+                <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
+              </div>
+            `).join('');
+          }
+        }
+      });
     }
 
     function showDebugInfo() {
@@ -1701,12 +1719,12 @@
           `).join('');
         }
 
-        // Update players tab
-        const activePlayers = getAllActivePlayers();
+        // Update players tab - fetch from API
+        const activePlayers = await getActivePlayers();
         const playersList = document.getElementById('adminPlayersList');
         const activePlayerCount = document.getElementById('activePlayerCount');
         
-        console.log('🎮 Players found:', activePlayers.length, activePlayers);
+        console.log('🎮 Players found from API:', activePlayers.length, activePlayers);
         
         if (activePlayerCount) {
           activePlayerCount.textContent = activePlayers.length;
@@ -1721,7 +1739,7 @@
                 <div class="token-info">
                   <div class="token-game-name">👤 ${player.playerUsername}</div>
                   <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
-                    🎮 Playing: <strong>${player.gameName}</strong><br>
+                    ${player.gameName ? `🎮 Playing: <strong>${player.gameName}</strong><br>` : ''}
                     🆔 ${player.playerId}
                   </div>
                 </div>
