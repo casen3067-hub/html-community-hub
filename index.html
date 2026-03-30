@@ -1021,10 +1021,27 @@
     <div class="modal-content" style="max-width: 95vw; max-height: 95vh;">
       <div class="modal-header">
         <span id="modalGameTitle">Game</span>
-        <button class="modal-close" onclick="closeGameModal()">✕</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="modal-close" onclick="toggleGameFullscreen()" style="color: var(--primary); background: none; border: none; font-size: 1.5em; cursor: pointer;">⛶</button>
+          <button class="modal-close" onclick="closeGameModal()">✕</button>
+        </div>
       </div>
-      <iframe id="gameIframe" style="width: 100%; height: 70vh; border: none; border-radius: 10px; background: black;"></iframe>
+      <div style="position: relative; width: 100%;">
+        <div id="gameLoadingSpinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 100; display: none;">
+          <div style="font-size: 3em; margin-bottom: 10px;">⏳</div>
+          <div style="color: var(--text-secondary);">Loading game...</div>
+        </div>
+        <iframe id="gameIframe" style="width: 100%; height: 70vh; border: none; border-radius: 10px; background: black;" onload="document.getElementById('gameLoadingSpinner').style.display = 'none';" onerror="showNotification('❌ Game failed to load')"></iframe>
+      </div>
     </div>
+  </div>
+
+  <!-- FULLSCREEN GAME MODAL -->
+  <div id="gameFullscreenContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 2000;">
+    <div style="position: absolute; top: 10px; right: 10px; z-index: 2001;">
+      <button style="padding: 10px 15px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1em;" onclick="closeGameFullscreen()">Exit Fullscreen (ESC)</button>
+    </div>
+    <iframe id="gameIframeFullscreen" style="width: 100%; height: 100%; border: none;"></iframe>
   </div>
 
   <!-- USERNAME SELECTION MODAL (First Visit) -->
@@ -1278,6 +1295,7 @@
               <button class="game-btn" onclick="downloadGame(${game.id})">⬇️ Download</button>
               <button class="fav-btn ${userFavorites.includes(game.id) ? 'favorited' : ''}" onclick="toggleFavorite(${game.id}, event)">❤️</button>
               ${uploaderTokens.hasOwnProperty(game.id) ? `<button class="game-btn" style="background:#ef4444;" onclick="openDeleteModal(${game.id})">🗑️</button>` : ''}
+              ${isAdminMode ? `<button class="game-btn" style="background:#ff6b6b; font-weight: 700;" onclick="adminDeleteGame(${game.id})" title="Admin Delete">⚔️</button>` : ''}
             </div>
           </div>
         </div>
@@ -1325,11 +1343,36 @@
       const game = allGames.find(g => g.id === gameId);
       document.getElementById('modalGameTitle').textContent = game.name;
       document.getElementById('gameIframe').src = `${API_BASE}/api/view/${gameId}`;
+      document.getElementById('gameLoadingSpinner').style.display = 'block';
       document.getElementById('gameModal').classList.add('show');
       
       // Track player playing this game
       trackPlayerInGame(gameId);
     }
+
+    function toggleGameFullscreen() {
+      const gameUrl = document.getElementById('gameIframe').src;
+      if (!gameUrl) {
+        showNotification('❌ Game not loaded yet');
+        return;
+      }
+      document.getElementById('gameIframeFullscreen').src = gameUrl;
+      document.getElementById('gameFullscreenContainer').style.display = 'flex';
+      document.getElementById('gameFullscreenContainer').style.alignItems = 'center';
+      document.getElementById('gameFullscreenContainer').style.justifyContent = 'center';
+    }
+
+    function closeGameFullscreen() {
+      document.getElementById('gameFullscreenContainer').style.display = 'none';
+      document.getElementById('gameIframeFullscreen').src = '';
+    }
+
+    // Keyboard shortcut for fullscreen exit
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeGameFullscreen();
+      }
+    });
 
     function closeGameModal() { 
       document.getElementById('gameModal').classList.remove('show');
@@ -1422,8 +1465,11 @@
       const password = document.getElementById('adminPassword').value;
       if (password === ADMIN_PASSWORD) {
         isAdminMode = true;
+        localStorage.setItem('adminPassword', password);
         document.getElementById('adminStatusDiv').style.display = 'block';
         showNotification('✅ Admin mode activated!');
+        // Re-render current view to show admin delete buttons
+        renderGames(allGames);
       } else {
         showNotification('❌ Invalid password');
       }
@@ -1619,11 +1665,22 @@
 
     function adminDeleteGame(gameId) {
       const game = allGames.find(g => g.id === gameId);
-      if (confirm(`Delete "${game.name}" and all its data?\n\nThis action cannot be undone!`)) {
+      if (!game) {
+        showNotification('❌ Game not found');
+        return;
+      }
+      
+      if (!isAdminMode) {
+        showNotification('❌ Admin mode not active');
+        return;
+      }
+      
+      if (confirm(`🗑️ DELETE GAME?\n\n"${game.name}"\n\nThis will delete:\n✗ Game file\n✗ Views & downloads\n✗ Ratings & comments\n✗ Favorites\n\nThis CANNOT be undone!`)) {
+        const adminPassword = localStorage.getItem('adminPassword') || ADMIN_PASSWORD;
         fetch(`${API_BASE}/api/delete/${gameId}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPassword: localStorage.getItem('adminPassword') })
+          body: JSON.stringify({ adminPassword: adminPassword })
         }).then(r => r.json()).then(result => {
           if (result.success) {
             delete uploaderTokens[gameId];
@@ -1632,8 +1689,10 @@
             loadGames();
             loadAdminDashboard();
           } else {
-            showNotification('❌ Delete failed: ' + result.error);
+            showNotification('❌ Delete failed: ' + (result.error || 'Unknown error'));
           }
+        }).catch(err => {
+          showNotification('❌ Error: ' + err.message);
         });
       }
     }
@@ -1646,6 +1705,17 @@
     const savedTheme = localStorage.getItem('colorTheme') || 'default';
     changeTheme(savedTheme);
     document.getElementById('themeSelector').value = savedTheme;
+    
+    // Restore admin mode if password was saved
+    const savedAdminPassword = localStorage.getItem('adminPassword');
+    if (savedAdminPassword && savedAdminPassword === ADMIN_PASSWORD) {
+      isAdminMode = true;
+      document.getElementById('adminStatusDiv').style.display = 'block';
+      document.getElementById('adminPassword').value = savedAdminPassword;
+      document.getElementById('adminPassword').disabled = true;
+      // Re-render games after a brief delay to ensure they're loaded
+      setTimeout(() => renderGames(allGames), 100);
+    }
   </script>
 </body>
 </html>
