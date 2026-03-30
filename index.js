@@ -212,11 +212,13 @@ const activeSessions = new Map();
 
 function cleanupInactiveSessions() {
   const now = Date.now();
-  const timeout = 15000;
+  const timeout = 15000;  // 15 seconds
   
-  for (const [sessionId, timestamp] of activeSessions) {
-    if (now - timestamp > timeout) {
+  for (const [sessionId, playerData] of activeSessions) {
+    const lastActivity = playerData.timestamp || playerData;
+    if (now - lastActivity > timeout) {
       activeSessions.delete(sessionId);
+      console.log(`🗑️ Cleaned up inactive session: ${sessionId}`);
     }
   }
 }
@@ -635,13 +637,21 @@ app.post('/api/track-playtime', async (req, res) => {
 
 // HEARTBEAT
 app.post('/api/heartbeat', (req, res) => {
-  const sessionId = req.body.sessionId;
+  const { sessionId, playerUsername, playerId, gameId, gameName } = req.body;
   
   if (!sessionId) {
     return res.status(400).json({ error: 'Missing sessionId' });
   }
   
-  activeSessions.set(sessionId, Date.now());
+  // Store detailed player info
+  activeSessions.set(sessionId, {
+    timestamp: Date.now(),
+    playerUsername: playerUsername || 'Unknown',
+    playerId: playerId || sessionId,
+    gameId: gameId || null,
+    gameName: gameName || null
+  });
+  
   cleanupInactiveSessions();
   
   res.json({ success: true, activePlayers: activeSessions.size });
@@ -650,10 +660,25 @@ app.post('/api/heartbeat', (req, res) => {
 // GET ACTIVE PLAYERS
 app.get('/api/active-players', (req, res) => {
   cleanupInactiveSessions();
-  const count = activeSessions.size;
+  const players = [];
   
-  console.log(`👥 Current active players: ${count}`);
-  res.json({ count });
+  // Convert activeSessions map to array of player objects
+  activeSessions.forEach((playerData, sessionId) => {
+    players.push({
+      sessionId: sessionId,
+      playerUsername: playerData.playerUsername || 'Unknown',
+      playerId: playerData.playerId || sessionId,
+      gameId: playerData.gameId,
+      gameName: playerData.gameName,
+      timestamp: playerData.timestamp
+    });
+  });
+  
+  console.log(`👥 Current active players: ${players.length}`, players);
+  res.json({ 
+    count: players.length,
+    players: players
+  });
 });
 
 // VIEW GAME
