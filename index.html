@@ -836,7 +836,7 @@
       <!-- TABS -->
       <div class="settings-tabs">
         <button class="settings-tab-btn active" onclick="switchSettingsTab('appearance', this)">🌓 Appearance</button>
-        <button class="settings-tab-btn" onclick="switchSettingsTab('games', this)">🎮 Games</button>
+        <button class="settings-tab-btn" onclick="switchSettingsTab('settings-games', this)">🎮 Games</button>
         <button class="settings-tab-btn" onclick="switchSettingsTab('music', this)">🎵 Music</button>
         <button class="settings-tab-btn" onclick="switchSettingsTab('admin', this)">🔐 Admin</button>
         <button class="settings-tab-btn" onclick="switchSettingsTab('tokens', this)">🔑 Tokens</button>
@@ -894,10 +894,7 @@
       </div>
 
       <!-- GAMES TAB -->
-      <div id="games-tab" class="settings-tab-content">
-        <div class="settings-section">
-          <div class="settings-section-header">
-            <h3>🎮 Game Display</h3>
+      <div id="settings-games-tab" class="settings-tab-content">
             <p>Customize game card appearance</p>
           </div>
 
@@ -1013,18 +1010,6 @@
         <div class="form-group">
           <label>Your Name</label>
           <input type="text" id="uploaderName" placeholder="Enter your name">
-        </div>
-        <div id="adminOnlyToggleGroup" style="display:none; margin-bottom:20px;">
-          <label style="display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none;">
-            <div class="toggle-switch" style="flex-shrink:0;">
-              <input type="checkbox" id="adminOnlyCheck">
-              <label for="adminOnlyCheck" class="toggle-label"><span class="toggle-icon"></span></label>
-            </div>
-            <div>
-              <span style="font-weight:700;">🔐 Admin Only</span>
-              <div style="font-size:0.82em;color:var(--text-secondary);margin-top:2px;">Only visible to admins — hidden from regular players</div>
-            </div>
-          </label>
         </div>
         <div class="form-group">
           <label>Cover Image <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span></label>
@@ -1576,12 +1561,9 @@
 
     function openUploadModal() {
       document.getElementById('uploadModal').classList.add('show');
-      // Show admin-only option only for admins
-      document.getElementById('adminOnlyToggleGroup').style.display = isAdminMode ? 'block' : 'none';
     }
     function closeUploadModal() { 
       document.getElementById('uploadModal').classList.remove('show');
-      document.getElementById('adminOnlyCheck').checked = false;
       removeCover();
     }
 
@@ -1626,7 +1608,6 @@
       formData.append('name', document.getElementById('gameName').value);
       formData.append('description', document.getElementById('gameDescription').value);
       formData.append('uploader', document.getElementById('uploaderName').value);
-      formData.append('adminOnly', isAdminMode && document.getElementById('adminOnlyCheck').checked ? 'true' : 'false');
       if (iconData) formData.append('iconData', iconData);
 
       try {
