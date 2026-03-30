@@ -79,7 +79,7 @@ const gameSchema = new mongoose.Schema({
   ratingCount: { type: Number, default: 0 },
   isPasswordProtected: { type: Boolean, default: false },
   password: String,
-  accessCode: String,
+  adminOnly: { type: Boolean, default: false },
 });
 
 const ratingSchema = new mongoose.Schema({
@@ -272,6 +272,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     isPasswordProtected: req.body.isPasswordProtected === 'true',
     password: req.body.isPasswordProtected === 'true' ? req.body.password : null,
     accessCode: generateToken().substring(0, 8).toUpperCase(),
+    adminOnly: req.body.adminOnly === 'true',
   };
 
   if (gridFSBucket && Game) {
@@ -359,10 +360,9 @@ app.get('/api/files', async (req, res) => {
     }
   }
 
-  // Return only non-archived games to regular players
-  // Admin can pass ?showAll=true to see everything
+  // Return only non-archived, non-adminOnly games to regular players
   const showAll = req.query.showAll === 'true';
-  const visibleGames = showAll ? allFiles : allFiles.filter(g => !g.archived);
+  const visibleGames = showAll ? allFiles : allFiles.filter(g => !g.archived && !g.adminOnly);
 
   res.json(visibleGames);
 });
@@ -679,6 +679,26 @@ app.post('/api/admin/revert-version', (req, res) => {
     }, 500);
   } catch (err) {
     res.status(500).json({ error: 'Could not revert: ' + err.message });
+  }
+});
+
+// TOGGLE ADMIN-ONLY
+app.post('/api/admin-only/:id', async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    const { adminPassword } = req.body;
+    if (!isAdmin(adminPassword)) return res.status(401).json({ error: 'Invalid admin password' });
+
+    const game = allFiles.find(f => f.id === fileId);
+    if (!game) return res.status(404).json({ error: 'Game not found' });
+
+    game.adminOnly = !game.adminOnly;
+    await saveGamesToDB(game);
+
+    console.log(`🔐 Game "${game.name}" is now ${game.adminOnly ? 'admin-only' : 'public'}`);
+    res.json({ success: true, adminOnly: game.adminOnly });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error: ' + err.message });
   }
 });
 
