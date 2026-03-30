@@ -1263,12 +1263,37 @@
             <h3>🎮 All Games <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8em; margin-left: 8px;" id="adminGamesCount">0</span></h3>
             <p>Delete or archive games. Archived games are hidden from players but not deleted.</p>
           </div>
+
+          <!-- ADMIN UPLOAD FORM -->
+          <div style="margin-bottom: 20px; padding: 18px; background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.3); border-radius: 12px;">
+            <div style="font-weight: 700; font-size:1em; margin-bottom:4px;">🔐 Upload Admin-Only Game</div>
+            <div style="font-size:0.82em; color:var(--text-secondary); margin-bottom:14px;">This game will be hidden from regular players and only visible in admin mode.</div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <input type="text" id="adminGameName" placeholder="Game Name *" style="padding:10px 14px; background:rgba(45,55,72,0.5); border:1.5px solid var(--border); border-radius:8px; color:var(--text-primary); font-family:'Poppins',sans-serif;">
+              <textarea id="adminGameDesc" placeholder="Description (optional)" rows="2" style="padding:10px 14px; background:rgba(45,55,72,0.5); border:1.5px solid var(--border); border-radius:8px; color:var(--text-primary); font-family:'Poppins',sans-serif; resize:vertical;"></textarea>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:160px;">
+                  <div style="font-size:0.82em; color:var(--text-secondary); margin-bottom:5px;">HTML File *</div>
+                  <input type="file" id="adminGameFile" accept=".html" style="width:100%; padding:8px; background:rgba(45,55,72,0.5); border:1.5px solid var(--border); border-radius:8px; color:var(--text-primary); font-family:'Poppins',sans-serif;">
+                </div>
+                <div style="flex:1; min-width:160px;">
+                  <div style="font-size:0.82em; color:var(--text-secondary); margin-bottom:5px;">Cover Image (optional)</div>
+                  <input type="file" id="adminGameIcon" accept="image/*" style="width:100%; padding:8px; background:rgba(45,55,72,0.5); border:1.5px solid var(--border); border-radius:8px; color:var(--text-primary); font-family:'Poppins',sans-serif;">
+                </div>
+              </div>
+              <button onclick="uploadAdminGame()" style="padding:12px; background:linear-gradient(135deg,#8b5cf6,#6366f1); color:white; border:none; border-radius:10px; font-weight:700; font-family:'Poppins',sans-serif; font-size:0.95em; cursor:pointer;" id="adminUploadBtn">🔐 Upload Admin-Only Game</button>
+              <div id="adminUploadFeedback" style="font-size:0.88em; text-align:center; display:none;"></div>
+            </div>
+          </div>
+
           <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
             <input type="text" id="adminGamesSearch" placeholder="🔎 Search games..." oninput="filterAdminGames()" style="flex:1; min-width:180px; padding: 8px 14px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif;">
             <select id="adminGamesFilter" onchange="filterAdminGames()" style="padding: 8px 12px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif; cursor:pointer;">
               <option value="all">All Games</option>
               <option value="active">Active Only</option>
               <option value="archived">Archived Only</option>
+              <option value="adminOnly">Admin Only</option>
             </select>
           </div>
           <div id="adminGamesList" style="display: flex; flex-direction: column; gap: 12px;"></div>
@@ -2404,6 +2429,73 @@
       }).catch(err => showNotification('❌ Error: ' + err.message));
     }
 
+    async function uploadAdminGame() {
+      const name = document.getElementById('adminGameName').value.trim();
+      const desc = document.getElementById('adminGameDesc').value.trim();
+      const fileInput = document.getElementById('adminGameFile');
+      const iconInput = document.getElementById('adminGameIcon');
+      const btn = document.getElementById('adminUploadBtn');
+      const feedback = document.getElementById('adminUploadFeedback');
+
+      if (!name) { feedback.style.display='block'; feedback.style.color='#ef4444'; feedback.textContent='❌ Game name is required.'; return; }
+      if (!fileInput.files[0]) { feedback.style.display='block'; feedback.style.color='#ef4444'; feedback.textContent='❌ Please select an HTML file.'; return; }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Uploading...';
+      feedback.style.display = 'none';
+      showNotification('⏳ Uploading admin game...');
+
+      // Read cover image
+      let iconData = '';
+      if (iconInput.files[0]) {
+        iconData = await new Promise(resolve => {
+          const r = new FileReader();
+          r.onload = e => resolve(e.target.result);
+          r.readAsDataURL(iconInput.files[0]);
+        });
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('name', name);
+      formData.append('description', desc || 'Admin-only game');
+      formData.append('uploader', playerUsername || 'Admin');
+      formData.append('adminOnly', 'true');
+      if (iconData) formData.append('iconData', iconData);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
+        const result = await res.json();
+        if (result.success) {
+          showNotification('✅ Admin game uploaded!');
+          feedback.style.display = 'block';
+          feedback.style.color = '#10b981';
+          feedback.textContent = '✅ Uploaded! Token saved to your Tokens tab.';
+          // Save token
+          uploaderTokens[result.file.id] = result.uploaderToken;
+          localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
+          // Clear form
+          document.getElementById('adminGameName').value = '';
+          document.getElementById('adminGameDesc').value = '';
+          fileInput.value = '';
+          iconInput.value = '';
+          loadGames();
+          loadAdminDashboard();
+        } else {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.textContent = '❌ ' + (result.error || 'Upload failed');
+        }
+      } catch (err) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#ef4444';
+        feedback.textContent = '❌ Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔐 Upload Admin-Only Game';
+      }
+    }
+
     function filterAdminGames() {
       const query = document.getElementById('adminGamesSearch')?.value.toLowerCase() || '';
       const filter = document.getElementById('adminGamesFilter')?.value || 'all';
@@ -2413,7 +2505,11 @@
         const game = allGames.find(g => g.id === gameId);
         if (!game) return;
         const matchesSearch = !query || game.name.toLowerCase().includes(query) || (game.uploader || '').toLowerCase().includes(query);
-        const matchesFilter = filter === 'all' || (filter === 'active' && !game.archived) || (filter === 'archived' && game.archived);
+        const matchesFilter =
+          filter === 'all' ||
+          (filter === 'active' && !game.archived && !game.adminOnly) ||
+          (filter === 'archived' && game.archived) ||
+          (filter === 'adminOnly' && game.adminOnly);
         row.style.display = matchesSearch && matchesFilter ? '' : 'none';
       });
     }
