@@ -1247,11 +1247,11 @@
     }
     animateParticles();
 
-    function showNotification(msg) {
+    function showNotification(msg, duration = 4000) {
       const toast = document.getElementById('notificationToast');
       document.getElementById('notificationText').textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      setTimeout(() => toast.classList.remove('show'), duration);
     }
 
     function switchSettingsTab(tabName, button) {
@@ -1339,6 +1339,11 @@
     async function uploadFile(event) {
       event.preventDefault();
 
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Uploading...';
+      showNotification('⏳ Uploading game, please wait...');
+
       // Read cover image as base64 if provided
       const iconInput = document.getElementById('iconFile');
       let iconData = '';
@@ -1363,12 +1368,18 @@
         if (result.success) {
           uploaderTokens[result.file.id] = result.uploaderToken;
           localStorage.setItem('uploaderTokens', JSON.stringify(uploaderTokens));
-          showNotification('✅ Game uploaded!');
+          showNotification('✅ Game uploaded successfully!');
           closeUploadModal();
+          event.target.reset();
           loadGames();
+        } else {
+          showNotification('❌ Upload failed: ' + (result.error || 'Unknown error'));
         }
       } catch (err) {
-        showNotification('❌ Upload failed');
+        showNotification('❌ Upload failed: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Upload Game';
       }
     }
 
