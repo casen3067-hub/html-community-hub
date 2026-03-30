@@ -1008,6 +1008,16 @@
           <input type="text" id="uploaderName" placeholder="Enter your name">
         </div>
         <div class="form-group">
+          <label>Cover Image <span style="color: var(--text-secondary); font-weight: 400;">(optional)</span></label>
+          <input type="file" id="iconFile" accept="image/*" onchange="previewCover(event)">
+          <div id="coverPreview" style="display:none; margin-top: 12px; text-align: center;">
+            <img id="coverPreviewImg" style="max-width: 100%; max-height: 160px; border-radius: 10px; border: 1.5px solid var(--border); object-fit: cover;">
+            <div style="margin-top: 6px;">
+              <button type="button" onclick="removeCover()" style="padding: 4px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85em;">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
           <label>HTML File *</label>
           <input type="file" id="file" accept=".html" required>
         </div>
@@ -1304,15 +1314,48 @@
     }
 
     function openUploadModal() { document.getElementById('uploadModal').classList.add('show'); }
-    function closeUploadModal() { document.getElementById('uploadModal').classList.remove('show'); }
+    function closeUploadModal() { 
+      document.getElementById('uploadModal').classList.remove('show');
+      removeCover();
+    }
+
+    function previewCover(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('coverPreviewImg').src = e.target.result;
+        document.getElementById('coverPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeCover() {
+      document.getElementById('iconFile').value = '';
+      document.getElementById('coverPreview').style.display = 'none';
+      document.getElementById('coverPreviewImg').src = '';
+    }
 
     async function uploadFile(event) {
       event.preventDefault();
+
+      // Read cover image as base64 if provided
+      const iconInput = document.getElementById('iconFile');
+      let iconData = '';
+      if (iconInput.files[0]) {
+        iconData = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(iconInput.files[0]);
+        });
+      }
+
       const formData = new FormData();
       formData.append('file', document.getElementById('file').files[0]);
       formData.append('name', document.getElementById('gameName').value);
       formData.append('description', document.getElementById('gameDescription').value);
       formData.append('uploader', document.getElementById('uploaderName').value);
+      if (iconData) formData.append('iconData', iconData);
 
       try {
         const response = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
