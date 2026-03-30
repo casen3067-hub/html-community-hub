@@ -794,7 +794,11 @@
   <div class="main-wrapper">
     <!-- HEADER -->
     <div class="header">
-      <div class="logo">🎮 GameVault</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="logo">🎮 GameVault</div>
+        <button onclick="openChangelog()" style="padding: 4px 10px; background: rgba(99,102,241,0.15); border: 1.5px solid var(--primary); border-radius: 20px; color: var(--primary); font-size: 0.75em; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(99,102,241,0.3)'" onmouseout="this.style.background='rgba(99,102,241,0.15)'">v1.6</button>
+        <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 500;">Made with Java, By Casen</span>
+      </div>
       <div class="search-container">
         <input type="text" id="searchInput" class="search-bar" placeholder="🔎 Search games...">
       </div>
@@ -1054,6 +1058,91 @@
     <iframe id="gameIframeFullscreen" style="width: 100%; height: 100%; border: none;"></iframe>
   </div>
 
+  <!-- CHANGELOG MODAL -->
+  <div class="modal" id="changelogModal">
+    <div class="modal-content" style="max-width: 550px;">
+      <div class="modal-header">
+        <span>📋 Changelog</span>
+        <button class="modal-close" onclick="document.getElementById('changelogModal').classList.remove('show')">✕</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="font-size:1em;">v1.6 — Cover Images & Upload Fix</strong>
+            <span style="font-size:0.75em; color:var(--primary); background:rgba(99,102,241,0.15); padding:2px 8px; border-radius:10px;">Latest</span>
+          </div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Added cover image upload with live preview</li>
+            <li>Upload button now shows ⏳ Uploading... while in progress</li>
+            <li>Toast notification on upload start and finish</li>
+            <li>Server errors now display instead of silently failing</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.5 — Active Players Fix</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Heartbeat now repeats every 10s to keep session alive</li>
+            <li>Players no longer disappear from admin dashboard after 15s</li>
+            <li>Heartbeat stops cleanly when game is closed</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.4 — Bug Fix</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Fixed SyntaxError: await outside async in admin dashboard</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.3 — Admin Dashboard & Player Tracking</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Admin dashboard with overview, players, games, analytics tabs</li>
+            <li>Active player tracking — see who's playing what in real time</li>
+            <li>Username + unique Player ID system on first visit</li>
+            <li>Uploader delete tokens saved in Settings → Tokens tab</li>
+            <li>Password-protected admin mode</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.2 — Themes & Settings Menu</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>9 color themes (Default, Snow, Lava, Nature, Ocean, Space, Cyberpunk, Sunset, Midnight)</li>
+            <li>Settings moved to its own full-page menu</li>
+            <li>Animated particle background</li>
+            <li>Favorites, Trending, Recent, My Games tabs</li>
+            <li>Game search bar</li>
+            <li>Fullscreen game mode</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.1 — Persistent Storage & Categories</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>MongoDB Atlas + GridFS for persistent game storage</li>
+            <li>Games survive server restarts and redeploys</li>
+            <li>Category system (Action, Puzzle, Adventure, Strategy, Sports, Casual, Other)</li>
+            <li>Deployed to Render at doki-doki.onrender.com</li>
+          </ul>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0;">
+          <div style="margin-bottom:10px;"><strong style="font-size:1em;">v1.0 — Initial Release</strong></div>
+          <ul style="color:var(--text-secondary); font-size:0.88em; line-height:1.8; padding-left:18px;">
+            <li>Upload HTML files for the community to play</li>
+            <li>Browse and play games in an iframe viewer</li>
+            <li>Download games</li>
+            <li>Made with JavaScript (Node.js + Express), by Casen</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- USERNAME SELECTION MODAL (First Visit) -->
   <div class="modal" id="usernameModal">
     <div class="modal-content" style="max-width: 500px;">
@@ -1246,6 +1335,10 @@
       requestAnimationFrame(animateParticles);
     }
     animateParticles();
+
+    function openChangelog() {
+      document.getElementById('changelogModal').classList.add('show');
+    }
 
     function showNotification(msg, duration = 4000) {
       const toast = document.getElementById('notificationToast');
