@@ -150,12 +150,25 @@ async function loadGamesFromDB() {
   }
 
   try {
+    console.log('🔍 Querying MongoDB for games...');
     const games = await Game.find().sort({ id: 1 });
+    console.log(`   Found ${games.length} game documents in database`);
+    
     allFiles = games.map(g => g.toObject());
+    console.log(`   Converted to objects: ${allFiles.length} games in allFiles`);
+    
     nextId = allFiles.length > 0 ? Math.max(...allFiles.map(g => g.id)) + 1 : 1;
-    console.log(`📂 Loaded ${allFiles.length} games from MongoDB`);
+    console.log(`   Next ID set to: ${nextId}`);
+    
+    console.log(`✅ Loaded ${allFiles.length} games from MongoDB`);
+    
+    if (allFiles.length > 0) {
+      console.log(`   First game:`, allFiles[0].name);
+      console.log(`   Last game:`, allFiles[allFiles.length - 1].name);
+    }
   } catch (err) {
-    console.error('Error loading games from MongoDB:', err);
+    console.error('❌ Error loading games from MongoDB:', err.message);
+    console.error('   Stack:', err.stack);
   }
 }
 
@@ -383,10 +396,28 @@ app.get('/api/health', async (req, res) => {
 
 // GET ALL GAMES
 app.get('/api/files', async (req, res) => {
-  console.log(`📋 Fetching ${allFiles.length} games`);
+  console.log(`📋 /api/files called`);
+  console.log(`   Games in memory: ${allFiles.length}`);
+  
+  if (allFiles.length === 0) {
+    console.log('⚠️  WARNING: No games in allFiles, attempting to reload from database...');
+    
+    if (Game) {
+      try {
+        const gamesFromDB = await Game.find();
+        console.log(`   Found ${gamesFromDB.length} games in database`);
+        allFiles = gamesFromDB.map(g => g.toObject());
+        console.log(`   Loaded into memory: ${allFiles.length} games`);
+      } catch (err) {
+        console.error('   Error reloading games:', err.message);
+      }
+    }
+  }
+  
+  console.log(`📋 Returning ${allFiles.length} games`);
   
   // Calculate average ratings
-  if (Rating) {
+  if (Rating && allFiles.length > 0) {
     try {
       const ratings = await Rating.find();
       allFiles.forEach(game => {
@@ -938,7 +969,17 @@ const server = app.listen(PORT, async () => {
   
   await connectDB();
   
-  console.log(`📊 Games loaded: ${allFiles.length}\n`);
+  console.log(`\n========= STARTUP STATUS =========`);
+  console.log(`📊 Games loaded into memory: ${allFiles.length}`);
+  
+  if (allFiles.length > 0) {
+    console.log(`✅ First 3 games:`, allFiles.slice(0, 3).map(g => g.name));
+  } else {
+    console.log(`⚠️  WARNING: No games loaded! Check MongoDB connection.`);
+  }
+  
+  console.log(`🆔 Next ID: ${nextId}`);
+  console.log(`===================================\n`);
 });
 
 // Handle graceful shutdown
