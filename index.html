@@ -969,6 +969,64 @@
             <button class="btn-submit" onclick="openAdminDashboard()" style="margin-top: 12px; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);">👨‍💻 Open Admin Dashboard</button>
           </div>
         </div>
+
+        <!-- CODE EDITOR - only visible when admin mode active -->
+        <div id="codeEditorPanel" style="display:none; margin-top: 20px;">
+          <div class="settings-section">
+            <div class="settings-section-header">
+              <h3>📝 File Editor</h3>
+              <p>Edit and save server files directly. Changes take effect after save — the server will restart automatically.</p>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center; flex-wrap:wrap;">
+              <select id="fileEditorSelect" onchange="loadFileIntoEditor()" style="padding: 10px 14px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif; cursor:pointer; font-weight:600;">
+                <option value="index.html">📄 index.html (Frontend)</option>
+                <option value="index.js">⚙️ index.js (Backend)</option>
+              </select>
+              <button onclick="loadFileIntoEditor()" style="padding: 10px 16px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif;">📂 Load File</button>
+              <span id="editorStatus" style="font-size:0.85em; color:var(--text-secondary);"></span>
+            </div>
+
+            <div style="position:relative;">
+              <textarea id="codeEditorTextarea" spellcheck="false" style="
+                width: 100%;
+                height: 500px;
+                background: #0d1117;
+                color: #e6edf3;
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                padding: 16px;
+                font-family: 'Courier New', Consolas, monospace;
+                font-size: 0.85em;
+                line-height: 1.6;
+                resize: vertical;
+                box-sizing: border-box;
+                tab-size: 2;
+              " placeholder="Click 'Load File' to load the current file contents here, make your edits, then click Save..."></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+              <button onclick="saveFileFromEditor()" class="btn-submit" style="flex:1;">💾 Save & Restart Server</button>
+              <button onclick="clearEditor()" style="padding:14px 20px; background:transparent; border:1.5px solid var(--border); color:var(--text-secondary); border-radius:10px; cursor:pointer; font-family:'Poppins',sans-serif; font-weight:600;">🗑️ Clear</button>
+            </div>
+
+            <div id="editorFeedback" style="display:none; margin-top:12px; padding:12px 16px; border-radius:10px; font-size:0.9em; font-weight:600;"></div>
+          </div>
+
+          <!-- PREVIOUS VERSIONS -->
+          <div class="settings-section" style="margin-top:20px;">
+            <div class="settings-section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h3>⏪ Previous Versions</h3>
+                <p>Click Preview to load a version into the editor, or Revert to restore it immediately.</p>
+              </div>
+              <button onclick="loadVersionsList()" style="padding: 8px 14px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif; font-size:0.85em;">🔄 Refresh</button>
+            </div>
+            <div id="versionsList" style="display:flex; flex-direction:column; gap:10px;">
+              <p style="color:var(--text-secondary); text-align:center; padding:15px 0; font-size:0.9em;">Save a file to see its version history here.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- TOKENS TAB -->
@@ -1045,17 +1103,13 @@
           <div style="font-size: 3em; margin-bottom: 10px;">⏳</div>
           <div style="color: var(--text-secondary);">Loading game...</div>
         </div>
-        <iframe id="gameIframe" style="width: 100%; height: 70vh; border: none; border-radius: 10px; background: black;" onload="document.getElementById('gameLoadingSpinner').style.display = 'none';" onerror="showNotification('❌ Game failed to load')"></iframe>
+        <iframe id="gameIframe" style="width: 100%; height: 70vh; border: none; border-radius: 10px; background: black;"
+          allow="fullscreen; autoplay; clipboard-read; clipboard-write; pointer-lock; microphone; camera; accelerometer; gyroscope"
+          allowfullscreen
+          onload="document.getElementById('gameLoadingSpinner').style.display = 'none';"
+          onerror="showNotification('❌ Game failed to load')"></iframe>
       </div>
     </div>
-  </div>
-
-  <!-- FULLSCREEN GAME MODAL -->
-  <div id="gameFullscreenContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 2000;">
-    <div style="position: absolute; top: 10px; right: 10px; z-index: 2001;">
-      <button style="padding: 10px 15px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1em;" onclick="closeGameFullscreen()">Exit Fullscreen (ESC)</button>
-    </div>
-    <iframe id="gameIframeFullscreen" style="width: 100%; height: 100%; border: none;"></iframe>
   </div>
 
   <!-- CHANGELOG MODAL -->
@@ -1175,6 +1229,7 @@
         <button class="settings-tab-btn" onclick="switchAdminTab('players', this)">👥 Players</button>
         <button class="settings-tab-btn" onclick="switchAdminTab('games', this)">🎮 Games</button>
         <button class="settings-tab-btn" onclick="switchAdminTab('stats', this)">📈 Analytics</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('banned', this)">🚫 Banned</button>
       </div>
 
       <!-- OVERVIEW TAB -->
@@ -1229,8 +1284,19 @@
       <!-- GAMES TAB -->
       <div id="games-tab" class="settings-tab-content">
         <div class="settings-section">
-          <div class="settings-section-header"><h3>🎮 All Games</h3><p>Manage and delete games</p></div>
-          <div id="adminGamesList" style="display: flex; flex-direction: column; gap: 15px;"></div>
+          <div class="settings-section-header">
+            <h3>🎮 All Games <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8em; margin-left: 8px;" id="adminGamesCount">0</span></h3>
+            <p>Delete or archive games. Archived games are hidden from players but not deleted.</p>
+          </div>
+          <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="adminGamesSearch" placeholder="🔎 Search games..." oninput="filterAdminGames()" style="flex:1; min-width:180px; padding: 8px 14px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif;">
+            <select id="adminGamesFilter" onchange="filterAdminGames()" style="padding: 8px 12px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif; cursor:pointer;">
+              <option value="all">All Games</option>
+              <option value="active">Active Only</option>
+              <option value="archived">Archived Only</option>
+            </select>
+          </div>
+          <div id="adminGamesList" style="display: flex; flex-direction: column; gap: 12px;"></div>
         </div>
       </div>
 
@@ -1254,6 +1320,31 @@
           </div>
         </div>
       </div>
+
+      <!-- BANNED TAB -->
+      <div id="banned-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🚫 Banned Players <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8em; margin-left: 10px;" id="bannedCountBadge">0</span></h3>
+            <p>Manage banned players. Banned players are kicked immediately and blocked from sending heartbeats.</p>
+            <button onclick="refreshBannedList()" style="margin-top: 10px; padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em;">🔄 Refresh</button>
+          </div>
+
+          <div style="margin-bottom: 20px; padding: 15px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px;">
+            <div style="font-weight: 700; margin-bottom: 10px;">➕ Ban a Player by ID</div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="banPlayerIdInput" placeholder="Player ID (e.g. PLAYER-ABC123)" style="flex:1; min-width:180px; padding: 8px 12px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif;">
+              <input type="text" id="banReasonInput" placeholder="Reason (optional)" style="flex:1; min-width:150px; padding: 8px 12px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif;">
+              <button onclick="banPlayerById()" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: 'Poppins', sans-serif;">🚫 Ban</button>
+            </div>
+          </div>
+
+          <div id="bannedPlayersList" style="display: flex; flex-direction: column; gap: 12px;">
+            <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players banned.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1373,7 +1464,7 @@
         return;
       }
 
-      container.innerHTML = games.map(game => `
+      container.innerHTML = games.filter(game => !game.archived || isAdminMode).map(game => `
         <div class="game-card">
           <div class="game-thumbnail">${game.icon ? `<img src="data:image/png;base64,${game.icon}" alt="${game.name}" style="width:100%;height:100%;object-fit:cover;">` : '🎮'}</div>
           <div class="game-info">
@@ -1486,20 +1577,21 @@
     }
 
     function toggleGameFullscreen() {
-      const gameUrl = document.getElementById('gameIframe').src;
-      if (!gameUrl) {
-        showNotification('❌ Game not loaded yet');
+      const iframe = document.getElementById('gameIframe');
+      if (!iframe.src || iframe.src === window.location.href) {
+        showNotification('❌ No game loaded yet');
         return;
       }
-      document.getElementById('gameIframeFullscreen').src = gameUrl;
-      document.getElementById('gameFullscreenContainer').style.display = 'flex';
-      document.getElementById('gameFullscreenContainer').style.alignItems = 'center';
-      document.getElementById('gameFullscreenContainer').style.justifyContent = 'center';
+      // Use native fullscreen on the existing iframe - no restart, no second load
+      if (iframe.requestFullscreen) iframe.requestFullscreen();
+      else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+      else if (iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
+      else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
     }
 
     function closeGameFullscreen() {
-      document.getElementById('gameFullscreenContainer').style.display = 'none';
-      document.getElementById('gameIframeFullscreen').src = '';
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 
     document.addEventListener('keydown', (e) => {
@@ -1508,6 +1600,8 @@
 
     function closeGameModal() {
       document.getElementById('gameModal').classList.remove('show');
+      // Clear the src so audio/video stops immediately
+      document.getElementById('gameIframe').src = '';
       clearCurrentGame();
     }
 
@@ -1585,11 +1679,169 @@
         isAdminMode = true;
         localStorage.setItem('adminPassword', password);
         document.getElementById('adminStatusDiv').style.display = 'block';
+        document.getElementById('codeEditorPanel').style.display = 'block';
         showNotification('✅ Admin mode activated!');
         renderGames(allGames);
       } else {
         showNotification('❌ Invalid password');
       }
+    }
+
+    async function loadVersionsList() {
+      const filename = document.getElementById('fileEditorSelect').value;
+      const list = document.getElementById('versionsList');
+      list.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:15px 0;">⏳ Loading versions...</p>';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/list-versions?filename=${encodeURIComponent(filename)}&adminPassword=${encodeURIComponent(ADMIN_PASSWORD)}`);
+        const data = await res.json();
+
+        if (!data.success) { list.innerHTML = `<p style="color:#ef4444;">${data.error}</p>`; return; }
+
+        if (data.versions.length === 0) {
+          list.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:15px 0; font-size:0.9em;">No versions saved yet for this file.</p>';
+          return;
+        }
+
+        list.innerHTML = data.versions.map((v, i) => `
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 14px; background:rgba(26,31,58,0.8); border:1px solid var(--border); border-radius:10px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:700; font-size:0.9em; margin-bottom:3px;">
+                ${i === 0 ? '<span style="background:var(--primary);color:white;padding:1px 7px;border-radius:8px;font-size:0.75em;margin-right:6px;">Latest</span>' : ''}
+                Version from ${new Date(v.savedAt).toLocaleString()}
+              </div>
+              <div style="font-size:0.78em; color:var(--text-secondary);">${v.size} &nbsp;·&nbsp; ${v.preview}</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0;">
+              <button onclick="previewVersion('${filename}', '${v.id}')" style="padding:6px 12px; background:rgba(99,102,241,0.2); border:1.5px solid var(--primary); color:var(--primary); border-radius:7px; cursor:pointer; font-weight:700; font-size:0.82em; font-family:'Poppins',sans-serif;">👁️ Preview</button>
+              <button onclick="revertToVersion('${filename}', '${v.id}', '${new Date(v.savedAt).toLocaleString()}')" style="padding:6px 12px; background:#f59e0b; border:none; color:white; border-radius:7px; cursor:pointer; font-weight:700; font-size:0.82em; font-family:'Poppins',sans-serif;">⏪ Revert</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = `<p style="color:#ef4444;">❌ Failed to load versions</p>`;
+      }
+    }
+
+    async function previewVersion(filename, versionId) {
+      const status = document.getElementById('editorStatus');
+      status.textContent = '⏳ Loading version...';
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/read-version?filename=${encodeURIComponent(filename)}&versionId=${encodeURIComponent(versionId)}&adminPassword=${encodeURIComponent(ADMIN_PASSWORD)}`);
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('codeEditorTextarea').value = data.content;
+          document.getElementById('fileEditorSelect').value = filename;
+          status.textContent = `👁️ Previewing old version — click Save to apply it`;
+          status.style.color = '#f59e0b';
+          showNotification('👁️ Version loaded into editor — save to apply');
+          window.scrollTo({ top: document.getElementById('codeEditorTextarea').offsetTop - 100, behavior: 'smooth' });
+        } else {
+          status.textContent = '❌ ' + data.error;
+        }
+      } catch (err) {
+        status.textContent = '❌ Failed to load version';
+      }
+    }
+
+    async function revertToVersion(filename, versionId, dateStr) {
+      if (!confirm(`⏪ Revert ${filename} to version from:\n${dateStr}\n\nThe current file will be backed up first, then the server will restart.`)) return;
+
+      const feedback = document.getElementById('editorFeedback');
+      feedback.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/revert-version`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename, versionId, adminPassword: ADMIN_PASSWORD })
+        });
+        const data = await res.json();
+        if (data.success) {
+          feedback.style.display = 'block';
+          feedback.style.background = 'rgba(245,158,11,0.15)';
+          feedback.style.border = '1px solid rgba(245,158,11,0.4)';
+          feedback.style.color = '#f59e0b';
+          feedback.textContent = `⏪ Reverted to version from ${dateStr}! Refreshing in a few seconds...`;
+          showNotification('⏪ Reverted! Server restarting...');
+          setTimeout(() => location.reload(), 4000);
+        } else {
+          showNotification('❌ Revert failed: ' + data.error);
+        }
+      } catch (err) {
+        showNotification('❌ Error: ' + err.message);
+      }
+    }
+
+    async function loadFileIntoEditor() {
+      const filename = document.getElementById('fileEditorSelect').value;
+      const status = document.getElementById('editorStatus');
+      status.style.color = 'var(--text-secondary)';
+      status.textContent = '⏳ Loading...';
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/read-file?filename=${encodeURIComponent(filename)}&adminPassword=${encodeURIComponent(ADMIN_PASSWORD)}`);
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('codeEditorTextarea').value = data.content;
+          status.textContent = `✅ Loaded ${filename} (${(data.content.length / 1024).toFixed(1)} KB)`;
+          loadVersionsList(); // auto-refresh versions for this file
+        } else {
+          status.textContent = '❌ ' + data.error;
+        }
+      } catch (err) {
+        status.textContent = '❌ Failed to load file';
+      }
+    }
+
+    async function saveFileFromEditor() {
+      const filename = document.getElementById('fileEditorSelect').value;
+      const content = document.getElementById('codeEditorTextarea').value;
+      const feedback = document.getElementById('editorFeedback');
+      const saveBtn = document.querySelector('[onclick="saveFileFromEditor()"]');
+
+      if (!content.trim()) { showNotification('❌ Editor is empty'); return; }
+      if (!confirm(`💾 Save changes to ${filename}?\n\nThe server will restart automatically.`)) return;
+
+      saveBtn.textContent = '⏳ Saving...';
+      saveBtn.disabled = true;
+      feedback.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/write-file`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename, content, adminPassword: ADMIN_PASSWORD })
+        });
+        const data = await res.json();
+        if (data.success) {
+          feedback.style.display = 'block';
+          feedback.style.background = 'rgba(16,185,129,0.15)';
+          feedback.style.border = '1px solid rgba(16,185,129,0.4)';
+          feedback.style.color = '#10b981';
+          feedback.textContent = `✅ ${filename} saved! Server is restarting — refresh the page in a few seconds.`;
+          showNotification('✅ File saved! Refreshing soon...');
+          setTimeout(() => location.reload(), 4000);
+        } else {
+          feedback.style.display = 'block';
+          feedback.style.background = 'rgba(239,68,68,0.15)';
+          feedback.style.border = '1px solid rgba(239,68,68,0.4)';
+          feedback.style.color = '#ef4444';
+          feedback.textContent = '❌ Save failed: ' + data.error;
+        }
+      } catch (err) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#ef4444';
+        feedback.textContent = '❌ Error: ' + err.message;
+      } finally {
+        saveBtn.textContent = '💾 Save & Restart Server';
+        saveBtn.disabled = false;
+      }
+    }
+
+    function clearEditor() {
+      document.getElementById('codeEditorTextarea').value = '';
+      document.getElementById('editorStatus').textContent = '';
+      document.getElementById('editorFeedback').style.display = 'none';
     }
 
     function displayTokens() {
@@ -1646,11 +1898,109 @@
       showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
     }
 
+    function banPlayer(pid, username) {
+      const reason = prompt(`Reason for banning ${username}? (optional)`);
+      if (reason === null) return; // cancelled
+      fetch(`${API_BASE}/api/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: ADMIN_PASSWORD, playerId: pid, playerUsername: username, reason: reason || 'Banned by admin' })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          showNotification(`🚫 ${username} has been banned!`);
+          refreshPlayersList();
+          refreshBannedList();
+        } else {
+          showNotification('❌ ' + result.error);
+        }
+      });
+    }
+
+    function banPlayerById() {
+      const pid = document.getElementById('banPlayerIdInput').value.trim();
+      const reason = document.getElementById('banReasonInput').value.trim();
+      if (!pid) { showNotification('❌ Enter a Player ID'); return; }
+      fetch(`${API_BASE}/api/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: ADMIN_PASSWORD, playerId: pid, playerUsername: pid, reason: reason || 'Banned by admin' })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          showNotification(`🚫 Player banned!`);
+          document.getElementById('banPlayerIdInput').value = '';
+          document.getElementById('banReasonInput').value = '';
+          refreshBannedList();
+        } else {
+          showNotification('❌ ' + result.error);
+        }
+      });
+    }
+
+    function unbanPlayer(pid, username) {
+      if (!confirm(`Unban ${username}?`)) return;
+      fetch(`${API_BASE}/api/unban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: ADMIN_PASSWORD, playerId: pid })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          showNotification(`✅ ${username} has been unbanned!`);
+          refreshBannedList();
+        } else {
+          showNotification('❌ ' + result.error);
+        }
+      });
+    }
+
+    function refreshBannedList() {
+      fetch(`${API_BASE}/api/banned-players?adminPassword=${encodeURIComponent(ADMIN_PASSWORD)}`)
+        .then(r => r.json())
+        .then(data => {
+          const badge = document.getElementById('bannedCountBadge');
+          if (badge) badge.textContent = data.count || 0;
+          const list = document.getElementById('bannedPlayersList');
+          if (!list) return;
+          if (!data.players || data.players.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players banned.</p>';
+            return;
+          }
+          list.innerHTML = data.players.map(p => `
+            <div class="token-item" style="border-color: rgba(239,68,68,0.4);">
+              <div class="token-info">
+                <div class="token-game-name" style="color:#ef4444;">🚫 ${p.playerUsername}</div>
+                <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
+                  🆔 ${p.playerId}<br>
+                  📋 Reason: ${p.reason}<br>
+                  🕐 ${new Date(p.bannedAt).toLocaleString()}
+                </div>
+              </div>
+              <button class="token-copy-btn" style="background: #10b981;" onclick="unbanPlayer('${p.playerId}', '${p.playerUsername}')">✅ Unban</button>
+            </div>
+          `).join('');
+        }).catch(() => showNotification('❌ Failed to load ban list'));
+    }
+
     function sendHeartbeat(gameId, gameName) {
       fetch(`${API_BASE}/api/heartbeat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, playerUsername, playerId, gameId, gameName })
+      }).then(r => r.json()).then(result => {
+        if (result.banned) {
+          clearInterval(heartbeatInterval);
+          heartbeatInterval = null;
+          closeGameModal();
+          // Show ban screen
+          document.body.innerHTML = `
+            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0e27;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;z-index:99999;">
+              <div style="text-align:center;padding:40px;max-width:500px;">
+                <div style="font-size:5em;margin-bottom:20px;">🚫</div>
+                <div style="font-size:2em;font-weight:800;color:#ef4444;margin-bottom:15px;">You have been banned</div>
+                <div style="color:#94a3b8;font-size:1.1em;margin-bottom:10px;">Reason: ${result.reason || 'No reason given'}</div>
+                <div style="color:#64748b;font-size:0.85em;">Contact the administrator if you believe this is a mistake.</div>
+              </div>
+            </div>`;
+        }
       }).catch(err => console.error('❌ Heartbeat failed:', err));
     }
 
@@ -1706,7 +2056,10 @@
                     🆔 ${player.playerId}
                   </div>
                 </div>
-                <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
+                <div style="display:flex; gap:8px;">
+                  <button class="token-copy-btn" onclick="navigator.clipboard.writeText('${player.playerId}'); showNotification('📋 Player ID copied!')">📋 Copy</button>
+                  <button class="token-copy-btn" style="background:#ef4444;" onclick="banPlayer('${player.playerId}', '${player.playerUsername}')">🚫 Ban</button>
+                </div>
               </div>
             `).join('');
         }
@@ -1723,6 +2076,7 @@
     function openAdminDashboard() {
       if (!isAdminMode) { showNotification('❌ Not in admin mode'); return; }
       loadAdminDashboard();
+      refreshBannedList();
       document.getElementById('adminModal').classList.add('show');
     }
 
@@ -1747,18 +2101,30 @@
         document.getElementById('totalFavoritesCount').textContent = userFavorites.length;
 
         const gamesList = document.getElementById('adminGamesList');
+        const gamesCount = document.getElementById('adminGamesCount');
+        if (gamesCount) gamesCount.textContent = allGames.length;
         if (gamesList) {
           gamesList.innerHTML = allGames.length === 0
             ? '<p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No games in system</p>'
             : allGames.map(game => `
-              <div class="token-item">
+              <div class="token-item" id="admin-game-row-${game.id}" style="${game.archived ? 'opacity:0.5; border-color: rgba(148,163,184,0.3);' : ''}">
+                <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; font-size:1.5em;">
+                  ${game.icon ? `<img src="data:image/png;base64,${game.icon}" style="width:100%;height:100%;object-fit:cover;">` : '🎮'}
+                </div>
                 <div class="token-info">
-                  <div class="token-game-name">${game.name}</div>
-                  <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 4px;">
-                    👁️ ${game.views || 0} views | ⬇️ ${game.downloads || 0} downloads | ⭐ ${game.avgRating || 'N/A'}/5
+                  <div class="token-game-name" style="${game.archived ? 'color:var(--text-secondary);' : ''}">
+                    ${game.archived ? '📦 [Archived] ' : ''}${game.name}
+                  </div>
+                  <div style="font-size:0.82em; color:var(--text-secondary); margin-top:3px;">
+                    👤 ${game.uploader || 'Anonymous'} &nbsp;|&nbsp; 👁️ ${game.views || 0} &nbsp;|&nbsp; ⬇️ ${game.downloads || 0} &nbsp;|&nbsp; ⭐ ${game.avgRating || 'N/A'} &nbsp;|&nbsp; 📅 ${game.uploadDate || '?'}
                   </div>
                 </div>
-                <button class="token-copy-btn" style="background: #ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
+                <div style="display:flex; gap:8px; flex-shrink:0;">
+                  <button class="token-copy-btn" style="background:${game.archived ? '#10b981' : '#f59e0b'};" onclick="adminToggleArchive(${game.id})">
+                    ${game.archived ? '📤 Unarchive' : '📦 Archive'}
+                  </button>
+                  <button class="token-copy-btn" style="background:#ef4444;" onclick="adminDeleteGame(${game.id})">🗑️ Delete</button>
+                </div>
               </div>
             `).join('');
         }
@@ -1804,6 +2170,44 @@
       });
     }
 
+    function adminToggleArchive(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) { showNotification('❌ Game not found'); return; }
+      if (!isAdminMode) { showNotification('❌ Admin mode not active'); return; }
+
+      const isArchiving = !game.archived;
+      if (!confirm(`${isArchiving ? '📦 Archive' : '📤 Unarchive'} "${game.name}"?\n\n${isArchiving ? 'Players will no longer see this game, but it won\'t be deleted.' : 'This game will be visible to players again.'}`)) return;
+
+      fetch(`${API_BASE}/api/archive/${gameId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: ADMIN_PASSWORD })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          game.archived = result.archived;
+          showNotification(result.archived ? '📦 Game archived!' : '📤 Game unarchived!');
+          loadGames();
+          loadAdminDashboard();
+        } else {
+          showNotification('❌ ' + (result.error || 'Failed'));
+        }
+      }).catch(err => showNotification('❌ Error: ' + err.message));
+    }
+
+    function filterAdminGames() {
+      const query = document.getElementById('adminGamesSearch')?.value.toLowerCase() || '';
+      const filter = document.getElementById('adminGamesFilter')?.value || 'all';
+      const rows = document.querySelectorAll('[id^="admin-game-row-"]');
+      rows.forEach(row => {
+        const gameId = parseInt(row.id.replace('admin-game-row-', ''));
+        const game = allGames.find(g => g.id === gameId);
+        if (!game) return;
+        const matchesSearch = !query || game.name.toLowerCase().includes(query) || (game.uploader || '').toLowerCase().includes(query);
+        const matchesFilter = filter === 'all' || (filter === 'active' && !game.archived) || (filter === 'archived' && game.archived);
+        row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+      });
+    }
+
     function adminDeleteGame(gameId) {
       const game = allGames.find(g => g.id === gameId);
       if (!game) { showNotification('❌ Game not found'); return; }
@@ -1842,6 +2246,7 @@
     if (savedAdminPassword && savedAdminPassword === ADMIN_PASSWORD) {
       isAdminMode = true;
       document.getElementById('adminStatusDiv').style.display = 'block';
+      document.getElementById('codeEditorPanel').style.display = 'block';
       document.getElementById('adminPassword').value = savedAdminPassword;
       document.getElementById('adminPassword').disabled = true;
       setTimeout(() => renderGames(allGames), 100);
