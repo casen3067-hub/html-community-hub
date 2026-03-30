@@ -1167,6 +1167,7 @@
     let playerUsername = '';
     let playerId = '';
     let currentGamePlaying = null;
+    let heartbeatInterval = null;
     const API_BASE = '';
     const ADMIN_PASSWORD = 'Tiu2mc3y!!!';
 
@@ -1498,22 +1499,36 @@
       showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
     }
 
+    function sendHeartbeat(gameId, gameName) {
+      fetch(`${API_BASE}/api/heartbeat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, playerUsername, playerId, gameId, gameName })
+      }).catch(err => console.error('❌ Heartbeat failed:', err));
+    }
+
     function trackPlayerInGame(gameId) {
       const game = allGames.find(g => g.id === gameId);
       if (game) {
         currentGamePlaying = { gameId, gameName: game.name, playerUsername, playerId, timestamp: Date.now() };
-        fetch(`${API_BASE}/api/heartbeat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, playerUsername, playerId, gameId, gameName: game.name })
-        }).catch(err => console.error('❌ Heartbeat failed:', err));
         localStorage.setItem('currentGamePlaying_' + playerId, JSON.stringify(currentGamePlaying));
+
+        // Send first heartbeat immediately
+        sendHeartbeat(gameId, game.name);
+
+        // Keep sending every 10 seconds so server doesn't expire the session
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = setInterval(() => {
+          sendHeartbeat(gameId, game.name);
+        }, 10000);
       }
     }
 
     function clearCurrentGame() {
       currentGamePlaying = null;
       localStorage.removeItem('currentGamePlaying_' + playerId);
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
     }
 
     async function getActivePlayers() {
