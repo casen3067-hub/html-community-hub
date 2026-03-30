@@ -971,61 +971,6 @@
         </div>
 
         <!-- CODE EDITOR - only visible when admin mode active -->
-        <div id="codeEditorPanel" style="display:none; margin-top: 20px;">
-          <div class="settings-section">
-            <div class="settings-section-header">
-              <h3>📝 File Editor</h3>
-              <p>Edit and save server files directly. Changes take effect after save — the server will restart automatically.</p>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center; flex-wrap:wrap;">
-              <select id="fileEditorSelect" onchange="loadFileIntoEditor()" style="padding: 10px 14px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif; cursor:pointer; font-weight:600;">
-                <option value="index.html">📄 index.html (Frontend)</option>
-                <option value="index.js">⚙️ index.js (Backend)</option>
-              </select>
-              <button onclick="loadFileIntoEditor()" style="padding: 10px 16px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif;">📂 Load File</button>
-              <span id="editorStatus" style="font-size:0.85em; color:var(--text-secondary);"></span>
-            </div>
-
-            <div style="position:relative;">
-              <textarea id="codeEditorTextarea" spellcheck="false" style="
-                width: 100%;
-                height: 500px;
-                background: #0d1117;
-                color: #e6edf3;
-                border: 1.5px solid var(--border);
-                border-radius: 10px;
-                padding: 16px;
-                font-family: 'Courier New', Consolas, monospace;
-                font-size: 0.85em;
-                line-height: 1.6;
-                resize: vertical;
-                box-sizing: border-box;
-                tab-size: 2;
-              " placeholder="Click 'Load File' to load the current file contents here, make your edits, then click Save..."></textarea>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
-              <button onclick="saveFileFromEditor()" class="btn-submit" style="flex:1;">💾 Save & Restart Server</button>
-              <button onclick="clearEditor()" style="padding:14px 20px; background:transparent; border:1.5px solid var(--border); color:var(--text-secondary); border-radius:10px; cursor:pointer; font-family:'Poppins',sans-serif; font-weight:600;">🗑️ Clear</button>
-            </div>
-
-            <div id="editorFeedback" style="display:none; margin-top:12px; padding:12px 16px; border-radius:10px; font-size:0.9em; font-weight:600;"></div>
-          </div>
-
-          <!-- PREVIOUS VERSIONS -->
-          <div class="settings-section" style="margin-top:20px;">
-            <div class="settings-section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <div>
-                <h3>⏪ Previous Versions</h3>
-                <p>Click Preview to load a version into the editor, or Revert to restore it immediately.</p>
-              </div>
-              <button onclick="loadVersionsList()" style="padding: 8px 14px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif; font-size:0.85em;">🔄 Refresh</button>
-            </div>
-            <div id="versionsList" style="display:flex; flex-direction:column; gap:10px;">
-              <p style="color:var(--text-secondary); text-align:center; padding:15px 0; font-size:0.9em;">Save a file to see its version history here.</p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1230,6 +1175,8 @@
         <button class="settings-tab-btn" onclick="switchAdminTab('games', this)">🎮 Games</button>
         <button class="settings-tab-btn" onclick="switchAdminTab('stats', this)">📈 Analytics</button>
         <button class="settings-tab-btn" onclick="switchAdminTab('banned', this)">🚫 Banned</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('appeals', this); loadAppeals();">📨 Appeals</button>
+        <button class="settings-tab-btn" onclick="switchAdminTab('updates', this); loadVersionsList();">📝 Updates</button>
       </div>
 
       <!-- OVERVIEW TAB -->
@@ -1341,6 +1288,74 @@
 
           <div id="bannedPlayersList" style="display: flex; flex-direction: column; gap: 12px;">
             <p style="color: var(--text-secondary); text-align: center; padding: 20px 0;">No players banned.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPEALS TAB -->
+      <div id="appeals-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3>📨 Ban Appeals <span style="background:#f59e0b;color:white;padding:2px 8px;border-radius:20px;font-size:0.8em;margin-left:8px;" id="appealsBadge">0</span></h3>
+              <p>Review and act on appeals from banned players.</p>
+            </div>
+            <button onclick="loadAppeals()" style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em;">🔄 Refresh</button>
+          </div>
+          <div id="appealsList" style="display:flex; flex-direction:column; gap:14px;">
+            <p style="color:var(--text-secondary); text-align:center; padding:20px 0;">No appeals yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPDATES TAB -->
+      <div id="updates-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>📝 File Editor</h3>
+            <p>Edit and save server files directly. The server restarts automatically after saving.</p>
+          </div>
+          <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center; flex-wrap:wrap;">
+            <select id="fileEditorSelect" onchange="loadFileIntoEditor()" style="padding: 10px 14px; background: rgba(45,55,72,0.5); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Poppins', sans-serif; cursor:pointer; font-weight:600;">
+              <option value="index.html">📄 index.html (Frontend)</option>
+              <option value="index.js">⚙️ index.js (Backend)</option>
+            </select>
+            <button onclick="loadFileIntoEditor()" style="padding: 10px 16px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif;">📂 Load File</button>
+            <span id="editorStatus" style="font-size:0.85em; color:var(--text-secondary);"></span>
+          </div>
+          <textarea id="codeEditorTextarea" spellcheck="false" style="
+            width: 100%;
+            height: 500px;
+            background: #0d1117;
+            color: #e6edf3;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+            tab-size: 2;
+          " placeholder="Click 'Load File' to load the current file, edit it, then save..."></textarea>
+          <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+            <button onclick="saveFileFromEditor()" class="btn-submit" style="flex:1;">💾 Save & Restart Server</button>
+            <button onclick="clearEditor()" style="padding:14px 20px; background:transparent; border:1.5px solid var(--border); color:var(--text-secondary); border-radius:10px; cursor:pointer; font-family:'Poppins',sans-serif; font-weight:600;">🗑️ Clear</button>
+          </div>
+          <div id="editorFeedback" style="display:none; margin-top:12px; padding:12px 16px; border-radius:10px; font-size:0.9em; font-weight:600;"></div>
+        </div>
+
+        <!-- PREVIOUS VERSIONS -->
+        <div class="settings-section" style="margin-top:20px;">
+          <div class="settings-section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3>⏪ Previous Versions</h3>
+              <p>Preview loads a version into the editor. Revert restores it immediately.</p>
+            </div>
+            <button onclick="loadVersionsList()" style="padding: 8px 14px; background: rgba(99,102,241,0.2); border: 1.5px solid var(--primary); color: var(--primary); border-radius: 8px; cursor:pointer; font-weight:700; font-family:'Poppins',sans-serif; font-size:0.85em;">🔄 Refresh</button>
+          </div>
+          <div id="versionsList" style="display:flex; flex-direction:column; gap:10px;">
+            <p style="color:var(--text-secondary); text-align:center; padding:15px 0; font-size:0.9em;">Save a file to see its version history here.</p>
           </div>
         </div>
       </div>
@@ -1679,12 +1694,84 @@
         isAdminMode = true;
         localStorage.setItem('adminPassword', password);
         document.getElementById('adminStatusDiv').style.display = 'block';
-        document.getElementById('codeEditorPanel').style.display = 'block';
         showNotification('✅ Admin mode activated!');
         renderGames(allGames);
       } else {
         showNotification('❌ Invalid password');
       }
+    }
+
+    async function loadAppeals() {
+      const list = document.getElementById('appealsList');
+      const badge = document.getElementById('appealsBadge');
+      if (list) list.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:20px 0;">⏳ Loading...</p>';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/appeals?adminPassword=${encodeURIComponent(ADMIN_PASSWORD)}`);
+        const data = await res.json();
+        if (!data.success) { list.innerHTML = `<p style="color:#ef4444;">${data.error}</p>`; return; }
+
+        const pending = data.appeals.filter(a => a.status === 'pending');
+        if (badge) badge.textContent = pending.length;
+
+        if (data.appeals.length === 0) {
+          list.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:20px 0;">No appeals yet.</p>';
+          return;
+        }
+
+        list.innerHTML = data.appeals.map(a => {
+          const statusColor = a.status === 'pending' ? 'rgba(245,158,11,0.5)' : a.status === 'approved' ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.3)';
+          const badgeStyle = a.status === 'pending' ? 'background:rgba(245,158,11,0.2);color:#f59e0b' : a.status === 'approved' ? 'background:rgba(16,185,129,0.2);color:#10b981' : 'background:rgba(239,68,68,0.2);color:#ef4444';
+          return `
+          <div style="padding:16px;background:rgba(26,31,58,0.8);border:1.5px solid ${statusColor};border-radius:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+              <div>
+                <span style="font-weight:700;">👤 ${a.playerUsername}</span>
+                <span style="font-size:0.78em;color:var(--text-secondary);margin-left:8px;">🆔 ${a.playerId}</span>
+              </div>
+              <span style="font-size:0.78em;padding:2px 10px;border-radius:10px;font-weight:700;${badgeStyle};">${a.status.toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.82em;color:var(--text-secondary);margin-bottom:6px;">📋 Ban reason: ${a.banReason || 'N/A'}</div>
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;font-size:0.88em;color:#e2e8f0;margin-bottom:10px;line-height:1.5;">"${a.appealText}"</div>
+            <div style="font-size:0.78em;color:var(--text-secondary);margin-bottom:${a.status === 'pending' ? '12px' : '0'};">🕐 ${new Date(a.submittedAt).toLocaleString()}</div>
+            ${a.status === 'pending' ? `
+              <div style="display:flex;gap:8px;">
+                <button onclick="approveAppeal('${a.id}')" style="flex:1;padding:8px;background:#10b981;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-family:'Poppins',sans-serif;font-size:0.88em;">✅ Approve & Unban</button>
+                <button onclick="denyAppeal('${a.id}')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-family:'Poppins',sans-serif;font-size:0.88em;">❌ Deny</button>
+              </div>` : ''}
+          </div>`;
+        }).join('');
+      } catch (err) {
+        if (list) list.innerHTML = '<p style="color:#ef4444;">❌ Failed to load appeals</p>';
+      }
+    }
+
+    async function approveAppeal(appealId) {
+      if (!confirm('✅ Approve this appeal and unban the player?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/appeals/${appealId}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: ADMIN_PASSWORD })
+        });
+        const data = await res.json();
+        if (data.success) { showNotification('✅ Appeal approved, player unbanned!'); loadAppeals(); refreshBannedList(); }
+        else showNotification('❌ ' + data.error);
+      } catch (err) { showNotification('❌ Error: ' + err.message); }
+    }
+
+    async function denyAppeal(appealId) {
+      if (!confirm('❌ Deny this appeal? The player will remain banned.')) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/appeals/${appealId}/deny`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminPassword: ADMIN_PASSWORD })
+        });
+        const data = await res.json();
+        if (data.success) { showNotification('❌ Appeal denied.'); loadAppeals(); }
+        else showNotification('❌ ' + data.error);
+      } catch (err) { showNotification('❌ Error: ' + err.message); }
     }
 
     async function loadVersionsList() {
@@ -1896,6 +1983,7 @@
 
       document.getElementById('usernameModal').classList.remove('show');
       showNotification(`👤 Welcome ${playerUsername}! ID: ${playerId}`);
+      startPresencePing();
     }
 
     function banPlayer(pid, username) {
@@ -1980,28 +2068,81 @@
         }).catch(() => showNotification('❌ Failed to load ban list'));
     }
 
+    function showBanScreen(reason) {
+      clearInterval(heartbeatInterval);
+      clearInterval(presenceInterval);
+      heartbeatInterval = null;
+      closeGameModal();
+      document.body.innerHTML = `
+        <div id="banScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0e27;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;z-index:99999;overflow-y:auto;">
+          <div style="text-align:center;padding:40px;max-width:520px;width:90%;">
+            <div style="font-size:5em;margin-bottom:16px;">🚫</div>
+            <div style="font-size:2em;font-weight:800;color:#ef4444;margin-bottom:10px;">You have been banned</div>
+            <div style="color:#94a3b8;font-size:1em;margin-bottom:6px;">Reason: <strong style="color:#cbd5e1;">${reason || 'No reason given'}</strong></div>
+            <div style="color:#64748b;font-size:0.85em;margin-bottom:30px;">Player ID: ${playerId}</div>
+
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:24px;text-align:left;">
+              <div style="font-size:1.05em;font-weight:700;color:#e2e8f0;margin-bottom:6px;">✍️ Submit an Appeal</div>
+              <div style="color:#64748b;font-size:0.85em;margin-bottom:16px;">Explain why you think this ban should be reversed. The admin will review it.</div>
+
+              <div style="margin-bottom:12px;">
+                <textarea id="appealText" placeholder="Write your appeal here..." style="width:100%;height:120px;background:rgba(45,55,72,0.6);border:1.5px solid #2d3748;border-radius:10px;padding:12px;color:#e2e8f0;font-family:'Poppins',sans-serif;font-size:0.9em;resize:vertical;box-sizing:border-box;"></textarea>
+              </div>
+
+              <button onclick="submitAppeal('${reason}')" style="width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#ec4899);color:white;border:none;border-radius:10px;font-weight:700;font-size:1em;cursor:pointer;font-family:'Poppins',sans-serif;">📨 Submit Appeal</button>
+              <div id="appealFeedback" style="margin-top:12px;font-size:0.88em;text-align:center;"></div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function submitAppeal(banReason) {
+      const text = document.getElementById('appealText').value.trim();
+      const feedback = document.getElementById('appealFeedback');
+      if (!text) { feedback.style.color = '#ef4444'; feedback.textContent = '❌ Please write something before submitting.'; return; }
+
+      const btn = document.querySelector('#banScreen button[onclick^="submitAppeal"]');
+      btn.disabled = true;
+      btn.textContent = '⏳ Submitting...';
+
+      fetch('/api/appeal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, playerUsername, banReason, appealText: text })
+      }).then(r => r.json()).then(result => {
+        if (result.success) {
+          feedback.style.color = '#10b981';
+          feedback.textContent = '✅ Appeal submitted! The admin will review it.';
+          btn.textContent = '✅ Appeal Sent';
+        } else {
+          feedback.style.color = '#ef4444';
+          feedback.textContent = '❌ ' + (result.error || 'Failed to submit');
+          btn.disabled = false;
+          btn.textContent = '📨 Submit Appeal';
+        }
+      }).catch(() => {
+        feedback.style.color = '#ef4444';
+        feedback.textContent = '❌ Network error, try again.';
+        btn.disabled = false;
+        btn.textContent = '📨 Submit Appeal';
+      });
+    }
+
     function sendHeartbeat(gameId, gameName) {
       fetch(`${API_BASE}/api/heartbeat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, playerUsername, playerId, gameId, gameName })
       }).then(r => r.json()).then(result => {
-        if (result.banned) {
-          clearInterval(heartbeatInterval);
-          heartbeatInterval = null;
-          closeGameModal();
-          // Show ban screen
-          document.body.innerHTML = `
-            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0e27;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;z-index:99999;">
-              <div style="text-align:center;padding:40px;max-width:500px;">
-                <div style="font-size:5em;margin-bottom:20px;">🚫</div>
-                <div style="font-size:2em;font-weight:800;color:#ef4444;margin-bottom:15px;">You have been banned</div>
-                <div style="color:#94a3b8;font-size:1.1em;margin-bottom:10px;">Reason: ${result.reason || 'No reason given'}</div>
-                <div style="color:#64748b;font-size:0.85em;">Contact the administrator if you believe this is a mistake.</div>
-              </div>
-            </div>`;
-        }
+        if (result.banned) showBanScreen(result.reason);
       }).catch(err => console.error('❌ Heartbeat failed:', err));
+    }
+
+    // Always-on presence ping — checks ban status even when not playing a game
+    let presenceInterval = null;
+    function startPresencePing() {
+      sendHeartbeat(null, null); // check immediately
+      presenceInterval = setInterval(() => sendHeartbeat(null, null), 10000);
     }
 
     function trackPlayerInGame(gameId) {
@@ -2077,6 +2218,7 @@
       if (!isAdminMode) { showNotification('❌ Not in admin mode'); return; }
       loadAdminDashboard();
       refreshBannedList();
+      loadAppeals();
       document.getElementById('adminModal').classList.add('show');
     }
 
@@ -2236,6 +2378,8 @@
     // INIT
     loadGames();
     initializePlayer();
+    // Start presence ping (for returning users who skip the username modal)
+    if (localStorage.getItem('playerId')) startPresencePing();
     uploaderTokens = JSON.parse(localStorage.getItem('uploaderTokens') || '{}');
     userFavorites = JSON.parse(localStorage.getItem('userFavorites_' + sessionId) || '[]');
     const savedTheme = localStorage.getItem('colorTheme') || 'default';
@@ -2246,7 +2390,6 @@
     if (savedAdminPassword && savedAdminPassword === ADMIN_PASSWORD) {
       isAdminMode = true;
       document.getElementById('adminStatusDiv').style.display = 'block';
-      document.getElementById('codeEditorPanel').style.display = 'block';
       document.getElementById('adminPassword').value = savedAdminPassword;
       document.getElementById('adminPassword').disabled = true;
       setTimeout(() => renderGames(allGames), 100);
