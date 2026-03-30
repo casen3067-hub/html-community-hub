@@ -2296,7 +2296,7 @@
 
     // ✅ FIX: Made the .then() callback async so await works inside it
     function loadAdminDashboard() {
-      fetch(`${API_BASE}/api/files`).then(r => r.json()).then(async games => {
+      fetch(`${API_BASE}/api/files?showAll=true`).then(r => r.json()).then(async games => {
         allGames = games;
 
         const totalViews = allGames.reduce((sum, g) => sum + (g.views || 0), 0);
