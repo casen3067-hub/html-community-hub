@@ -538,6 +538,7 @@
       display: block;
     }
 
+
     .settings-view {
       display: none;
       padding: 30px;
@@ -895,6 +896,9 @@
 
       <!-- GAMES TAB -->
       <div id="settings-games-tab" class="settings-tab-content">
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <h3>🎮 Game Display</h3>
             <p>Customize game card appearance</p>
           </div>
 
@@ -1489,6 +1493,16 @@
       document.getElementById('notificationText').textContent = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function resetAllSettings() {
+      localStorage.removeItem('colorTheme');
+      localStorage.removeItem('adminPassword');
+      isAdminMode = false;
+      document.getElementById('adminStatusDiv').style.display = 'none';
+      changeTheme('default');
+      document.getElementById('themeSelector').value = 'default';
+      showNotification('🔄 Settings reset!');
     }
 
     function switchSettingsTab(tabName, button) {
