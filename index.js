@@ -281,29 +281,29 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         metadata: { gameId: nextId, gameName: gameName }
       });
 
-      uploadStream.end(htmlContent, async (err) => {
-        if (err) {
-          console.error('GridFS upload failed:', err);
-          return res.status(500).json({ error: 'Failed to save game file' });
-        }
+      // Use a promise so async/await works reliably instead of a callback
+      await new Promise((resolve, reject) => {
+        uploadStream.on('finish', resolve);
+        uploadStream.on('error', reject);
+        uploadStream.end(Buffer.from(htmlContent, 'utf-8'));
+      });
 
-        newFile.htmlFileId = uploadStream.id;
-        await saveGamesToDB(newFile);
-        allFiles.push(newFile);
-        nextId++;
+      newFile.htmlFileId = uploadStream.id;
+      await saveGamesToDB(newFile);
+      allFiles.push(newFile);
+      nextId++;
 
-        console.log(`✅ Game uploaded successfully: ${newFile.name}`);
-        res.json({
-          success: true,
-          file: newFile,
-          uploaderToken: uploaderToken,
-          accessCode: newFile.accessCode,
-          message: 'Game uploaded successfully!'
-        });
+      console.log(`✅ Game uploaded successfully: ${newFile.name}`);
+      return res.json({
+        success: true,
+        file: newFile,
+        uploaderToken: uploaderToken,
+        accessCode: newFile.accessCode,
+        message: 'Game uploaded successfully!'
       });
     } catch (err) {
-      console.error('GridFS error:', err);
-      return res.status(500).json({ error: 'Failed to save game' });
+      console.error('GridFS upload error:', err);
+      return res.status(500).json({ error: 'Failed to save game file: ' + err.message });
     }
   } else {
     newFile.htmlContent = htmlContent;
